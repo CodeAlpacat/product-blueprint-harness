@@ -9,6 +9,21 @@ Use this after `product-blueprint:design-system` and before accepting visual des
 
 This is not the production app. It is a portable design artifact for product planning, design review, and later frontend handoff.
 
+Read first: `${CLAUDE_PLUGIN_ROOT}/references/anti-slop-doctrine.md`, `${CLAUDE_PLUGIN_ROOT}/references/token-substrate.md`, and `${CLAUDE_PLUGIN_ROOT}/references/craft-loop.md`.
+
+## Build On A Real Substrate — Never Raw Divs, Never Default shadcn
+
+Two failure modes, both slop:
+
+1. **Hand-rolled from raw Tailwind `<div>`s** → collapses to the training average (generic cards, generic spacing, S1–S14). Build components on a real substrate (shadcn/ui structure + Radix behavior) so correctness and accessibility come for free.
+2. **shadcn on its defaults** (New York / zinc / Geist / `rounded-md`) → instantly recognizable "starter template" = slop v2. The substrate is skeleton only. **Strip the default skin entirely** and re-skin from the Measured Spec: overwrite the token layer with the OKLCH values, replace the font, re-derive radius/border/elevation/density, override component variants, and add the signature element. Follow `token-substrate.md` step by step.
+
+Gate before propagating: open the workbench next to a vanilla shadcn starter — if a designer cannot tell them apart within the neutral chrome, the skin was not replaced (fail).
+
+## Establish The Ceiling On One Screen First
+
+Do not render all P0 screens at once at average quality. Per `craft-loop.md`: craft the single most decisive screen to the bar, pass the adversarial visual gate, then propagate the passing token/component system to the remaining P0 surfaces. Render screens full-size at real viewport (mobile 390×844, desktop 1440), one per view — never tiled into tiny phone frames, which destroys fidelity and hides slop.
+
 ## Hard Lesson
 
 Do not call a low-fidelity storyboard decomposition a design system. A workbench made by cutting a wireframe into named cards is a failure.
@@ -87,14 +102,18 @@ The React workbench must include these sections:
 
 Pass only if:
 
-- Tokens visibly map to components and screens.
+- Tokens visibly map to components and screens, and text pairs pass their measured contrast (`X on Y = N:1`).
 - The component catalog documents anatomy, variants, states, usage, accessibility, and token mapping.
 - The screen set preserves the approved product flow and forbidden shortcuts.
 - The workbench can be opened locally and screenshot-tested.
 - Desktop and mobile frames are readable without cropped core content.
+- The ceiling screen passed the adversarial visual gate (`${CLAUDE_PLUGIN_ROOT}/references/adversarial-visual-gate.md`) before propagation.
 - It feels like a senior designer's handoff board, not a blurred wireframe or generic template.
 
 Fail if:
+
+- It is hand-rolled from raw divs, or it is recognizable as a default shadcn/starter skin (default skin not stripped).
+- Any S1–S14 slop signature is present (per `anti-slop-doctrine.md`).
 
 - It only produces markdown tables.
 - It only produces one polished screen while the rest of the product remains abstract.

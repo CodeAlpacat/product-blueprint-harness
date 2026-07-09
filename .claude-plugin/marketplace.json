@@ -1,0 +1,29 @@
+{
+  "name": "product-blueprint-harness",
+  "owner": {
+    "name": "CodeAlpacat",
+    "url": "https://github.com/CodeAlpacat"
+  },
+  "metadata": {
+    "description": "Product Blueprint — pre-development planning-to-design harness that turns an idea into a production-grade design system without AI slop.",
+    "version": "0.2.0"
+  },
+  "plugins": [
+    {
+      "name": "product-blueprint",
+      "source": "./",
+      "description": "Guided product planning and production-grade visual design harness: research, PRD, screen contracts, mechanism contracts, storyboards, measured art direction, shadcn/Radix + OKLCH token substrate, impeccable hero-screen craft loop, adversarial anti-slop visual quality gate, and engineering handoff.",
+      "category": "design",
+      "tags": [
+        "product-planning",
+        "design-system",
+        "art-direction",
+        "anti-ai-slop",
+        "ux",
+        "prd",
+        "storyboard",
+        "handoff"
+      ]
+    }
+  ]
+}

@@ -9,6 +9,20 @@ Use this as the master pre-development workflow. Do not start from screens, API,
 
 Read `references/pro-design-process.md` when the user asks why the workflow is staged this way or wants senior designer process guidance.
 
+## Visual Craft Spine (Anti-Slop) — the part that decides production quality
+
+Product logic in this workflow is strong; the historical failure was visual craft producing AI slop that the gate self-passed. The visual phases (art direction → token substrate → hi-fi screen → workbench → gate) run on a shared anti-slop spine. Before any visual phase, read:
+
+- `${CLAUDE_PLUGIN_ROOT}/references/anti-slop-doctrine.md` — why slop happens, the S1–S14 signature taxonomy + fixes, the shadcn-sameness defense, the two survival tests.
+- `${CLAUDE_PLUGIN_ROOT}/references/measured-design-spec.md` — art direction must output numbers (type ramp, OKLCH roles, grid, spacing), not adjectives.
+- `${CLAUDE_PLUGIN_ROOT}/references/token-substrate.md` — build on shadcn/Radix with the default skin stripped and product OKLCH tokens applied; never raw divs, never default shadcn.
+- `${CLAUDE_PLUGIN_ROOT}/references/craft-loop.md` — layered passes (structure→layout→type→color→imagery→polish→distinctiveness), ceiling-on-one-screen-first, full-viewport rendering.
+- `${CLAUDE_PLUGIN_ROOT}/references/adversarial-visual-gate.md` — fresh-critic + measurable checks + loop-until-clean.
+
+**Delegate pixel craft to Claude Code's design skills** when available (they are engineered against these signatures): `impeccable`/`craft` (shape→build), `layout`, `typeset`, `colorize`, `distill`, `polish`, `bolder`/`ui-redesign` (distinctiveness), `critique`/`audit` (adversarial review). This plugin owns product logic, IA, screen contracts, states, the measured spec, and the gate; the design skills own the pixels. Never let a design skill change product IA (e.g. promote persona to a home tab) for visual convenience — the screen contract wins.
+
+**Ceiling-first ordering.** Do not render all P0 screens at average quality at once. Craft the single most decisive screen to the bar, pass the adversarial gate, then propagate the passing token/component system to the rest. One screen at the ceiling beats eight at the average.
+
 ## Output Language And Stage Exit
 
 - Default to the user's conversation language for planning artifacts, review prompts, decision logs, PRD summaries, storyboards, critique notes, and final guidance.
