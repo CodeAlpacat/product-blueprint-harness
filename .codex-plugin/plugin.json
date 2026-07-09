@@ -1,0 +1,41 @@
+{
+  "name": "product-blueprint",
+  "version": "0.1.0+codex.20260709020125",
+  "description": "Guided pre-development product blueprint workflow for turning ideas and reference services into research-backed PRDs, decision logs, visual decision dashboards, reference deconstructions, parallel concepts, screen contracts, mechanism contracts, storyboards, art direction briefs, visual quality gates, backend systems briefs, design-system briefs, React design-system workbenches, high-fidelity screen specimens, prototype tests, design critiques, feasibility reviews, and engineering handoff packets.",
+  "author": {
+    "name": "Local developer"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Product Blueprint",
+    "shortDescription": "Guided product planning before technical design: asks for decisions, records assumptions, and moves through research, PRD, screen flows, design gates, and handoff.",
+    "longDescription": "Product Blueprint provides independent pre-development product-planning skills for founders and agents: guided intake, decision logging, visual decision dashboards, reference research, ideation, reference deconstruction, parallel concepting, PRD writing, screen contracts, product-experience mechanism design, storyboard visualization, art direction, anti-slop visual quality review, backend systems briefing, production design-system briefing, React design-system workbench creation, high-fidelity screen specimen creation, prototype testing, structured design critique, feasibility review, and engineering handoff. Technical architecture is an optional follow-up, not the default workflow.",
+    "developerName": "Local developer",
+    "category": "Productivity",
+    "capabilities": [
+      "product-research",
+      "guided-intake",
+      "decision-gates",
+      "decision-dashboard",
+      "reference-deconstruction",
+      "parallel-concepting",
+      "prd-writing",
+      "screen-contracts",
+      "storyboard-visualization",
+      "art-direction",
+      "experience-mechanism-design",
+      "visual-quality-gate",
+      "design-system-planning",
+      "design-system-workbench",
+      "high-fidelity-screen",
+      "backend-systems-brief",
+      "prototype-testing",
+      "design-critique",
+      "feasibility-review",
+      "engineering-handoff"
+    ],
+    "defaultPrompt": [
+      "Guide me from idea to product blueprint, PRD, screens, design gates, critique, and handoff. Ask when decisions are needed."
+    ]
+  }
+}
