@@ -26,16 +26,18 @@ Create or update:
 ## Required Sections
 
 1. **Current Status**: phase, pass/conditional/fail, and why.
-2. **Review This First**: 3 to 6 visual cards linking to storyboard, workbench, screenshots, or key artifacts.
+2. **Review This First (핵심 2~4)**: the 2–4 artifacts the user must actually look at now, each marked ★, each with a one-line "what to confirm/decide." Do not list all artifacts here — only the few that matter this phase.
 3. **Decision Queue**: each decision as `Approve`, `Change`, or `Hold`; include impact and the file that changes.
 4. **Flow Snapshot**: compact user-flow map with entry, gate, commitment, result, and recovery.
 5. **Design Snapshot**: current visual direction, missing design work, and quality risks.
 6. **Scope Snapshot**: P0/P1/P2 and explicit scope-out.
-7. **Evidence / Gaps**: what is observed, user-confirmed, proposed, assumed, or unverified.
-8. **Next Step**: one recommended skill, why, and what it will produce.
+7. **Artifact Map**: every artifact grouped (planning / spec / design), each with a one-line purpose + status, so the founder sees the whole package at a glance and knows which are ★-key vs supporting evidence.
+8. **Evidence / Gaps**: what is observed, user-confirmed, proposed, assumed, or unverified.
+9. **Next Step**: one recommended skill, why, and what it will produce.
 
 ## Rules
 
+- **Update after every phase — mandatory, not on request.** The orchestrator finishes a phase by refreshing this dashboard. Never ship 10+ markdown files while the dashboard is still the init stub. A stale/stub dashboard while artifacts pile up is the single most common way the founder ends up overwhelmed ("too many docs, don't know what to look at").
 - Do not duplicate entire markdown contents.
 - Put the user's decisions and visual evidence first.
 - Link to markdown files for details.

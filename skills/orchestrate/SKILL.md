@@ -23,6 +23,15 @@ Product logic in this workflow is strong; the historical failure was visual craf
 
 **Ceiling-first ordering.** Do not render all P0 screens at average quality at once. Craft the single most decisive screen to the bar, pass the adversarial gate, then propagate the passing token/component system to the rest. One screen at the ceiling beats eight at the average.
 
+## Visual-First Review (mandatory) — the founder does not read 20 markdown files
+
+A solo founder reviews **visually**, not by opening every `.md`. Producing a wall of markdown with no visual review surface is a failure mode, even if the markdown is excellent. Enforce:
+
+- **After every phase, update `00-review-dashboard.html`** via `product-blueprint:decision-dashboard`. This is not optional and not "when asked" — it is part of finishing a phase. Never leave the dashboard as the init stub while shipping 10+ markdown files. If you produced artifacts and did not update the dashboard, the phase is not done.
+- **The dashboard is THE review surface.** It answers, in <30s: where are we, what are the 2–4 things to look at now (with ★), what decisions are pending, and what each artifact is for. Markdown is the detail SoT; the founder should never be told "read these 20 files."
+- **Visuals are first-class deliverables, not decoration.** The review layer is the dashboard + the storyboard flow board + screen mockups. When the user says "there are too many documents / I don't know what to look at / I don't read them one by one," that is a signal the visual review layer is missing — build/repair it, do not answer with more prose.
+- **Visualize decisions and expected outcomes**, not just status: a decision→implication map and a flow board let the founder *see* what the plan produces without reading contracts. Prefer a legible flow/IA diagram over tiny pixel mockups (tiny tiled frames destroy fidelity — that is the storyboard's flow-contract role, distinct from the workbench's full-fidelity role).
+
 ## Output Language And Stage Exit
 
 - Default to the user's conversation language for planning artifacts, review prompts, decision logs, PRD summaries, storyboards, critique notes, and final guidance.

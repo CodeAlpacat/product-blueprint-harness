@@ -9,7 +9,10 @@ from pathlib import Path
 
 
 def slugify(value: str) -> str:
-    slug = re.sub(r"[^a-zA-Z0-9]+", "-", value.strip().lower()).strip("-")
+    # Preserve unicode word chars (Korean/Japanese/etc.) so non-Latin project
+    # names do not collapse to the fallback. ASCII-only stripping used to turn
+    # every Korean name into "product-plan".
+    slug = re.sub(r"[^\w]+", "-", value.strip().lower(), flags=re.UNICODE).strip("-_")
     return slug or "product-plan"
 
 
@@ -59,25 +62,45 @@ Use this file to keep user decisions, assumptions, and gate status from getting 
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Product Blueprint Review Dashboard</title>
+  <title>Product Blueprint — Review Dashboard</title>
+  <style>
+    :root{--surface:#faf7f2;--raised:#fff;--ink:#2a2622;--muted:#6b6259;--hair:#e7e0d6;--accent:#7c2d3a}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#f2ede5;color:var(--ink);font-family:-apple-system,"Apple SD Gothic Neo","Pretendard",sans-serif;line-height:1.55}
+    .wrap{max-width:1040px;margin:0 auto;padding:36px 24px 64px}
+    h1{font-size:24px;font-weight:600}
+    .sub{color:var(--muted);font-size:13px;margin-top:4px}
+    .todo{margin:18px 0;padding:12px 16px;border-left:3px solid var(--accent);background:#fbeef0;font-size:13px}
+    .hero{background:var(--raised);border:1px solid var(--hair);border-left:3px solid var(--accent);border-radius:4px;padding:20px 22px;margin:14px 0}
+    .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
+    section{background:var(--raised);border:1px solid var(--hair);border-radius:4px;padding:16px 20px;margin-top:14px}
+    section h2{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:10px}
+    .row{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--hair);font-size:13.5px}
+    .row:last-child{border-bottom:0}
+    code{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--accent)}
+  </style>
 </head>
 <body>
-  <main>
+  <div class="wrap">
     <h1>Review Dashboard</h1>
-    <p>Use this as the fast visual review surface. Markdown files remain the detailed source of truth.</p>
-    <section>
-      <h2>Current Status</h2>
-      <p>Update with the current phase, gate status, and next decision.</p>
-    </section>
-    <section>
-      <h2>Decision Queue</h2>
-      <p>List approve/change/hold decisions here.</p>
-    </section>
-    <section>
-      <h2>Next Step</h2>
-      <p>Use the next recommended Product Blueprint skill.</p>
-    </section>
-  </main>
+    <div class="sub">이 대시보드가 유일한 리뷰 진입점입니다. 각 md는 상세 SoT — 유저가 20개 문서를 하나하나 읽게 하지 마세요.</div>
+    <div class="todo">⚠️ 매 단계 종료 시 <code>product-blueprint:decision-dashboard</code>로 이 파일을 갱신하세요. 빈 스텁으로 두면 안 됩니다.</div>
+
+    <div class="hero">
+      <div class="eyebrow">여기만 보세요</div>
+      <h2 style="font-weight:600;margin:6px 0 8px">리뷰가 필요한 핵심 (2~4개)</h2>
+      <p style="font-size:13px;color:var(--muted)">지금 유저가 실제로 봐야 할 산출물 2~4개만. 각 항목 = 무엇을 확인/결정할지 1줄. 나머지는 근거.</p>
+    </div>
+
+    <section><h2>1. 현재 상태</h2><p style="font-size:13px;color:var(--muted)">단계 · pass/conditional/fail · 이유.</p></section>
+    <section><h2>2. 지금 당신의 결정 대기</h2><p style="font-size:13px;color:var(--muted)">각 결정 = Approve / Change / Hold · 영향 · 바뀔 파일.</p></section>
+    <section><h2>3. 유저플로우 스냅샷</h2><p style="font-size:13px;color:var(--muted)">진입→게이트→커밋→결과→복구 압축 맵 (텍스트 아닌 시각 우선).</p></section>
+    <section><h2>4. 디자인 스냅샷</h2><p style="font-size:13px;color:var(--muted)">현재 시각 방향 · 남은 디자인 · 품질 리스크.</p></section>
+    <section><h2>5. 스코프</h2><p style="font-size:13px;color:var(--muted)">P0 / P1 / P2 · 명시적 scope-out.</p></section>
+    <section><h2>6. 산출물 지도</h2><p style="font-size:13px;color:var(--muted)">각 md = 1줄 목적 + 상태 + 핵심(★) 표시. 링크로 상세 연결.</p></section>
+    <section><h2>7. 근거 / 갭</h2><p style="font-size:13px;color:var(--muted)">observed / user-confirmed / proposed / assumed / unverified.</p></section>
+    <section><h2>8. 다음 단계</h2><p style="font-size:13px;color:var(--muted)">추천 스킬 1개 · 이유 · 산출물.</p></section>
+  </div>
 </body>
 </html>
 """,
