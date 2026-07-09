@@ -60,16 +60,18 @@ Slop-avoidance is necessary but not sufficient. Production-grade work also does 
 
 The first render is a draft, never the deliverable. Real quality is layered passes, each a discrete edit + screenshot: **structure → layout/grid → typography → color → density/polish → distinctiveness push**. See `craft-loop.md`. A screen that was generated once and never re-critiqued is, by definition, the training-average sample.
 
-## 6. Delegate craft to the proven design skills
+## 6. Use design skills if the environment provides them — but be self-sufficient
 
-When running inside Claude Code, do not hand-improvise the craft. Delegate to the environment's design skills, which are engineered against exactly these signatures:
+**This doctrine is self-sufficient.** Sections 2–5 are the full craft method; applying them directly produces the result with no external skill. Do not treat any skill as a required dependency — a greenfield environment may have none.
+
+*If* the Claude Code environment does provide design skills (they are engineered against exactly these signatures), prefer delegating the pixel craft to them:
 
 - `impeccable` (a.k.a. `craft`) — shape-then-build distinctive, non-generic UI; the primary craft engine.
 - `layout`, `typeset`, `colorize`, `distill` — the per-pass craft moves in section 5.
-- `bolder` / `ui-redesign` — push a safe/flat result past the template read.
+- `bolder` — push a safe/flat result past the template read.
 - `critique`, `audit`, `polish` — the review + final pass.
 
-The blueprint skills own **product logic, IA discipline, states, and the measured spec/gate**; the design skills own **pixel craft**. Keep that division.
+Any other project-local design skill (some environments ship one) may be used too, but never assume it exists. Whether delegated or applied by hand, the division holds: the blueprint skills own **product logic, IA discipline, states, and the measured spec/gate**; the craft (skill or manual) owns **pixel execution**.
 
 ## 7. The two survival questions
 

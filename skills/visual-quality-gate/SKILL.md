@@ -9,7 +9,7 @@ Use this as a gate, not as decoration. It decides whether the current visual dir
 
 ## Run It Adversarially — Not As Self-Grading
 
-The gate is worthless if the model that produced the screen also grades it against an adjective list; it will pass its own slop (this is exactly how earlier boylog output slipped through as "conditional pass"). Follow `${CLAUDE_PLUGIN_ROOT}/references/adversarial-visual-gate.md`:
+The gate is worthless if the model that produced the screen also grades it against an adjective list; it will pass its own slop (this is a common failure — weak output slips through as "conditional pass"). Follow `${CLAUDE_PLUGIN_ROOT}/references/adversarial-visual-gate.md`:
 
 - **Fresh critic.** Run the gate as a fresh-context subagent (or the `critique` + `audit` skills) that receives only the rendered screenshots, the measured spec/tokens, and the screen contract — **not** the generation conversation. Its job is to find reasons to reject; default to fail on doubt.
 - **Measurable, not vibes.** Compute WCAG contrast for each text pair, check the type-scale ratio, sample spacing for off-grid values, count palette hues, and scan for each named slop signature S1–S14 in `${CLAUDE_PLUGIN_ROOT}/references/anti-slop-doctrine.md`. Cite where each finding appears.

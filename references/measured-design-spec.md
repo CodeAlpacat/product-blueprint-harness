@@ -8,7 +8,7 @@ Produce this as `03.5-art-direction-brief.md` → section "Measured Spec", and e
 
 ## 1. Reference extraction (numbers, not principles)
 
-Before inventing anything, ingest 3–5 real reference screenshots (competitors + one out-of-category exemplar) and extract **measured** decisions, labeled `관찰`:
+If references exist, ingest 3–5 real reference screenshots (competitors + one out-of-category exemplar) and extract **measured** decisions, labeled `관찰`:
 
 - Grid: column count, gutter px, page margin px, max content width.
 - Type: body size px, line-height, the ratio between heading steps, families used.
@@ -21,6 +21,8 @@ Example (bad, banned): `관찰 — Zeta는 모던하고 깔끔함.`
 
 Then decide, per extracted decision, `차용`(borrow the principle) or `거부`(refuse to copy) — never copy the literal skin.
 
+**Greenfield (no references — novel category or none supplied):** do not stall. Derive the measured spec from first principles + the art-direction thesis (product world → material → type/color/grid decisions), mark the reference-extraction inputs `미확인`, and note which numbers are hypotheses to validate once any comparable exists. A spec with numbers from first principles beats waiting for references that don't exist.
+
 ## 2. Color spec (OKLCH, with roles and contrast)
 
 Define the palette in OKLCH (perceptually uniform → predictable lightness/contrast). See `token-substrate.md` for how these become CSS variables on the shadcn substrate.
@@ -31,7 +33,7 @@ Required roles, each with a value and a contrast obligation:
 - `ink` / `ink-muted` / `ink-subtle` — text ramp. `ink` on `surface` must be ≥ 7:1 (AAA body target); `ink-muted` ≥ 4.5:1.
 - `accent` + `accent-ink` (text on accent) — one brand accent. Must pass 4.5:1 for any text placed on it.
 - `border-hairline` — the separation line width+color (e.g. 1px, ink at 8–12% alpha).
-- Semantic: `success`, `warn`, `danger`, `locked`, `paid` — reserved for state only, each ≥ 3:1 against surface for non-text, 4.5:1 for text.
+- Semantic (use *your product's* real states — this is an example superset; a product with no gating/payments won't need `locked`/`paid`): e.g. `success`, `warn`, `danger`, `locked`, `paid` — reserved for state only, each ≥ 3:1 against surface for non-text, 4.5:1 for text.
 
 Constraints:
 - Total distinct hues in the base UI (excluding imagery): ≤ 3 + semantic set. More = S14 slop.

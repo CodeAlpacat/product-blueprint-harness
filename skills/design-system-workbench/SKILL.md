@@ -81,7 +81,7 @@ The React workbench must include these sections:
 1. **Design Thesis**: product promise, anti-aesthetic, and one signature visual device.
 2. **Foundation Tokens**: color, typography, spacing, radius, elevation, motion. Separate primitive, semantic, and component tokens. Show real usage, not just swatches.
 3. **Component Documentation**: for each priority component show purpose, anatomy, variants, states, behavior, accessibility, content rules, do/don't, and token mapping.
-4. **Pattern Library**: discovery grid, ranking list, detail reading flow, persona setup, chat thread, tool panel, memory correction, checkpoint copy, locked/error recovery.
+4. **Pattern Library**: the product's real cross-component patterns, derived from *its* PRD and screen contracts. (Example set for a character-chat product: discovery grid, ranking list, detail reading flow, persona setup, chat thread, tool panel, memory correction, checkpoint copy, locked/error recovery. Substitute your product's actual patterns — a commerce or data product will have entirely different ones.)
 5. **State Lab**: loading, empty, locked/safety, error/retry, paid confirmation, success, correction/recovery, disabled, long-content, image-failure, and permission states.
 6. **Production Screen Set**: high-fidelity mockups for all P0 surfaces from the screen contracts. For character-chat products this usually means home, search/all characters, ranking, character detail, persona gate, chat, chat side panel/tools, and conversations/library.
 7. **Flow Wiring**: arrows, labels, and review notes outside the product screen frames. Product frames must contain only user-facing UI.
@@ -90,7 +90,7 @@ The React workbench must include these sections:
 ## Product Rules
 
 - Do not invent new primary navigation just to show components.
-- Do not promote internal mechanisms into main tabs. Persona/setup belongs after character detail and before chat unless the user changed the model. Memory and checkpoint belong in the chat tool surface unless approved otherwise.
+- Do not promote internal mechanisms into main tabs without user approval. (Domain example: for character-chat, persona/setup belongs after character detail and before chat, and memory/checkpoint belong in the chat tool surface, unless the user changed the model. For other domains, apply the neutral rule — an internal mechanism earns a primary surface only when the user's task requires it.)
 - Do not use blank image wells for character/product-heavy domains. Use reference screenshots, generated images, or repeated safe assets with different crops.
 - Do not let the workbench become a generic SaaS kit. Components must use product-specific content, states, and vocabulary.
 - Planning labels, arrows, and critique notes belong outside mocked product screens.

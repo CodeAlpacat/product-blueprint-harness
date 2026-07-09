@@ -19,7 +19,7 @@ Product logic in this workflow is strong; the historical failure was visual craf
 - `${CLAUDE_PLUGIN_ROOT}/references/craft-loop.md` — layered passes (structure→layout→type→color→imagery→polish→distinctiveness), ceiling-on-one-screen-first, full-viewport rendering.
 - `${CLAUDE_PLUGIN_ROOT}/references/adversarial-visual-gate.md` — fresh-critic + measurable checks + loop-until-clean.
 
-**Delegate pixel craft to Claude Code's design skills** when available (they are engineered against these signatures): `impeccable`/`craft` (shape→build), `layout`, `typeset`, `colorize`, `distill`, `polish`, `bolder`/`ui-redesign` (distinctiveness), `critique`/`audit` (adversarial review). This plugin owns product logic, IA, screen contracts, states, the measured spec, and the gate; the design skills own the pixels. Never let a design skill change product IA (e.g. promote persona to a home tab) for visual convenience — the screen contract wins.
+**Delegate pixel craft to Claude Code's design skills when the environment provides them** (they are engineered against these signatures): `impeccable`/`craft` (shape→build), `layout`, `typeset`, `colorize`, `distill`, `polish`, `bolder` (distinctiveness), `critique`/`audit` (adversarial review). If the environment provides none, the `references/` doctrine is self-sufficient — apply the craft passes by hand. Either way this plugin owns product logic, IA, screen contracts, states, the measured spec, and the gate; the craft owns the pixels. Never let craft change product IA (e.g. promoting an internal mechanism to primary navigation) for visual convenience — the screen contract wins.
 
 **Ceiling-first ordering.** Do not render all P0 screens at average quality at once. Craft the single most decisive screen to the bar, pass the adversarial gate, then propagate the passing token/component system to the rest. One screen at the ceiling beats eight at the average.
 
@@ -115,6 +115,8 @@ Do not promote a feature into P0 just because it sounds powerful. Classify each 
 ## Concept-To-Surface Discipline
 
 Do not turn internal planning concepts into tabs, screens, or primary UI without checking the product logic and the user's language.
+
+> Domain neutrality: the character-chat examples in this section and throughout this skill (persona-as-entry-gate, memory, checkpoint) are illustrations of *one* domain. This harness is product-agnostic — substitute your product's real concepts and IA. Apply the neutral rules; treat the chat-specific defaults as examples, not universal law.
 
 For every major concept or mechanism, separate these levels:
 

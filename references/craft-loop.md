@@ -4,7 +4,7 @@ Production-grade screens are not generated in one pass. The first render is the 
 
 ## Establish the ceiling on ONE screen first
 
-Do not render all P0 screens at mediocre quality simultaneously. Pick the single most decisive screen (for character-chat: the discovery/home or the `character detail → persona gate → chat` entry), craft it to the bar, pass the adversarial gate, and **only then** propagate the passing system to the other screens. One screen at the ceiling beats eight screens at the average.
+Do not render all P0 screens at mediocre quality simultaneously. Pick the single most decisive screen — the one carrying the highest product/design risk for *your* product (e.g. discovery/home or the `detail → persona gate → chat` entry for character-chat; the transaction/checkout for commerce; the primary dashboard for a data product) — craft it to the bar, pass the adversarial gate, and **only then** propagate the passing system to the other screens. One screen at the ceiling beats eight screens at the average.
 
 ## The passes
 
@@ -16,7 +16,7 @@ Run these in order. Each pass = one focused change set, then re-screenshot and l
 4. **Color & material** — apply OKLCH tokens; mostly-neutral surface, accent used sparingly, semantic colors for state only; hairlines over shadows; no gradient hero (S1/S8). Skill: `colorize`.
 5. **Imagery** — apply the image treatment spec (aspect, crop, overlay/duotone/grain) so art reads as one editorial world, never placeholder (S7). Use real/generated assets, not gray wells.
 6. **Density & polish** — spacing on the 4px grid, optical alignment, consistent radius-by-role, remove clutter. Skills: `distill`, `polish`.
-7. **Distinctiveness push** — if it still reads as a template, push it: strengthen the signature element, add one memorable-but-functional move. Skills: `bolder`, `ui-redesign`. Then re-check it did not reintroduce slop.
+7. **Distinctiveness push** — if it still reads as a template, push it: strengthen the signature element, add one memorable-but-functional move. Skill (if available): `bolder`. Then re-check it did not reintroduce slop.
 
 ## States are part of craft, not an afterthought
 
