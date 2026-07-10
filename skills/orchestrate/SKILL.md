@@ -223,6 +223,7 @@ Lite mode runs phases 1, 2, 7, 8, 10 only (with the dashboard). Standard/Deep ru
 20. **Design Critique**: Use `product-blueprint:design-critique` to review product intent, UX flow, visual quality, states, system trust, component reuse, and handoff readiness.
 21. **Risk Register**: Use `product-blueprint:risk-register` when the product touches adult content, minors, payments, UGC, PII, or AI-generated content (mandatory then; recommended otherwise). P0 risks need mitigations before handoff.
 22. **Feasibility Review (full)**: Use `product-blueprint:feasibility-review` to prepare product/design/engineering tradeoff discussions without silently downgrading the product. Reconcile against the phase-9 checkpoint verdicts.
+22.5. **Coverage Self-Audit (mandatory — do not wait for the founder to ask)**: run the six-point developer-lens scan in `references/coverage-self-audit.md` (responsive grammar / Storybook-style state enumeration / wiring matrix / global fallbacks + cross-cutting sheets / form policy / undefined-surface registry). Output `02.8-undefined-surfaces.md` — every referenced-but-undrawn surface classified as 정의됨 / 규칙 파생 / 지금 계약(3-line mini-contract) / P1 명시 이연 — and surface it in the dashboard "남은 갭" section. Dogfood evidence: three founder questions each hit a real P0 gap this scan would have caught first.
 23. **Engineering Handoff**: Use `product-blueprint:engineering-handoff` as the default final phase. Must include the Entity & State Contract (entities/relationships, per-screen state machines, invariants as testable assertions) so a developer can start architecting — not a list of open questions.
 
 After each phase, explicitly recommend one next phase and explain why (the `다음 단계` block — mandatory on every response). If required inputs for the next phase are missing, stop and ask the user for those inputs instead of proceeding with invented assumptions.
@@ -267,6 +268,7 @@ Run these lenses inline by default. Use subagents only when the environment has 
 - No visual design (storyboard onward) for a P0 screen whose mechanisms lack a feasibility-checkpoint verdict.
 - No handoff readiness while the all-P0 coverage matrix has missing rows or the risk register has unmitigated P0 rows (when the register is mandatory).
 - **Retry cap + ACCEPT-FLAG**: any gate loops at most 3 fix cycles per artifact. Still failing → do not loop forever, do not silently pass: record ACCEPT-FLAG in the decision log (what failed, why accepted, later fix) and surface it in the dashboard and handoff. See `references/quality-bar.md`.
+- No handoff readiness before the coverage self-audit has run and `02.8-undefined-surfaces.md` has zero unclassified rows (`references/coverage-self-audit.md`).
 - Non-visual red-team: PRD/mechanism lock gets a fresh-context adversarial pass (subagent when available, inline otherwise) — the visual gate must not be the only place a critic exists.
 
 ## Required Outputs
@@ -300,6 +302,7 @@ Create or update a folder such as `docs/product-planning/<slug>/` with:
 - `04.4-prototype-test.md`
 - `04.45-design-critique.md`
 - `04.55-risk-register.md` when the domain makes it mandatory
+- `02.8-undefined-surfaces.md` (coverage self-audit registry — mandatory before handoff)
 - `04.5-feasibility-review.md`
 - `05-engineering-handoff.md`
 - `screenshots/` when references are researched

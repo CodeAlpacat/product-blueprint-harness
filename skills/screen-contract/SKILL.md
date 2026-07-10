@@ -57,9 +57,11 @@ Create `02.5-screen-contracts.md` with:
 - Screen inventory
 - Contract per screen
 - Entry/exit map
+- **Wiring Matrix** — screen × action → destination table covering EVERY allowed action (later marked click-verified vs state-sample once the demo exists). The prose entry/exit map alone cannot be checked for completeness.
 - State matrix
 - Forbidden shortcut list
 - Acceptance checks
+- Feed `02.8-undefined-surfaces.md` (coverage self-audit): any surface an action points to that has no contract gets a 3-line mini-contract or an explicit derivation/deferral — developers must never have to invent a referenced screen.
 
 ## Next Step
 

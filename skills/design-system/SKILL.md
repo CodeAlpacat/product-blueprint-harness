@@ -55,6 +55,8 @@ Beyond the analysis brief, emit a single **portable `DESIGN.md`** at the plannin
 - **Typography** — families + the named ramp (size/line-height/weight/tracking/role) + do/don't.
 - **Space / radius / elevation / motion** — the numeric scales.
 - **Components** — for each: anatomy, variants, states, token mapping, do/don't.
+- **Form controls — Storybook-style state enumeration (mandatory)**: TextField/TextArea(+counter)/choice cards(locked ≠ disabled — tapping explains or routes)/toggle/checkbox(required-unchecked)/buttons(pending, non-freeze)/toast(success·error — toast-only feedback on state-changing actions is a defect)/destructive confirm dialog, each RENDERED per state (default/focus/filled/error+message/disabled). A states legend is not enumeration.
+- **Form policy** — validation timing (blur + submit; never while typing), submit-with-missing-required behavior (button stays enabled → scroll to first error + inline message; multi-step funnels may gate only the final publish), error copy = plain-language cause + next action, save model per surface (auto-draft funnel / instant-apply settings sheet / explicit-submit payment·auth), destructive actions always confirm + name the undo path.
 - **Imagery** — aspect/crop/treatment/fallback.
 - **Signature element** and **Voice / UX writing** (link the microcopy sheet `03.7-ux-writing.md` when it exists).
 - **Dark mode** — the dark token pair (or an explicit, user-approved deferral note).

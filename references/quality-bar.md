@@ -60,3 +60,12 @@ End with exactly one of:
 
 - **READY** — all applicable rows pass (ACCEPT-FLAG rows listed).
 - **NOT READY — N rows failing** — list the failing rows and the single next skill that fixes the most of them.
+
+## Coverage additions (2026-07-10 dogfood — gaps the founder had to ask about)
+
+- [ ] Responsive grammar rendered: desktop = mobile extended with an app max-width cap (Zeta/WHIF pattern), ≥3 screens drawn, derivation rule for the rest. No desktop-only grammar.
+- [ ] Form controls enumerated Storybook-style (rendered states, not a legend) + written form validation policy.
+- [ ] Wiring matrix (screen × action → destination; click-verified vs state-sample rows distinguished).
+- [ ] Global fallbacks drawn: 404 · connection-lost/server-error (progress-preserved copy) · maintenance.
+- [ ] Cross-cutting sheets drawn: guest lazy-auth · report · payment in-progress/done.
+- [ ] `02.8-undefined-surfaces.md` registry exists with zero unclassified rows ("이 목록에 없는 화면 임의 생성 금지").

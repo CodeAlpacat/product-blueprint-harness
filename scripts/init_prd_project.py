@@ -259,6 +259,19 @@ Not legal advice — real counsel reviews before launch.
 
 - Engineering handoff is NOT ready while any P0 row lacks a mitigation.
 """,
+    "02.8-undefined-surfaces.md": """# Undefined Surfaces Registry (coverage self-audit)
+
+> 이 목록에 없는 화면을 개발 중 임의 생성하지 말 것 — 발견 시 목록에 추가하고 확인 요청.
+
+| Surface (referenced by) | 분류 | 처리 (mini-contract 3줄 / 파생 규칙 / P1 사유) |
+| --- | --- | --- |
+
+분류: 정의됨(증거 경로) / 규칙 파생 / 지금 계약 / P1 명시 이연
+
+## Next Step
+
+- 미분류 행 0이 될 때까지 engineering handoff 준비 완료 선언 금지 (references/coverage-self-audit.md).
+""",
     "02-prd.md": """# PRD
 
 ## Product Thesis

@@ -27,6 +27,10 @@ Use this only after product/design intent, feasibility review, and engineering h
 - Mark high-risk invariants: auth, billing, age gates, deletion, publishing, ranking, scoring.
 - Include migration and rollout risks if building in an existing repo.
 
+## Reuse verdicts (when an existing codebase is in play)
+
+"Reuse" must be judged per domain, not declared globally (see `feature-adoption` §3): money/legal domains with production mileage → **transplant** (rewriting resets validation); highly-coupled domains where the new product's requirements are simpler → **reference-rewrite** (schema + edge cases + hook structure only — detaching costs more than rewriting, and forks drift). Name fork-drift as a cost of every transplant. Product-identity domains are new.
+
 ## Output
 
 Create `06-technical-plan.md` with:
