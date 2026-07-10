@@ -37,6 +37,13 @@ For each task, record:
 - Does the prototype work at the target mobile viewport?
 - Are screenshots readable and uncropped?
 
+## Two Levels — never conflate them
+
+1. **Heuristic walkthrough (always run)**: you execute the tasks against the demo/workbench yourself, adversarially. This catches flow breaks, hidden gates, unclear copy. It is NOT user evidence.
+2. **Real-user protocol (recommend when stakes justify it)**: 5 target-audience users, the same task prompts, think-aloud, success signal per task, confusion notes. Provide the ready-to-run protocol in the artifact (tasks, script, what to record) so the founder can execute it without design-research background.
+
+Until level 2 runs, every downstream artifact that claims the flow "works" carries the label **`실사용자 미검증`** — the handoff readiness checklist must show it. A heuristic pass upgraded to "validated" is a false claim.
+
 ## Rules
 
 - Do not call a prototype tested because it renders.
@@ -49,13 +56,14 @@ For each task, record:
 Create `04.4-prototype-test.md` with:
 
 - Test tasks
-- Pass/fail table
+- Pass/fail table (heuristic) + real-user protocol (ready to run) + validation status label
 - Confusion log
 - Required revisions
 - Screenshots or links to prototype evidence
-- Decision: pass, conditional pass, or fail
+- Decision: pass or fail (plus ACCEPT-FLAG rows if capped — see `references/quality-bar.md`)
 
 ## Next Step
 
+- 사용자가 결정할 것: 실사용자 검증(레벨 2) 실행 여부와 시점 — 미실행이면 "실사용자 미검증" 라벨이 핸드오프까지 따라간다.
 - Use `product-blueprint:design-critique` for structured product/UX/visual/systems critique.
 - If the prototype passes, proceed to `product-blueprint:feasibility-review`.

@@ -7,6 +7,12 @@ description: Creates a senior-level art direction brief before high-fidelity UI,
 
 Use this before high-fidelity design. Art direction is not decoration; it is the product's visual point of view.
 
+Read first: `${CLAUDE_PLUGIN_ROOT}/references/anti-slop-doctrine.md` and `${CLAUDE_PLUGIN_ROOT}/references/measured-design-spec.md`. This brief is the input to the token substrate and the craft loop, so it must end in **numbers, not adjectives**.
+
+## Adjectives Do Not Transfer Taste
+
+The words "clean / modern / premium / editorial" produce slop, because the model already believes its average output is those things. Taste transfers through constraints with numbers and through reference decisions. Every tone word in this brief must resolve, in the Measured Spec section, to a type ramp, a spacing scale, an OKLCH color role, a grid, or an explicit `차용/거부` decision against a real reference. A brief with tone words but no measured spec is incomplete.
+
 ## Brief Sections
 
 1. **Audience and context**: Who uses it, where, when, and with what emotional state?
@@ -30,6 +36,19 @@ Use this before high-fidelity design. Art direction is not decoration; it is the
 - Tie every aesthetic choice to a product behavior or audience need.
 - If image generation is used, separate generated art assets from UI structure.
 
+## Measured Spec (required — the contract the render must obey)
+
+Before this brief exits, add a `## Measured Spec` section following `${CLAUDE_PLUGIN_ROOT}/references/measured-design-spec.md`. It must contain:
+
+- **Reference extraction** — 3–5 real reference screenshots deconstructed into *measured* `관찰` decisions (grid px, body size/line-height, spacing unit, hue count, border-vs-shadow), each marked `차용` or `거부`. No adjective-only observations.
+- **Color spec** — OKLCH values for `surface / ink / accent / border-hairline / semantic`, each text pair stated as `X on Y = N:1` (compute the contrast).
+- **Type spec** — a named ramp table: `size / line-height / weight / tracking / role`, ≥3 distinct roles, consistent step ratio, Korean line-height if applicable.
+- **Spacing / grid / radius / elevation / motion** — all numeric (4px scale, columns+gutter+max-width, radius-by-role, ≤2 elevation steps, motion durations+what each explains).
+- **Imagery spec** — aspect + crop + treatment (overlay/duotone/grain) + source policy + fallback. Mandatory for image-heavy products.
+- **Signature element** — one, product-derived, with its measured form.
+
+Export stable values to `tokens/<product>.tokens.json`. If a spec line has no number and no reference decision, it is not done.
+
 ## Output
 
 Create `03.5-art-direction-brief.md` with:
@@ -37,13 +56,15 @@ Create `03.5-art-direction-brief.md` with:
 - Design thesis
 - Product world
 - Reference translation
+- **Measured Spec** (numeric — per above)
 - Palette and typography rationale
 - Imagery and motion rules
 - Signature element
-- Anti-slop checklist
+- Anti-slop checklist (scan against the S1–S14 signatures in `anti-slop-doctrine.md`)
 - Open design risks
 
 ## Next Step
 
+- 사용자가 결정할 것: 디자인 방향(팔레트·타입 램프·시그니처 요소) 승인 — 이 승인이 hi-fi 진입 게이트다. 바꾸려면 지금이 가장 싸다.
 - Use `product-blueprint:visual-quality-gate` after creating a mockup or storyboard proof.
 - Then use `product-blueprint:design-system` to turn the approved visual direction into reusable rules.

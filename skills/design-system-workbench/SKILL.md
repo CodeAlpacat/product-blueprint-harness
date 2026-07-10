@@ -5,9 +5,26 @@ description: Creates a React/Tailwind design-system workbench that visualizes to
 
 # Product Blueprint Design System Workbench
 
-Use this after `product-blueprint:design-system` and before accepting visual design as implementation-ready. This skill turns the design-system brief into a rendered React artifact that a founder, designer, and engineer can inspect.
+Use this after `product-blueprint:design-system` and before accepting visual design as implementation-ready. This skill turns the design-system brief into a rendered artifact that a founder, designer, and engineer can inspect.
 
 This is not the production app. It is a portable design artifact for product planning, design review, and later frontend handoff.
+
+**Medium**: React + Tailwind when the environment has node tooling. In a planning-only greenfield folder (no build step available or wanted), a **self-contained no-build HTML workbench** using the same tokens is an equal-class artifact — it opens from disk, renders anywhere, and pairs naturally with the clickable demo. The substrate rules below apply identically either way (tokens, no starter look, full sections).
+
+Read first: `${CLAUDE_PLUGIN_ROOT}/references/anti-slop-doctrine.md`, `${CLAUDE_PLUGIN_ROOT}/references/token-substrate.md`, and `${CLAUDE_PLUGIN_ROOT}/references/craft-loop.md`.
+
+## Build On A Real Substrate — Never Raw Divs, Never Default shadcn
+
+Two failure modes, both slop:
+
+1. **Hand-rolled from raw Tailwind `<div>`s** → collapses to the training average (generic cards, generic spacing, S1–S14). Build components on a real substrate (shadcn/ui structure + Radix behavior) so correctness and accessibility come for free.
+2. **shadcn on its defaults** (New York / zinc / Geist / `rounded-md`) → instantly recognizable "starter template" = slop v2. The substrate is skeleton only. **Strip the default skin entirely** and re-skin from the Measured Spec: overwrite the token layer with the OKLCH values, replace the font, re-derive radius/border/elevation/density, override component variants, and add the signature element. Follow `token-substrate.md` step by step.
+
+Gate before propagating: open the workbench next to a vanilla shadcn starter — if a designer cannot tell them apart within the neutral chrome, the skin was not replaced (fail).
+
+## Establish The Ceiling On One Screen First
+
+Do not render all P0 screens at once at average quality. Per `craft-loop.md`: craft the single most decisive screen to the bar, pass the adversarial visual gate, then propagate the passing token/component system to the remaining P0 surfaces. Render screens full-size at real viewport (mobile 390×844, desktop 1440), one per view — never tiled into tiny phone frames, which destroys fidelity and hides slop.
 
 ## Hard Lesson
 
@@ -66,16 +83,19 @@ The React workbench must include these sections:
 1. **Design Thesis**: product promise, anti-aesthetic, and one signature visual device.
 2. **Foundation Tokens**: color, typography, spacing, radius, elevation, motion. Separate primitive, semantic, and component tokens. Show real usage, not just swatches.
 3. **Component Documentation**: for each priority component show purpose, anatomy, variants, states, behavior, accessibility, content rules, do/don't, and token mapping.
-4. **Pattern Library**: discovery grid, ranking list, detail reading flow, persona setup, chat thread, tool panel, memory correction, checkpoint copy, locked/error recovery.
+4. **Pattern Library**: the product's real cross-component patterns, derived from *its* PRD and screen contracts. (Example set for a character-chat product: discovery grid, ranking list, detail reading flow, persona setup, chat thread, tool panel, memory correction, checkpoint copy, locked/error recovery. Substitute your product's actual patterns — a commerce or data product will have entirely different ones.)
 5. **State Lab**: loading, empty, locked/safety, error/retry, paid confirmation, success, correction/recovery, disabled, long-content, image-failure, and permission states.
 6. **Production Screen Set**: high-fidelity mockups for all P0 surfaces from the screen contracts. For character-chat products this usually means home, search/all characters, ranking, character detail, persona gate, chat, chat side panel/tools, and conversations/library.
-7. **Flow Wiring**: arrows, labels, and review notes outside the product screen frames. Product frames must contain only user-facing UI.
-8. **Implementation Handoff Map**: component-to-screen matrix, token-to-component matrix, state ownership, and unresolved product/design decisions.
+7. **All-P0 Coverage Matrix (exit gate)**: a table in `04.32-design-system-workbench.md` — every P0 screen from `02.5-screen-contracts.md` | rendered artifact (workbench section or demo screen) | visual-gate status. **A row with no rendered artifact fails the phase.** "Propagated from the ceiling" is a technique, not coverage — coverage is a render you can screenshot.
+8. **Flow Wiring**: arrows, labels, and review notes outside the product screen frames. Product frames must contain only user-facing UI.
+9. **Dark mode & motion**: a dark token pair (OKLCH makes this cheap) with at least one screen rendered dark + contrast re-checked, and a motion spec (durations, easing curve, enter/exit patterns, waiting-state behavior — motion explains, never decorates). Mark dark mode "explicitly deferred" only with a user decision logged.
+10. **Governance note**: how tokens/components change after handoff — where the SoT lives (tokens files + DESIGN.md), who approves additions, and the rule that screens never introduce off-token values.
+11. **Implementation Handoff Map**: component-to-screen matrix, token-to-component matrix, state ownership, and unresolved product/design decisions.
 
 ## Product Rules
 
 - Do not invent new primary navigation just to show components.
-- Do not promote internal mechanisms into main tabs. Persona/setup belongs after character detail and before chat unless the user changed the model. Memory and checkpoint belong in the chat tool surface unless approved otherwise.
+- Do not promote internal mechanisms into main tabs without user approval. (Domain example: for character-chat, persona/setup belongs after character detail and before chat, and memory/checkpoint belong in the chat tool surface, unless the user changed the model. For other domains, apply the neutral rule — an internal mechanism earns a primary surface only when the user's task requires it.)
 - Do not use blank image wells for character/product-heavy domains. Use reference screenshots, generated images, or repeated safe assets with different crops.
 - Do not let the workbench become a generic SaaS kit. Components must use product-specific content, states, and vocabulary.
 - Planning labels, arrows, and critique notes belong outside mocked product screens.
@@ -87,14 +107,18 @@ The React workbench must include these sections:
 
 Pass only if:
 
-- Tokens visibly map to components and screens.
+- Tokens visibly map to components and screens, and text pairs pass their measured contrast (`X on Y = N:1`).
 - The component catalog documents anatomy, variants, states, usage, accessibility, and token mapping.
 - The screen set preserves the approved product flow and forbidden shortcuts.
 - The workbench can be opened locally and screenshot-tested.
 - Desktop and mobile frames are readable without cropped core content.
+- The ceiling screen passed the adversarial visual gate (`${CLAUDE_PLUGIN_ROOT}/references/adversarial-visual-gate.md`) before propagation.
 - It feels like a senior designer's handoff board, not a blurred wireframe or generic template.
 
 Fail if:
+
+- It is hand-rolled from raw divs, or it is recognizable as a default shadcn/starter skin (default skin not stripped).
+- Any S1–S14 slop signature is present (per `anti-slop-doctrine.md`).
 
 - It only produces markdown tables.
 - It only produces one polished screen while the rest of the product remains abstract.

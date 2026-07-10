@@ -22,7 +22,7 @@ Use this before technical architecture. It is not a DB/API design. It prepares b
 - Product mechanisms
 - PRD requirements
 - Storyboard flows
-- Feasibility review
+- Feasibility checkpoint verdicts (`02.7-feasibility-checkpoint.md`) — carry them forward; do not re-litigate settled verdicts
 - Monetization, safety, creator, and result-state requirements
 
 ## Brief Sections

@@ -5,7 +5,20 @@ description: Facilitates product-design-backend-to-engineering feasibility revie
 
 # Product Blueprint Feasibility Review
 
-Use this after product/design artifacts exist and before engineering handoff. This is a meeting-prep artifact for product, design, and engineering. It should protect product intent while making hard tradeoffs visible.
+Two modes. Both protect product intent while making hard tradeoffs visible.
+
+## Mode A — Feasibility Checkpoint (lightweight, BEFORE visual design)
+
+Run right after screen contracts, before the storyboard renders anything. This is the "engineer in the room" moment — it prevents mockups from promising the impossible, which is far cheaper than reconciling after screens are polished.
+
+1. List every mechanism that a P0 screen depends on (from `02.5-screen-contracts.md` × `02-mechanisms.md`).
+2. Give each a one-line verdict with the frontend/backend/AI lens: **feasible** / **conditional** (state the condition and rough cost driver) / **infeasible as specified** (state the closest feasible version).
+3. `infeasible` or expensive-`conditional` verdicts go to the user BEFORE that screen is storyboarded — offer staged alternatives, never silently downgrade.
+4. Output `02.7-feasibility-checkpoint.md`: mechanism | depending screens | verdict | condition/alternative | user decision needed. Keep it under a page — this is a checkpoint, not the full review.
+
+## Mode B — Full Feasibility Review (before handoff)
+
+Use after product/design artifacts exist and before engineering handoff. This is a meeting-prep artifact for product, design, and engineering. Reconcile against the Mode A verdicts: any screen that shipped visuals against a `conditional` verdict must show the condition was addressed.
 
 ## Review Inputs
 
@@ -52,4 +65,5 @@ Then use `product-blueprint:engineering-handoff` for the approved pre-developmen
 
 ## Next Step
 
+- 사용자가 결정할 것: infeasible/conditional 판정 메커니즘의 staged 대안 채택 또는 scope-out.
 - Use `product-blueprint:engineering-handoff` when tradeoffs and unresolved questions are documented.

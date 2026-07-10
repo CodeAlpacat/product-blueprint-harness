@@ -82,5 +82,6 @@ Create `02-mechanisms.md` or add a `Product Mechanisms` section to the PRD. Ever
 
 ## Next Step
 
+- 사용자가 결정할 것: 각 메커니즘의 surface 레벨(백그라운드/사이드/전용 화면)과 P0 편입 여부 — 단독 결정 금지 영역.
 - Use `product-blueprint:prd` if product requirements are not yet written.
 - Use `product-blueprint:screen-contract` once the MVP scope and priority screens are clear.

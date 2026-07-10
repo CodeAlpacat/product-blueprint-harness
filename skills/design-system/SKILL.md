@@ -43,9 +43,32 @@ HTML storyboards are acceptable inputs here because they are flow/IA contracts. 
 - Do not claim that the HTML storyboard is production-grade UI. It remains a planning reference.
 - Recommend `product-blueprint:design-system-workbench` when design quality needs to be raised before engineering handoff. Recommend one decisive React screen only after the workbench shows the system across P0 surfaces.
 
+## Portable DESIGN.md (AI-consumable design system — required)
+
+Beyond the analysis brief, emit a single **portable `DESIGN.md`** at the planning-folder root (it moves to the repo root when the project graduates to code). This is the file any AI assistant or developer reads to produce consistent, on-brand UI — the same role as the `design.md` convention (getdesign.md): a self-contained, human- and AI-readable design system spec.
+
+`DESIGN.md` must be concrete enough to build from without further taste calls:
+
+- **One-liner + "works best for / anti"** — the DNA in a sentence and where it applies / must not.
+- **Design DNA** — the few rules that, if broken, break the brand.
+- **Color** — role table with OKLCH values + measured contrast pairs (`X on Y = N:1`) + do/don't.
+- **Typography** — families + the named ramp (size/line-height/weight/tracking/role) + do/don't.
+- **Space / radius / elevation / motion** — the numeric scales.
+- **Components** — for each: anatomy, variants, states, token mapping, do/don't.
+- **Form controls — Storybook-style state enumeration (mandatory)**: TextField/TextArea(+counter)/choice cards(locked ≠ disabled — tapping explains or routes)/toggle/checkbox(required-unchecked)/buttons(pending, non-freeze)/toast(success·error — toast-only feedback on state-changing actions is a defect)/destructive confirm dialog, each RENDERED per state (default/focus/filled/error+message/disabled). A states legend is not enumeration.
+- **Form policy** — validation timing (blur + submit; never while typing), submit-with-missing-required behavior (button stays enabled → scroll to first error + inline message; multi-step funnels may gate only the final publish), error copy = plain-language cause + next action, save model per surface (auto-draft funnel / instant-apply settings sheet / explicit-submit payment·auth), destructive actions always confirm + name the undo path.
+- **Imagery** — aspect/crop/treatment/fallback.
+- **Signature element** and **Voice / UX writing** (link the microcopy sheet `03.7-ux-writing.md` when it exists).
+- **Dark mode** — the dark token pair (or an explicit, user-approved deferral note).
+- **Motion** — durations, the easing curve, enter/exit patterns, waiting-state rule (in-place pending, no freeze).
+- **Governance** — where the SoT lives, how tokens/components are added, off-token values forbidden.
+- **Anti-slop rules** — the S1–S14 scan items to refuse.
+
+Keep the three layers in sync: `tokens/<product>.*` (machine), `DESIGN.md` (portable AI/human spec), and the rendered visual page from `design-system-workbench` (`prototypes/<product>-design-system.html` — swatches, type specimens, live components, states). `DESIGN.md` is the source a coding agent reads; the rendered page is how a human reviews it; the tokens are what code imports.
+
 ## Output
 
-Create `04.3-design-system.md` or `04.3-design-system.html` with tokens, components, examples, and screen application notes.
+Create `04.3-design-system.md` or `04.3-design-system.html` with tokens, components, examples, and screen application notes — **plus the portable `DESIGN.md`** above.
 
 ## Next Step
 

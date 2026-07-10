@@ -9,6 +9,20 @@ Use this after `product-blueprint:design-system-workbench` when one decisive scr
 
 If the user expects tokens, component catalog, states, and multiple production screen mockups, use `product-blueprint:design-system-workbench` first. A single screen specimen is not enough for design-system handoff.
 
+Read first: `${CLAUDE_PLUGIN_ROOT}/references/anti-slop-doctrine.md`, `${CLAUDE_PLUGIN_ROOT}/references/craft-loop.md`, `${CLAUDE_PLUGIN_ROOT}/references/token-substrate.md`.
+
+## Run The Layered Craft Loop — Not One Shot
+
+The first render is the training-average draft, not the deliverable. Craft this screen in discrete passes, re-screenshotting after each (full detail in `craft-loop.md`):
+
+1. Structure (hierarchy, focal point) → 2. Layout & grid → 3. Typography (measured ramp) → 4. Color & material (OKLCH tokens, hairlines over shadows) → 5. Imagery (art-directed treatment, no placeholder wells) → 6. Density & polish → 7. Distinctiveness push (strengthen the signature; break the template read).
+
+Build on the token substrate (shadcn/Radix structure, default skin stripped, product tokens applied). When Claude Code design skills are available, delegate the pixel craft to them and keep product logic here:
+
+- If the environment provides them: `impeccable`/`craft` for shape→build, `layout`, `typeset`, `colorize`, `distill`, `polish` for passes 2–6, `bolder` for pass 7, `critique`/`audit` for review. If it provides none, apply the passes by hand — the doctrine is self-sufficient.
+
+Render full-size at real viewport (mobile 390×844, desktop 1440), screenshot at 2x, then run the adversarial visual gate (`${CLAUDE_PLUGIN_ROOT}/references/adversarial-visual-gate.md`). Loop until it passes — conditional is not pass. This screen becomes the anchor the workbench and other screens are gated against.
+
 ## When To Use HTML vs React
 
 - Use HTML for `03-storyboard.html`: fast Figma-like boards, IA, screen coverage, flow wiring, evidence strips, and review annotations.
@@ -49,12 +63,11 @@ If the user has not chosen a screen, select the decisive one and record the assu
 
 ## React Specimen Rules
 
-- Create one isolated planning specimen under the product-planning folder by default. It must not be presented as production implementation.
-- Prefer a standalone React + Tailwind artifact in `docs/product-planning/<project>/prototypes/` so planning output does not become coupled to the current app framework.
-- Use a preview route inside the product app only when the user explicitly asks for it, the coupling is intentional, and the artifact is clearly marked as non-production.
-- Use React/TSX and Tailwind utility classes when the repository supports them. For planning-only work, a single-file static React artifact is acceptable if it can be run locally and screenshot-tested.
+- Create one isolated, **self-contained** planning specimen under the product-planning folder by default. It must not be presented as production implementation. Greenfield is the default assumption: there is usually no host repo yet.
+- Default to a standalone single-file artifact (self-contained HTML that inlines the OKLCH tokens per `${CLAUDE_PLUGIN_ROOT}/references/token-substrate.md`, or a standalone React + Tailwind file) in `docs/product-planning/<project>/prototypes/`. It must run locally and be screenshot-tested with no build step and no host dependencies.
+- Only if a host repo/app already exists AND the user wants coupling: you *may* reuse its Tailwind tokens, `cn` helper, shared UI primitives, and icon system, or add a preview route — clearly marked non-production. Never assume any of these exist.
 - Use real component names and token names that can become design-system candidates, but do not decide app routing, API, DB, query state, or backend behavior.
-- Prefer the repository's existing Tailwind tokens, `cn` helper, shared UI primitives, and icon system. If the planning product needs its own visual language, keep product-specific colors local to the specimen and mark them for later token extraction.
+- Build on the shadcn/Radix structure with the default skin stripped and the product OKLCH tokens applied (per `token-substrate.md`). Keep product-specific colors in the specimen's own token layer; never ship a default component-library skin.
 - Include at least these states when relevant: default, loading/skeleton, empty, error/retry, locked/unsafe, paid confirmation, success, correction.
 - Use product-specific imagery. Do not leave character or media slots as blank gradients.
 - Keep planning notes outside the product surface. The UI specimen must only show plausible user-facing UI.
@@ -92,5 +105,5 @@ Fail if:
 ## Next Step
 
 - If the specimen fails, revise `product-blueprint:art-direction-brief`, `product-blueprint:design-system`, or the selected screen contract.
-- If it conditionally passes, use `product-blueprint:prototype-test` for task-based review or `product-blueprint:design-critique` for visual/product critique.
+- If it passes with ACCEPT-FLAG rows recorded, use `product-blueprint:prototype-test` for task-based review or `product-blueprint:design-critique` for visual/product critique.
 - Use `product-blueprint:tech-plan` only after engineering handoff and explicit user approval.

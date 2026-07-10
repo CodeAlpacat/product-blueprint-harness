@@ -1,0 +1,26 @@
+{
+  "name": "product-blueprint",
+  "version": "0.2.0",
+  "description": "Guided pre-development product blueprint workflow for Claude Code: turns a vague idea and reference services into research-backed PRDs, decision logs, screen contracts, mechanism contracts, storyboards, and a production-grade visual craft spine (measured art direction, shadcn/Radix + OKLCH token substrate, impeccable hero-screen craft loop, adversarial visual quality gate) that reaches real design-system output instead of AI slop.",
+  "author": {
+    "name": "CodeAlpacat",
+    "url": "https://github.com/CodeAlpacat"
+  },
+  "homepage": "https://github.com/CodeAlpacat/product-blueprint-harness#readme",
+  "repository": "https://github.com/CodeAlpacat/product-blueprint-harness",
+  "license": "MIT",
+  "keywords": [
+    "product-planning",
+    "prd",
+    "design-system",
+    "art-direction",
+    "anti-ai-slop",
+    "ux",
+    "storyboard",
+    "shadcn",
+    "radix",
+    "design-tokens",
+    "engineering-handoff"
+  ],
+  "skills": "./skills/"
+}
