@@ -178,6 +178,87 @@ Use this file to keep user decisions, assumptions, and gate status from getting 
 
 - Use product-blueprint:screen-contract and product-blueprint:experience-mechanisms.
 """,
+    "01.8-positioning-brand.md": """# Positioning & Brand
+
+## Positioning Statement
+
+## Naming (taste-first rounds -> availability signals)
+
+## Voice & Tone One-Pager
+
+## Jargon Ban List
+
+## Mascot / Wordmark Direction
+
+## Trademark Warning
+
+- Signal research only. Real KIPRIS/USPTO + store search required before spending money.
+
+## Next Step
+
+- Use product-blueprint:experience-mechanisms.
+""",
+    "02.7-feasibility-checkpoint.md": """# Feasibility Checkpoint (before visual design)
+
+| Mechanism | Depending P0 screens | Verdict (feasible/conditional/infeasible) | Condition / closest alternative | User decision needed |
+| --- | --- | --- | --- | --- |
+
+## Next Step
+
+- Resolve infeasible rows with the user BEFORE storyboarding those screens.
+- Then use product-blueprint:storyboard.
+""",
+    "03.7-ux-writing.md": """# UX Writing — Microcopy Sheet
+
+Downstream mockups use these strings verbatim.
+
+## Voice Rules (from positioning-brand)
+
+## Per-Screen Copy Tables
+
+## Empty States
+
+## Errors & Recovery
+
+## Confirmations & Costs
+
+## CTA Verb List
+
+## Next Step
+
+- Use product-blueprint:design-system-workbench or product-blueprint:clickable-demo.
+""",
+    "04.36-clickable-demo.md": """# Clickable Demo Notes
+
+Demo file: prototypes/<product>-demo.html (single file, no build, opens from disk)
+
+## What Is Wired
+
+## Transition-Map Verification (from -> to => landed)
+
+## States Sample Coverage
+
+## Known Gaps / Mocked Parts
+
+## Next Step
+
+- Use product-blueprint:prototype-test.
+""",
+    "04.55-risk-register.md": """# Risk Register
+
+Not legal advice — real counsel reviews before launch.
+
+| Risk | Trigger surface | Jurisdiction note | P0 mitigation (structural) | Owner decision | Status |
+| --- | --- | --- | --- | --- | --- |
+
+## Categories Swept (mark n.a. explicitly)
+
+- Age & content rating / Personal data / Payments & virtual currency / UGC & moderation / AI-generated content / Platform policy / Accessibility & consumer law
+
+## Next Step
+
+- Engineering handoff is NOT ready while any P0 row lacks a mitigation.
+""",
     "02-prd.md": """# PRD
 
 ## Product Thesis
@@ -475,6 +556,7 @@ def main() -> int:
     parser.add_argument("name", help="Product or planning project name")
     parser.add_argument("--root", default="docs/product-planning", help="Output root directory")
     parser.add_argument("--force", action="store_true", help="Overwrite existing files")
+    parser.add_argument("--lite", action="store_true", help="Scaffold only the Lite-mode artifact set")
     args = parser.parse_args()
 
     target = Path(args.root).expanduser() / slugify(args.name)
@@ -483,7 +565,20 @@ def main() -> int:
     (target / "prototypes").mkdir(exist_ok=True)
     (target / "tokens").mkdir(exist_ok=True)
 
+    LITE_FILES = {
+        "00-brief.md",
+        "00-decision-log.md",
+        "00-review-dashboard.html",
+        "01-reference-research.md",
+        "01-ideation.md",
+        "02-prd.md",
+        "02.5-screen-contracts.md",
+        "03-storyboard.html",
+    }
+
     for filename, content in FILES.items():
+        if args.lite and filename not in LITE_FILES:
+            continue
         path = target / filename
         if path.exists() and not args.force:
             continue

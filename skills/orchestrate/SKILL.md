@@ -1,6 +1,6 @@
 ---
 name: orchestrate
-description: End-to-end pre-development product planning orchestration from vague idea and optional reference services to research, reference deconstruction, parallel concepts, mechanism contracts, PRD, screen contracts, storyboard, art direction, visual quality gate, backend systems brief, design system, React design-system workbench, high-fidelity screen specimen, prototype test, design critique, feasibility review, and engineering handoff. Use when the user wants to plan a new product, structure an app idea, analyze references, run staged planning with expert agents, or create a product planning workflow before technical design and implementation.
+description: End-to-end pre-development product planning orchestration from vague idea and optional reference services to research, reference deconstruction, parallel concepts, positioning and brand naming, mechanism contracts, PRD, screen contracts, feasibility checkpoint, storyboard, art direction, visual quality gate, UX writing, backend systems brief, design system, workbench, high-fidelity screen, clickable demo, prototype test, design critique, risk register, feasibility review, and engineering handoff. Supports Lite/Standard/Deep modes and run-through pacing, and always ends each response with the recommended next step. Use when the user wants to plan a new product, structure an app idea, analyze references, run staged planning with expert agents, or create a product planning workflow before technical design and implementation.
 ---
 
 # Product Blueprint Orchestrate
@@ -8,6 +8,29 @@ description: End-to-end pre-development product planning orchestration from vagu
 Use this as the master pre-development workflow. Do not start from screens, API, DB, architecture, or implementation. Turn a vague product idea into staged artifacts that a founder, designer, and engineer can review before technical design starts.
 
 Read `references/pro-design-process.md` when the user asks why the workflow is staged this way or wants senior designer process guidance.
+
+## How To Run — modes and effort (tell the user this up front)
+
+When a run starts, state the chosen mode and its rough effort in one line, and confirm it. Three depths, plus a pacing switch:
+
+| Mode | Phases | Output files | Rough effort | For |
+|---|---|---|---|---|
+| **Lite** | Brief → Research/Ideation → PRD → Screen contracts (경량) → Storyboard → Dashboard | ~8 | one short session | small products, validating an idea, "간단히" |
+| **Standard** (default) | Full phase order below, single pixel ceiling + workbench | ~20 | several sessions | real product heading to build |
+| **Deep** | Standard + richer evidence, more alternatives, stronger state coverage, full risk register | ~25 | multi-day | production launch, regulated/sensitive domains |
+
+Pacing switch — **run-through mode ("쭉 진행")**: when the user says "쭉 진행해", "알아서 진행", "한번에 해줘", or approves run-through at intake, chain phases WITHOUT stopping for review between them — pause ONLY at the User Decision Gates listed below (direction lock, MVP lock, brand lock, surface lock, hi-fi entry, design acceptance, handoff). Everything else proceeds, with assumptions labeled and logged. In run-through mode the phase-exit block still appears after every phase so the user can scan what happened.
+
+**Every response in an orchestrate run — regardless of mode — ends with a `다음 단계` block**: (1) 추천 다음 스킬 1개 + 이유 1줄, (2) 사용자가 결정할 것 (없으면 "없음 — 그대로 진행 가능"), (3) 진행 중 위치 (단계 N/총단계). A response that ends without this block is an unfinished response. This is how the user always knows what to do next without reading the pipeline docs.
+
+## Phase 0 — Workspace detection (resume / redo / fresh)
+
+Before initializing anything, check whether the planning folder already exists (`docs/product-planning/<slug>/` or the folder the user names):
+
+- **No folder** → fresh run: initialize (see Required Outputs), then start at Brief.
+- **Folder exists, user continues the same product** → resume: read `00-decision-log.md` (decisions + gate status) and the dashboard FIRST, report "지금 어디까지 왔고, 다음은 X" — never restart phases that passed.
+- **User asks to redo one part** ("아트디렉션만 다시", "이름 다시 짓자") → rerun ONLY that skill, then cascade: list which downstream artifacts consume it (e.g., art direction → design system → workbench → demo) and update only those, farthest-upstream first. Do not touch unaffected artifacts.
+- **User pivots the product** → archive: move the old folder to `<slug>-archive-<date>/`, start fresh, and carry over only what the user explicitly keeps.
 
 ## Visual Craft Spine (Anti-Slop) — the part that decides production quality
 
@@ -60,12 +83,12 @@ Proceed without asking only when the missing information is non-blocking and rev
 
 `orchestrate` must not behave like a rough outline generator when the user asks for a standard or deep planning package. The first complete pass should be reviewable by a founder, product designer, and engineer even if it is not final.
 
-Default depth:
+Default depth (see the mode table in "How To Run"):
 
-- If the user says "쭉 진행", "orchestrate부터", "전체 기획", "프로덕션급", or gives a reference service for benchmarking, treat the request as `standard` unless they explicitly ask for a quick sketch.
-- `quick` may stop at brief, PRD outline, and low-fidelity storyboard recommendations.
-- `standard` must produce the full product-flow package, a readable storyboard, design-system brief, and React design-system workbench before engineering handoff.
-- `deep` must additionally include richer reference evidence, more alternative concepts, stronger state coverage, visual critiques, feasibility options, and handoff risks.
+- If the user says "쭉 진행", "orchestrate부터", "전체 기획", "프로덕션급", or gives a reference service for benchmarking, treat the request as `standard` unless they explicitly ask for a quick sketch. "쭉 진행" additionally enables run-through pacing.
+- `lite` stops at brief, PRD, light screen contracts, and storyboard — but never skips the decision log, user decision gates, or assumption labels.
+- `standard` must produce the full product-flow package, positioning/brand, a readable storyboard, design-system + workbench, and the clickable demo before engineering handoff.
+- `deep` must additionally include richer reference evidence, more alternative concepts, stronger state coverage, visual critiques, the full risk register, feasibility options, and handoff risks.
 
 Minimum standard/deep completeness:
 
@@ -157,6 +180,7 @@ Ask for user input before crossing these gates:
 
 - **Research access**: login, paid, adult-gated, destructive, publishing, account, or privacy-sensitive exploration.
 - **Direction lock**: choosing the winning concept from `parallel-concepts`.
+- **Brand lock**: confirming positioning, product name, and mascot direction from `positioning-brand`.
 - **MVP lock**: finalizing PRD scope and non-goals.
 - **Surface lock**: deciding that a mechanism becomes a visible tab, main-screen component, persistent panel, or primary navigation item.
 - **Screen contract lock**: accepting allowed actions and forbidden shortcuts.
@@ -166,7 +190,7 @@ Ask for user input before crossing these gates:
 
 At the end of every phase, include:
 
-- `Status`: pass, conditional pass, or fail
+- `Status`: pass, fail, or ACCEPT-FLAG (recorded limitation — see `references/quality-bar.md`; "conditional pass" is not a status)
 - `What changed`
 - `User decisions needed`
 - `Assumptions carried forward`
@@ -175,26 +199,33 @@ At the end of every phase, include:
 
 ## Phase Order
 
+Lite mode runs phases 1, 2, 7, 8, 10 only (with the dashboard). Standard/Deep run all.
+
 1. **Brief**: Define target user, job, core loop, reference services, constraints, and unknowns.
 2. **Research Or Ideation**: If reference products exist, use `product-blueprint:research`. If not, use `product-blueprint:ideation` with assumptions clearly labeled.
 3. **Reference Deconstruction**: Use `product-blueprint:reference-deconstruction` when references exist. Turn screenshots into product principles, gates, and anti-copy rules.
-4. **Parallel Concepts**: Use `product-blueprint:parallel-concepts`. Explore multiple product/screen directions before committing to one.
-5. **Experience Mechanisms**: Use `product-blueprint:experience-mechanisms` for invisible product behavior such as memory, judging, ranking, scoring, recommendations, personalization, safety gates, and paid actions.
-6. **User Stories And PRD**: Use `product-blueprint:prd`. Define MVP loops, requirements, non-goals, states, risks, and mechanism-dependent requirements.
-7. **Screen Contracts**: Use `product-blueprint:screen-contract`. Define each priority screen's purpose, allowed actions, forbidden shortcuts, states, entry paths, and exit paths.
-8. **Storyboard Board**: Use `product-blueprint:storyboard`. Visualize flows screen-by-screen with evidence, state, transition wiring, and mechanism surfaces as a Figma-like board. This is the default visual planning artifact; do not replace it with a rough clickable demo.
-9. **Art Direction Brief**: Use `product-blueprint:art-direction-brief`. Define product world, design thesis, imagery, typography, color roles, signature element, and anti-aesthetic.
-10. **Visual Quality Gate**: Use `product-blueprint:visual-quality-gate` before accepting any visual direction. Fail generic AI-slop, flow-inaccurate, unreadable, or state-poor design artifacts.
-11. **Backend Systems Brief**: Use `product-blueprint:backend-systems-brief` for memory, judging, ranking, billing, permissions, safety, creator publishing, and other backend/system concerns before technical architecture.
-12. **Design System / Visual Direction**: Use `product-blueprint:design-system` only after storyboard, art direction, and visual quality gate are stable. This creates a production design brief, not frontend implementation or frontend architecture.
-13. **Design System Workbench**: Use `product-blueprint:design-system-workbench` to render tokens, component catalog, state lab, and P0 production screen mockups in React + Tailwind. This is the default production-grade visual artifact before handoff.
-14. **High-Fidelity Screen Specimen**: Use `product-blueprint:high-fidelity-screen` only when one screen from the workbench needs an additional pixel-level pass. HTML remains the storyboard format; React workbench/specimens are bridges to production-grade visual design, but app routes are not the default planning artifact.
-15. **Prototype Test**: Use `product-blueprint:prototype-test` for concrete user tasks against HTML/Figma/React screenshots before claiming the flow works. Create clickable interaction only after the storyboard board, screen contracts, and workbench are stable enough to test.
-16. **Design Critique**: Use `product-blueprint:design-critique` to review product intent, UX flow, visual quality, states, system trust, component reuse, and handoff readiness.
-17. **Feasibility Review**: Use `product-blueprint:feasibility-review` to prepare product/design/engineering tradeoff discussions without silently downgrading the product.
-18. **Engineering Handoff**: Use `product-blueprint:engineering-handoff` as the default final phase. Prepare the product/design/backend-systems package engineers need before API, DB, architecture, or implementation planning.
+4. **Parallel Concepts**: Use `product-blueprint:parallel-concepts`. Explore multiple product/screen directions before committing to one. Concepts must differ at screen/mechanic level with a representative visual each — a non-reader must be able to choose.
+5. **Positioning & Brand**: Use `product-blueprint:positioning-brand`. Positioning statement, name (taste-first rounds → availability signals), voice one-pager, mascot/wordmark direction. Runs BEFORE art direction because the name, voice, and mascot constrain the visual world.
+6. **Experience Mechanisms**: Use `product-blueprint:experience-mechanisms` for invisible product behavior such as memory, judging, ranking, scoring, recommendations, personalization, safety gates, and paid actions.
+7. **User Stories And PRD**: Use `product-blueprint:prd`. Define MVP loops, requirements, non-goals, states, risks, and mechanism-dependent requirements. **Red-team this phase**: when multi-agent support exists, spawn a fresh-context critic to attack the PRD (missing loop steps, unowned states, scope lies) before MVP lock; inline adversarial pass otherwise. Record what it found.
+8. **Screen Contracts**: Use `product-blueprint:screen-contract`. Define each priority screen's purpose, allowed actions, forbidden shortcuts, states, entry paths, and exit paths.
+9. **Feasibility Checkpoint (lightweight, BEFORE any visual design)**: Use `product-blueprint:feasibility-review` in checkpoint mode. Every mechanism a P0 screen depends on gets a verdict — feasible / conditional (state the condition) / infeasible — so mockups never promise the impossible. Output `02.7-feasibility-checkpoint.md`. An `infeasible` verdict goes back to the user BEFORE the storyboard renders that screen. This is the "engineer in the room" moment; do not defer it to the full feasibility review (phase 22).
+10. **Storyboard Board**: Use `product-blueprint:storyboard`. Visualize flows screen-by-screen with evidence, state, transition wiring, and mechanism surfaces as a Figma-like board. This is the default visual planning artifact; do not replace it with a rough clickable demo.
+11. **Art Direction Brief**: Use `product-blueprint:art-direction-brief`. Define product world, design thesis, imagery, typography, color roles, signature element, and anti-aesthetic — consuming the brand lock (wordmark face, mascot palette rule, voice).
+12. **Visual Quality Gate**: Use `product-blueprint:visual-quality-gate` before accepting any visual direction. Fail generic AI-slop, flow-inaccurate, unreadable, or state-poor design artifacts.
+13. **UX Writing**: Use `product-blueprint:ux-writing`. Microcopy sheet (labels, empties, errors, loading, confirmations, CTA verbs) for every P0 screen. Downstream mockups use these strings verbatim.
+14. **Backend Systems Brief**: Use `product-blueprint:backend-systems-brief` for memory, judging, ranking, billing, permissions, safety, creator publishing, and other backend/system concerns before technical architecture.
+15. **Design System / Visual Direction**: Use `product-blueprint:design-system` only after storyboard, art direction, and visual quality gate are stable. This creates a production design brief, not frontend implementation or frontend architecture.
+16. **Design System Workbench**: Use `product-blueprint:design-system-workbench` to render tokens, component catalog, state lab, and P0 production screen mockups. **All-P0 coverage matrix is the exit gate**: every P0 screen from the contracts → a workbench/demo mockup → visual-gate pass. A missing row fails the phase; "propagated from the ceiling" without a rendered artifact is not coverage.
+17. **High-Fidelity Screen Specimen**: Use `product-blueprint:high-fidelity-screen` only when one screen from the workbench needs an additional pixel-level pass. This is the ceiling screen, not a substitute for all-P0 coverage.
+18. **Clickable Demo**: Use `product-blueprint:clickable-demo`. Single-file HTML: every P0 screen, real transitions matching the contract map (script-verified), board mode for Figma-like review, rendered non-happy-states sample. This is the founder's primary review artifact.
+19. **Prototype Test**: Use `product-blueprint:prototype-test` for concrete user tasks against the demo/workbench. Distinguish heuristic self-walkthrough (always) from a real-user protocol (recommend when stakes justify it); the loop stays labeled "실사용자 미검증" until real users run it.
+20. **Design Critique**: Use `product-blueprint:design-critique` to review product intent, UX flow, visual quality, states, system trust, component reuse, and handoff readiness.
+21. **Risk Register**: Use `product-blueprint:risk-register` when the product touches adult content, minors, payments, UGC, PII, or AI-generated content (mandatory then; recommended otherwise). P0 risks need mitigations before handoff.
+22. **Feasibility Review (full)**: Use `product-blueprint:feasibility-review` to prepare product/design/engineering tradeoff discussions without silently downgrading the product. Reconcile against the phase-9 checkpoint verdicts.
+23. **Engineering Handoff**: Use `product-blueprint:engineering-handoff` as the default final phase. Must include the Entity & State Contract (entities/relationships, per-screen state machines, invariants as testable assertions) so a developer can start architecting — not a list of open questions.
 
-After each phase, explicitly recommend one next phase and explain why. If required inputs for the next phase are missing, stop and ask the user for those inputs instead of proceeding with invented assumptions.
+After each phase, explicitly recommend one next phase and explain why (the `다음 단계` block — mandatory on every response). If required inputs for the next phase are missing, stop and ask the user for those inputs instead of proceeding with invented assumptions.
 
 After each phase that produces or changes multiple artifacts, update `product-blueprint:decision-dashboard`. The dashboard is the user's review entry point; do not make the user inspect long markdown files first.
 
@@ -232,11 +263,17 @@ Run these lenses inline by default. Use subagents only when the environment has 
 - No API/DB design during the default Product Blueprint workflow. Stop at engineering handoff unless the user explicitly asks for technical planning.
 - Mark unverified flows explicitly. Never invent reference behavior.
 - Paid, destructive, age-gated, or account-affecting actions require user approval before live exploration.
-- Do not erase a product requirement because it sounds technically hard. Mark it for feasibility review with staged options.
+- Do not erase a product requirement because it sounds technically hard. Mark it for feasibility review with staged options — but get the feasibility checkpoint verdict BEFORE the screen is visually designed.
+- No visual design (storyboard onward) for a P0 screen whose mechanisms lack a feasibility-checkpoint verdict.
+- No handoff readiness while the all-P0 coverage matrix has missing rows or the risk register has unmitigated P0 rows (when the register is mandatory).
+- **Retry cap + ACCEPT-FLAG**: any gate loops at most 3 fix cycles per artifact. Still failing → do not loop forever, do not silently pass: record ACCEPT-FLAG in the decision log (what failed, why accepted, later fix) and surface it in the dashboard and handoff. See `references/quality-bar.md`.
+- Non-visual red-team: PRD/mechanism lock gets a fresh-context adversarial pass (subagent when available, inline otherwise) — the visual gate must not be the only place a critic exists.
 
 ## Required Outputs
 
 Create or update a folder such as `docs/product-planning/<slug>/` with:
+
+> File numbers are folder-sort order for review, not execution order — the Phase Order above governs sequencing (e.g. the visual gate runs before `03.7-ux-writing.md`; the risk register runs before `04.5-feasibility-review.md`).
 
 - `00-brief.md`
 - `00-decision-log.md`
@@ -244,29 +281,38 @@ Create or update a folder such as `docs/product-planning/<slug>/` with:
 - `01-reference-research.md` or `01-ideation.md`
 - `01.5-reference-deconstruction.md` when references exist
 - `01.6-parallel-concepts.md`
+- `01.8-positioning-brand.md`
 - `02-mechanisms.md`
 - `02-prd.md`
 - `02.5-screen-contracts.md`
+- `02.7-feasibility-checkpoint.md`
 - `03-storyboard.html`
 - `03.5-art-direction-brief.md`
+- `03.7-ux-writing.md`
 - `04.1-visual-quality-gate.md`
 - `04.2-backend-systems-brief.md`
 - `04.3-design-system.md` or `.html`
 - `04.32-design-system-workbench.md`
-- `prototypes/<product>-design-system-workbench.html` or equivalent isolated React workbench
+- `prototypes/<product>-design-system-workbench.html` or equivalent isolated workbench
 - `tokens/` files when token export is useful and values are stable enough
 - `04.35-high-fidelity-screen.md` plus optional single-screen specimen only when one screen needs an extra pixel pass
+- `04.36-clickable-demo.md` + `prototypes/<product>-demo.html`
 - `04.4-prototype-test.md`
 - `04.45-design-critique.md`
+- `04.55-risk-register.md` when the domain makes it mandatory
 - `04.5-feasibility-review.md`
 - `05-engineering-handoff.md`
 - `screenshots/` when references are researched
 
+Lite mode creates only: `00-brief.md`, `00-decision-log.md`, `00-review-dashboard.html`, `01-*(research|ideation).md`, `02-prd.md`, `02.5-screen-contracts.md`, `03-storyboard.html` (init with `--lite`).
+
 To initialize the artifact structure, run:
 
 ```bash
-python3 <plugin-root>/scripts/init_prd_project.py "<product name>" --root docs/product-planning
+python3 <plugin-root>/scripts/init_prd_project.py "<product name>" --root docs/product-planning   # add --lite for Lite mode
 ```
+
+If `python3` is unavailable, do not stall: create the folder and the stub files directly with your file tools (same names as above; the script is a convenience, not a dependency).
 
 ## Completion
 

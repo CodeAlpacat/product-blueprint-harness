@@ -49,5 +49,6 @@ Use `references/research-checklist.md` when the feature is complex.
 
 ## Next Step
 
+- 사용자가 결정할 것: 추가 리서치 범위, 로그인/유료/성인 게이트 뒤 탐색 승인.
 - Use `product-blueprint:reference-deconstruction` to turn screenshots and observations into product principles, screen gates, and anti-copy rules.
 - If no reference evidence was found, use `product-blueprint:ideation` instead.

@@ -25,7 +25,7 @@ Create or update:
 
 ## Required Sections
 
-1. **Current Status**: phase, pass/conditional/fail, and why.
+1. **Current Status**: phase, pass/fail (+ACCEPT-FLAG), and why.
 2. **Review This First (핵심 2~4)**: the 2–4 artifacts the user must actually look at now, each marked ★, each with a one-line "what to confirm/decide." Do not list all artifacts here — only the few that matter this phase.
 3. **Decision Queue**: each decision as `Approve`, `Change`, or `Hold`; include impact and the file that changes.
 4. **Flow Snapshot**: compact user-flow map with entry, gate, commitment, result, and recovery.
@@ -51,3 +51,7 @@ Create or update:
 Pass if the user can answer "what do I need to look at and decide next?" within 30 seconds.
 
 Fail if the dashboard is just a markdown dump in HTML, hides open questions, or does not link to the concrete artifact to inspect next.
+
+## Next Step
+
+- 사용자가 결정할 것: 없음 — 대시보드 갱신은 매 단계 자동 의무. 유저에게는 "지금 볼 것 2~4개"만 노출.

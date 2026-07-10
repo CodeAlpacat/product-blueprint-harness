@@ -42,4 +42,5 @@ Create `06-technical-plan.md` with:
 
 ## Next Step
 
+- 사용자가 결정할 것: 아키텍처 옵션 중 선택(비용/속도/확장 트레이드오프 명시된 상태에서).
 - Move into the target project's normal implementation workflow. In this repo, that means project-specific plan/spec, architecture review, implementation, and verification rather than more Product Blueprint planning.

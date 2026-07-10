@@ -105,5 +105,5 @@ Fail if:
 ## Next Step
 
 - If the specimen fails, revise `product-blueprint:art-direction-brief`, `product-blueprint:design-system`, or the selected screen contract.
-- If it conditionally passes, use `product-blueprint:prototype-test` for task-based review or `product-blueprint:design-critique` for visual/product critique.
+- If it passes with ACCEPT-FLAG rows recorded, use `product-blueprint:prototype-test` for task-based review or `product-blueprint:design-critique` for visual/product critique.
 - Use `product-blueprint:tech-plan` only after engineering handoff and explicit user approval.

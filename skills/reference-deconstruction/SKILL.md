@@ -42,5 +42,6 @@ Create `01.5-reference-deconstruction.md` with:
 
 ## Next Step
 
+- 사용자가 결정할 것: anti-copy 목록 승인, 미확인 플로우의 추가 조사 여부.
 - If the product direction is still open, use `product-blueprint:parallel-concepts`.
 - If the direction is already selected, use `product-blueprint:experience-mechanisms` and then `product-blueprint:prd`.

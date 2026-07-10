@@ -29,14 +29,20 @@ Use this as the final default phase of Product Blueprint. It is not the technica
 5. Backend/system responsibilities and high-risk invariants.
 6. Approved compromises and staged versions from feasibility review.
 7. Scope-out candidates and user-facing consequences.
-8. Open questions for engineering, product, design, legal/safety, and data/AI.
-9. Evidence links: screenshots, storyboard frames, and mechanism examples.
-10. High-fidelity visual evidence: design-system workbench screenshots, token/component/state coverage, and optional single-screen pixel pass when the product requires production-grade UI confidence before technical design.
-11. Readiness checklist for starting technical design.
+8. **Entity & State Contract (required — this is what lets a developer start architecting)**:
+   - **Entities**: every product object the screens and mechanisms imply (descriptive: name, key fields in product language, relationships/cardinality — e.g. "a mission scopes to a category and connects many-to-many with characters"). This is a domain model, NOT a storage schema — no tables, columns, or types.
+   - **Per-screen state machines**: take each screen contract's state list and write the transitions (state → event → state), including error/retry and recovery paths.
+   - **Invariants as testable assertions**: rewrite forbidden shortcuts and mechanism promises as assertions a developer can enforce structurally and test (e.g. "unverified accounts' list responses contain zero age-gated items — server-side, not a client filter", "paid tool execution and ledger deduction are one atomic operation").
+   A handoff without this section hands over questions, not contracts — developers cannot begin. Prose questions belong in section 9, not here.
+9. Open questions for engineering, product, design, legal/safety, and data/AI.
+10. Evidence links: screenshots, storyboard frames, and mechanism examples.
+11. High-fidelity visual evidence: design-system workbench screenshots, clickable-demo link, token/component/state coverage, and optional single-screen pixel pass when the product requires production-grade UI confidence before technical design.
+12. Risk register status: P0 risks and their mitigations (from `04.55-risk-register.md` when it exists); handoff is not ready with unmitigated P0 risks.
+13. Readiness checklist for starting technical design.
 
 ## Rules
 
-- Do not write database schema, API routes, service architecture, queues, model choices, or storage strategy.
+- Do not write database schema, API routes, service architecture, queues, model choices, or storage strategy. The Entity & State Contract stays descriptive (behavior and relationships), never prescriptive (storage and endpoints).
 - Do translate product/design intent into engineering review questions.
 - Do include backend/system risks that would break user trust if mishandled.
 - Preserve user experience requirements even when they are difficult.
@@ -49,6 +55,7 @@ Create `05-engineering-handoff.md`. Use `product-blueprint:tech-plan` only if th
 
 ## Next Step
 
+- 사용자가 결정할 것: 핸드오프 준비 완료 선언, 그리고 남은 open question 각각의 오너/시점 지정.
 - Stop here by default. This is the end of Product Blueprint's pre-development workflow.
 - If visual quality is still the main risk, use `product-blueprint:design-system-workbench` before `product-blueprint:tech-plan`.
 - Use `product-blueprint:tech-plan` only when the user explicitly asks to proceed into implementation architecture.

@@ -34,5 +34,6 @@ When visualizing without references, label every screen as `Assumption` rather t
 
 ## Next Step
 
+- 사용자가 결정할 것: 진행할 제품 테제 1개(또는 parallel-concepts로 넘길 후보 2~3개).
 - Use `product-blueprint:parallel-concepts` to compare multiple directions before selecting one.
 - Then use `product-blueprint:experience-mechanisms` for system-dependent behavior and `product-blueprint:prd` for requirements.

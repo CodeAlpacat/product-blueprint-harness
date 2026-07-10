@@ -59,5 +59,6 @@ Create `01.6-parallel-concepts.md` with:
 
 ## Next Step
 
+- 사용자가 결정할 것: 컨셉 A/B/C 중 direction lock — 비교표와 대표 시각물만 보고 결정 가능해야 하며, 구분이 안 되면 컨셉을 다시 구체화한다.
 - Use `product-blueprint:screen-contract` to define what each priority screen must and must not do.
 - Then use `product-blueprint:experience-mechanisms` for hidden system behavior and `product-blueprint:prd` for requirements.

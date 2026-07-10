@@ -65,5 +65,6 @@ Create `03.5-art-direction-brief.md` with:
 
 ## Next Step
 
+- 사용자가 결정할 것: 디자인 방향(팔레트·타입 램프·시그니처 요소) 승인 — 이 승인이 hi-fi 진입 게이트다. 바꾸려면 지금이 가장 싸다.
 - Use `product-blueprint:visual-quality-gate` after creating a mockup or storyboard proof.
 - Then use `product-blueprint:design-system` to turn the approved visual direction into reusable rules.

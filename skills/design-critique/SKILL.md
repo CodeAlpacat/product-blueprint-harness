@@ -42,11 +42,12 @@ Create `04.45-design-critique.md` with:
 - Open questions
 - Required revisions
 - Optional improvements
-- Pass/conditional/fail decision
+- Pass/fail decision (+ACCEPT-FLAG rows)
 - Handoff readiness note
 
 ## Next Step
 
+- 사용자가 결정할 것: P0/P1 지적의 수용 여부(수용 = 수정 후 재게이트, 기각 = 사유를 결정 로그에 기록).
 - If P0/P1 issues remain, revise the relevant artifact and rerun `product-blueprint:prototype-test` or `product-blueprint:visual-quality-gate`.
 - If visual-system coverage is missing, use `product-blueprint:design-system-workbench`.
 - If only P2/P3 issues remain, proceed to `product-blueprint:feasibility-review`.

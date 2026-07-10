@@ -2,6 +2,27 @@
 
 Cross-agent plugin for pre-development product planning and production-grade visual design. Runs in **both Codex and Claude Code**.
 
+## Quickstart (60 seconds)
+
+1. Install (see Install below).
+2. In a new or empty project folder, just **describe your idea and name the plugin** — there is no slash command; skills auto-trigger:
+
+   > "product-blueprint로 내 아이디어 기획해줘: 여성향 캐릭터 채팅 서비스를 만들고 싶어. 레퍼런스는 WHIF랑 Zeta."
+
+   or explicitly: "`product-blueprint:orchestrate`부터 시작해줘".
+3. Answer the short intake (max 5 questions). Pick a **mode**:
+
+   | Mode | You get | Rough effort |
+   |---|---|---|
+   | **Lite** | brief → research/ideation → PRD → screen contracts → storyboard + dashboard (~8 files) | one short session |
+   | **Standard** (default) | full pipeline: research → brand/naming → mechanisms → screens → design system → all-P0 mockups → clickable demo → handoff | several sessions |
+   | **Deep** | Standard + richer evidence, risk register, stronger states | multi-day |
+
+4. Want it hands-off? Say **"쭉 진행해"** — the orchestrator chains phases and only stops at the decisions that are genuinely yours (direction, brand, MVP scope, design acceptance, handoff). Every response ends with a `다음 단계` block: the recommended next skill, what you must decide, and where you are in the pipeline.
+5. Review visually, not by reading markdown: open `00-review-dashboard.html` (always current), the storyboard, and the clickable demo. The `.md` files are the detail source of truth.
+
+Notes: artifact scaffolding uses `python3` if available (falls back to direct file creation if not). Interrupted sessions resume from `00-decision-log.md` — say "이어서 진행해" in the same folder; say "아트디렉션만 다시" to redo one phase and its downstream only.
+
 This repository contains only the reusable plugin:
 
 - `.claude-plugin/plugin.json` + `.claude-plugin/marketplace.json` (Claude Code)
@@ -31,15 +52,18 @@ Product Blueprint guides an idea or reference product through:
 
 - research and reference deconstruction
 - ideation and parallel concepts
-- PRD and screen contracts
+- positioning, naming (taste-first rounds + availability signals), brand voice, mascot direction
+- PRD, experience mechanisms, and screen contracts
+- feasibility checkpoint BEFORE visual design (so mockups never promise the impossible)
 - storyboard visualization
-- art direction and visual quality gates
-- design-system planning and workbench generation
-- high-fidelity screen specimens
-- prototype testing and design critique
-- backend systems briefing
+- art direction and adversarial visual quality gates (with an all-P0 coverage matrix)
+- UX writing / microcopy sheets
+- design-system planning, tokens, portable DESIGN.md, and workbench generation
+- high-fidelity screen specimens and a single-file clickable demo (phone-frame flow + Figma-like board mode + rendered non-happy states)
+- prototype testing (heuristic + real-user protocol) and design critique
+- backend systems briefing and risk register
 - feasibility review
-- engineering handoff
+- engineering handoff with an Entity & State Contract developers can architect from
 
 The plugin is for planning before implementation. Frontend/backend technical architecture is a later handoff step, not the default starting point.
 

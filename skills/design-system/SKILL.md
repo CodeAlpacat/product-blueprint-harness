@@ -56,7 +56,10 @@ Beyond the analysis brief, emit a single **portable `DESIGN.md`** at the plannin
 - **Space / radius / elevation / motion** — the numeric scales.
 - **Components** — for each: anatomy, variants, states, token mapping, do/don't.
 - **Imagery** — aspect/crop/treatment/fallback.
-- **Signature element** and **Voice / UX writing**.
+- **Signature element** and **Voice / UX writing** (link the microcopy sheet `03.7-ux-writing.md` when it exists).
+- **Dark mode** — the dark token pair (or an explicit, user-approved deferral note).
+- **Motion** — durations, the easing curve, enter/exit patterns, waiting-state rule (in-place pending, no freeze).
+- **Governance** — where the SoT lives, how tokens/components are added, off-token values forbidden.
 - **Anti-slop rules** — the S1–S14 scan items to refuse.
 
 Keep the three layers in sync: `tokens/<product>.*` (machine), `DESIGN.md` (portable AI/human spec), and the rendered visual page from `design-system-workbench` (`prototypes/<product>-design-system.html` — swatches, type specimens, live components, states). `DESIGN.md` is the source a coding agent reads; the rendered page is how a human reviews it; the tokens are what code imports.

@@ -14,8 +14,13 @@ The gate is worthless if the model that produced the screen also grades it again
 - **Fresh critic.** Run the gate as a fresh-context subagent (or the `critique` + `audit` skills) that receives only the rendered screenshots, the measured spec/tokens, and the screen contract — **not** the generation conversation. Its job is to find reasons to reject; default to fail on doubt.
 - **Measurable, not vibes.** Compute WCAG contrast for each text pair, check the type-scale ratio, sample spacing for off-grid values, count palette hues, and scan for each named slop signature S1–S14 in `${CLAUDE_PLUGIN_ROOT}/references/anti-slop-doctrine.md`. Cite where each finding appears.
 - **Two template tests.** "Could this be any shadcn/SaaS starter with content swapped?" and "Would a senior designer put this in a portfolio?" A wrong answer to either = fail.
-- **Loop until clean.** CONDITIONAL is not PASS — return ranked fixes to the craft loop, fix, re-screenshot, re-gate (≈4 rounds cap on the ceiling screen). Never quietly pass; if still failing at the cap, surface the specific unresolved signatures to the user.
+- **Loop until clean, capped.** CONDITIONAL is not PASS — return ranked fixes to the craft loop, fix, re-screenshot, re-gate. Cap at **3 fix cycles** per artifact; still failing → record **ACCEPT-FLAG** in the decision log (what failed, why accepted, later fix) and surface it in the dashboard — never quietly pass, never loop forever (`references/quality-bar.md`).
 - **Browser proof required.** "Looks good" without a real screenshot is not a gate result.
+
+## Two scan modes
+
+- **Ceiling scan** (one screen, deep): full pass list below on the single decisive screen — run during the craft loop.
+- **All-P0 board scan** (breadth): after the workbench/clickable-demo exists, screenshot the board/all-screens view and check EVERY P0 screen against the coverage matrix (`02.5-screen-contracts.md` list × rendered × passing). A P0 screen with no rendered artifact = fail; "propagated from the ceiling" without a render is not coverage. Also scan cross-screen coherence: same tokens, same imagery treatment, one storyline.
 
 ## Output Language And Stage Exit
 
@@ -81,7 +86,8 @@ Fail if:
 
 Create `04.1-visual-quality-gate.md` with:
 
-- Verdict: pass, conditional pass, or fail
+- Verdict: pass or fail (plus any ACCEPT-FLAG rows — "conditional pass" is not a verdict)
+- All-P0 coverage matrix result (board scan)
 - AI-slop findings
 - Reference fidelity issues
 - Product-specific art direction
@@ -93,5 +99,5 @@ Use `references/visual-quality-checklist.md` for detailed checks.
 ## Next Step
 
 - If the verdict is fail, revise `product-blueprint:art-direction-brief`, `product-blueprint:screen-contract`, or the prototype before continuing.
-- If the verdict is pass or conditional pass, use `product-blueprint:backend-systems-brief` and `product-blueprint:design-system`.
+- If the verdict is pass (including pass with recorded ACCEPT-FLAG rows), use `product-blueprint:backend-systems-brief` and `product-blueprint:design-system`.
 - If design quality is the main risk, follow the design-system brief with `product-blueprint:design-system-workbench` before engineering handoff.
