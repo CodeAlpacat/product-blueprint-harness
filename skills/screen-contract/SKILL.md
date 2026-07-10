@@ -30,7 +30,7 @@ For each screen, define:
 7. **Required content**: Data, copy, imagery, controls, disclaimers.
 8. **Required states**: Empty, loading, locked, paid, unsafe, error, returning, success.
 9. **Mechanism surfaces**: Memory, judging, ranking, personalization, cost, safety.
-10. **Surface level**: main content, inline hint, bottom sheet, side panel, settings, modal, dedicated screen, or background-only.
+10. **Surface level**: main content, inline hint, bottom sheet, side panel, settings, modal, dedicated screen, or background-only. **Challenge every "dedicated screen" (direction-challenges C1)**: in the REPEAT-use flow, is it a wasted hop? Is a "gate" actually a data contract (enforced in schema/API) that should render as a sheet/dialog over its parent context? Prefer the surface that keeps the deciding context visible.
 11. **Acceptance checks**: How to tell if the screen is doing its job.
 
 ## Rules
