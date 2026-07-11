@@ -25,7 +25,7 @@ Turn the locked direction into a positioning statement, a name, a voice, and a v
 
 Naming fails when run in the wrong order. The proven order:
 
-1. **Ask the user's taste constraints first**: syllable count, language feel (KR/EN/coined/compound), reference names they like ("like Zeta/WHIF"), sounds to avoid. Do not generate 20 names before this.
+1. **Ask the user's taste constraints first**: syllable count, language feel (KR/EN/coined/compound), reference names they like, sounds to avoid. Do not generate 20 names before this.
 2. **Generate 3–5 candidates per round, judged on 어감 (sound/feel) with the user** — present with pronunciation, association, and a one-line rationale each. Iterate rounds until the user reacts positively to 1–2. Expect multiple rounds; a rejected round is signal, not failure — record WHY each was rejected (it narrows the space).
 3. **Only then research availability signals** for the survivors: app-store search collision, dominant IP/brand collision (mascots too — an animal can be "taken" by a famous character), domain/social handle, phonetic neighbors that cause confusion. Use a fresh research agent when available.
 4. Present the shortlist as a table: name | 어감/연상 | availability signals | risk notes. User picks.

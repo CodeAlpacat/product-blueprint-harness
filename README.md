@@ -7,7 +7,7 @@ Cross-agent plugin for pre-development product planning and production-grade vis
 1. Install (see Install below).
 2. In a new or empty project folder, just **describe your idea and name the plugin** — there is no slash command; skills auto-trigger:
 
-   > "product-blueprint로 내 아이디어 기획해줘: 여성향 캐릭터 채팅 서비스를 만들고 싶어. 레퍼런스는 WHIF랑 Zeta."
+   > "product-blueprint로 내 아이디어 기획해줘: 러닝 기록·공유 모바일 웹앱을 만들고 싶어. 레퍼런스는 Strava."
 
    or explicitly: "`product-blueprint:orchestrate`부터 시작해줘".
 3. Answer the short intake (max 5 questions). Pick a **mode**:
@@ -32,7 +32,7 @@ This repository contains only the reusable plugin:
 - `scripts/init_prd_project.py`
 - `assets/templates/storyboard-section.html`
 
-It intentionally does not include project-specific benchmark outputs, screenshots, WHIF captures, or Boylog planning artifacts.
+It intentionally does not include any project-specific planning outputs, benchmark captures, or screenshots from dogfood runs.
 
 ## Anti-Slop Visual Craft Spine
 
@@ -44,7 +44,7 @@ The planning/IA discipline was always strong; the weak point was visual output c
 - `craft-loop.md` — layered craft passes, ceiling-on-one-screen-first, full-viewport rendering + screenshots.
 - `adversarial-visual-gate.md` — a fresh-context critic runs measurable checks and loops until clean; conditional is not pass.
 
-On Claude Code, the visual phases delegate pixel craft to the built-in design skills (`impeccable`/`craft`, `layout`, `typeset`, `colorize`, `distill`, `polish`, `bolder`/`ui-redesign`, `critique`/`audit`) while the plugin owns product logic, IA, states, the measured spec, and the gate.
+On Claude Code, the visual phases can additionally delegate pixel craft to an **external design-skill suite if you have it installed** — `impeccable` (Apache 2.0, based on Anthropic's `frontend-design` skill) and its companion skills (`craft`, `layout`, `typeset`, `colorize`, `distill`, `polish`, `bolder`, `critique`). **These are third-party skills, not authored by or bundled with this plugin** — install them separately if you want them. When they are absent, the `references/` doctrine above is self-sufficient: apply the craft passes by hand. Either way, this plugin owns product logic, IA, states, the measured spec, and the adversarial gate; the craft layer only owns pixels.
 
 ## Purpose
 
@@ -88,12 +88,66 @@ Clone and link it using your Codex plugin workflow:
 git clone https://github.com/CodeAlpacat/product-blueprint-harness.git
 ```
 
-## Main Skill
+## How the skills fit together
 
-Start with:
+`orchestrate` is the **router, not a gatekeeper**: it sequences phases, enforces gates, and writes the decision log — but every skill below is standalone-callable. You do not need a full orchestrate run to use one piece.
+
+Start a full run with:
 
 ```text
 product-blueprint:orchestrate
 ```
 
-The orchestrator should ask for missing decisions, write decision logs, and recommend the next skill at each stage. For production-grade visual output, it routes through the anti-slop visual craft spine described above.
+### Skill map (pipeline order)
+
+| Stage | Skill | Owns (artifact) |
+|---|---|---|
+| Control | `orchestrate` | phase routing, gates, `00-decision-log.md` |
+| Control | `decision-dashboard` | `00-review-dashboard.html` (the visual review surface — refresh after every phase) |
+| Research | `research` / `ideation` | `01-reference-research.md` / `01-ideation.md` |
+| Research | `reference-deconstruction` | `01.5-reference-deconstruction.md` |
+| Concept | `parallel-concepts` | `01.6-parallel-concepts.md` (direction lock input) |
+| Brand | `positioning-brand` | `01.8-positioning-brand.md` (name, voice, mascot direction) |
+| Definition | `experience-mechanisms` | `02-mechanisms.md` (invisible behavior: memory, scoring, safety, paid) |
+| Definition | `prd` | `02-prd.md` (MVP lock input) |
+| Definition | `screen-contract` | `02.5-screen-contracts.md` (per-screen actions/states/wiring) |
+| Definition | `feasibility-review` (checkpoint mode) | `02.7-feasibility-checkpoint.md` — BEFORE any visual design |
+| Existing assets | `feature-adoption` (optional) | adoption map when you already own a mature codebase |
+| Visual | `storyboard` | `03-storyboard.html` (flow board) |
+| Visual | `art-direction-brief` | `03.5-art-direction-brief.md` (measured spec, not adjectives) |
+| Visual | `visual-quality-gate` | `04.1-visual-quality-gate.md` (adversarial anti-slop gate) |
+| Visual | `ux-writing` | `03.7-ux-writing.md` (microcopy used verbatim downstream) |
+| Visual | `design-system` → `design-system-workbench` | `04.3-*` + workbench HTML (tokens, component states, all-P0 mockups) |
+| Visual | `high-fidelity-screen` | single ceiling-screen pixel pass |
+| Visual | `clickable-demo` | `prototypes/<product>-demo.html` (primary founder review artifact) |
+| Assets | `art-production` (optional) | character/scene asset pipeline (prompt recipes, batch, curation board) |
+| Validation | `prototype-test`, `design-critique` | `04.4-*`, `04.45-*` |
+| Validation | `risk-register` | `04.55-risk-register.md` (mandatory for adult/minors/payments/UGC/PII/AI content) |
+| Validation | `feasibility-review` (full) | `04.5-feasibility-review.md` |
+| Handoff | `backend-systems-brief` | `04.2-backend-systems-brief.md` |
+| Handoff | `engineering-handoff` | `05-engineering-handoff.md` (Entity & State Contract) |
+| Post-handoff | `tech-plan` (opt-in only) | technical architecture — only when explicitly requested |
+
+### Improving one part mid-stream (partial use)
+
+Skills communicate through the numbered artifacts, with `00-decision-log.md` as shared state — so partial reruns are a first-class flow, not a hack:
+
+1. **Call the one skill you need** (in the planning folder). It reads its upstream artifacts and rewrites only its own.
+2. **Cascade downstream only**: after the rerun, update the artifacts that consume the changed one, farthest-upstream first, and leave the rest untouched. Saying "아트디렉션만 다시" to `orchestrate` does exactly this (its Phase 0 redo mode).
+3. **Refresh the dashboard** (`decision-dashboard`) so the review surface matches.
+
+Common partial asks:
+
+| You want to… | Call | Then cascades to |
+|---|---|---|
+| Rename / rebrand | `positioning-brand` | art-direction → design-system → workbench → demo |
+| Add or change one screen | `screen-contract` | storyboard → workbench (if new components) → demo |
+| Rebuild just the demo | `clickable-demo` | — (reads existing contracts) |
+| Strengthen form/component states | `design-system-workbench` | demo (if shared components changed) |
+| Redo the visual direction | `art-direction-brief` | visual-quality-gate → design-system → workbench → demo |
+| Generate/curate art assets | `art-production` | demo (asset wiring) |
+| Audit what's still undefined | run the coverage self-audit (`references/coverage-self-audit.md`) | `02.8-undefined-surfaces.md` + dashboard |
+| Check risk/compliance only | `risk-register` | handoff |
+| Mine an existing codebase | `feature-adoption` | screen-contract deltas → demo → tech-plan |
+
+If you're unsure which skill owns what you want to change, ask `orchestrate` to route it ("X만 다시") — it will identify the owning skill and the downstream update list instead of restarting the pipeline.

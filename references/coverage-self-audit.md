@@ -1,6 +1,6 @@
 # Coverage Self-Audit — the developer-lens gap scan (run it BEFORE the user has to ask)
 
-Dogfood evidence (2026-07-10, Doyo): three separate founder questions — "where are the desktop layouts and side panels?", "desktop should extend mobile with a max-width cap", "where is the Storybook-style state enumeration?" — each hit a real P0 gap the harness had not caught. The pattern to kill: **gaps surface only when the founder asks**. This audit makes the harness ask first.
+Dogfood evidence (2026-07-10): three separate founder questions — "where are the desktop layouts and side panels?", "desktop should extend mobile with a max-width cap", "where is the Storybook-style state enumeration?" — each hit a real P0 gap the harness had not caught. The pattern to kill: **gaps surface only when the founder asks**. This audit makes the harness ask first.
 
 ## When
 

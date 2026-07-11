@@ -1,6 +1,6 @@
 # Direction Challenges — the harness challenges itself so the founder doesn't have to
 
-Dogfood evidence (Doyo): the founder's direction challenges — not completeness questions — produced the biggest quality jumps: "does the persona gate need to be a SCREEN?", "desktop should extend mobile, not invent a new grammar", "is wholesale transplant really better?". These are patternable. This catalog makes the harness fire them at the right lock points, answer them honestly in writing, and self-correct BEFORE presenting.
+Dogfood evidence: the founder's direction challenges — not completeness questions — produced the biggest quality jumps: "does the persona gate need to be a SCREEN?", "desktop should extend mobile, not invent a new grammar", "is wholesale transplant really better?". These are patternable. This catalog makes the harness fire them at the right lock points, answer them honestly in writing, and self-correct BEFORE presenting.
 
 ## How to run a challenge pass
 
