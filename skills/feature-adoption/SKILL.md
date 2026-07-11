@@ -5,7 +5,7 @@ description: Deep-analyzes an existing codebase the founder already owns (a sibl
 
 # Feature Adoption — mine the existing asset before building new
 
-A founder with a mature codebase owns validated features the new plan silently forgets. Mining it changed the Doyo screen set (reading settings, message actions, attendance) and the tech plan. Do this BEFORE tech-plan; feed screen deltas back into contracts/demo.
+A founder with a mature codebase owns validated features the new plan silently forgets. Mining it changed a dogfood project's screen set and tech plan in material ways. Do this BEFORE tech-plan; feed screen deltas back into contracts/demo.
 
 ## 1. Three-axis parallel inventory (fresh subagents, feature level — not code review)
 

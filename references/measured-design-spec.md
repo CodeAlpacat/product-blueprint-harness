@@ -16,8 +16,8 @@ If references exist, ingest 3–5 real reference screenshots (competitors + one 
 - Color: count of distinct hues, is there a gradient, border vs shadow for separation, hairline width.
 - Density: items per viewport, image-to-text ratio, card vs list.
 
-Example (good): `관찰 — Zeta 홈: 4pt grid, body 15px/1.5, no card shadow, 1px hairline dividers, 2-col character grid, image:text ≈ 60:40.`
-Example (bad, banned): `관찰 — Zeta는 모던하고 깔끔함.`
+Example (good): `관찰 — 레퍼런스 A 홈: 4pt grid, body 15px/1.5, no card shadow, 1px hairline dividers, 2-col character grid, image:text ≈ 60:40.`
+Example (bad, banned): `관찰 — 레퍼런스 A는 모던하고 깔끔함.`
 
 Then decide, per extracted decision, `차용`(borrow the principle) or `거부`(refuse to copy) — never copy the literal skin.
 

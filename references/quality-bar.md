@@ -63,7 +63,7 @@ End with exactly one of:
 
 ## Coverage additions (2026-07-10 dogfood — gaps the founder had to ask about)
 
-- [ ] Responsive grammar rendered: desktop = mobile extended with an app max-width cap (Zeta/WHIF pattern), ≥3 screens drawn, derivation rule for the rest. No desktop-only grammar.
+- [ ] Responsive grammar rendered: desktop = mobile extended with an app max-width cap (the mobile-first cap pattern common in consumer apps), ≥3 screens drawn, derivation rule for the rest. No desktop-only grammar.
 - [ ] Form controls enumerated Storybook-style (rendered states, not a legend) + written form validation policy.
 - [ ] Wiring matrix (screen × action → destination; click-verified vs state-sample rows distinguished).
 - [ ] Global fallbacks drawn: 404 · connection-lost/server-error (progress-preserved copy) · maintenance.
