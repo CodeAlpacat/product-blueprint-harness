@@ -20,7 +20,7 @@ The gate is worthless if the model that produced the screen also grades it again
 ## Two scan modes
 
 - **Ceiling scan** (one screen, deep): full pass list below on the single decisive screen — run during the craft loop.
-- **All-P0 board scan** (breadth): after the workbench/clickable-demo exists, screenshot the board/all-screens view and check EVERY P0 screen against the coverage matrix (`02.5-screen-contracts.md` list × rendered × passing). A P0 screen with no rendered artifact = fail; "propagated from the ceiling" without a render is not coverage. Also scan cross-screen coherence: same tokens, same imagery treatment, one storyline.
+- **All-P0 board scan** (breadth): after the workbench/clickable-demo exists, screenshot the board/all-screens view and check EVERY P0 surface/state from `02.6-service-manifest.json` against the rendered coverage matrix. A P0 surface with no rendered artifact = fail; "propagated from the ceiling" without a render is not coverage. Also scan cross-screen coherence: same tokens, same imagery treatment, one storyline.
 
 ## Output Language And Stage Exit
 
@@ -74,6 +74,7 @@ Fail if:
 - It has screens without states or state transitions.
 - It omits a category-baseline surface without explicitly scoping it out.
 - It turns an unconfirmed feature interpretation into a P0 screen.
+- It invents or drops a surface/action/state relative to the service manifest, even when the invented design looks better.
 - It uses reference screenshots but misses scroll/tab content that affects product structure.
 - It uses abstract placeholders where the product's core appeal depends on visual assets.
 - It does not show entry/decision/next wiring for priority frames, or puts those planning labels inside the mocked product UI instead of outside frame annotations.

@@ -9,7 +9,7 @@ Copy is UI. A screen with placeholder copy is an unfinished screen; a label that
 
 ## Inputs
 
-- `01.8-positioning-brand.md` (voice rules + jargon ban list), `02.5-screen-contracts.md` (screens + states), `02-mechanisms.md` (what the product promises)
+- `01.8-positioning-brand.md` (voice rules + jargon ban list), `02.5-screen-contracts.md` (human explanation), `02.6-service-manifest.json` (P0 surface/action/state IDs), `02-mechanisms.md` (what the product promises)
 
 ## Output
 
@@ -17,7 +17,7 @@ Copy is UI. A screen with placeholder copy is an unfinished screen; a label that
 
 ## The sheet
 
-Per P0 screen, a table: element | copy (user language) | tone note. Must cover:
+Per P0 surface ID, a table: action/state ID | element | copy (user language) | tone note. Must cover:
 
 1. **Labels & navigation**: every tab, button, and section header. User language only — apply the jargon ban list (internal concept names never surface).
 2. **Empty states**: a real sentence + a next action for every empty in the state matrix. Never "No data". Good empties acknowledge the moment ("아직 시작한 이야기가 없어요") and offer one door.
@@ -36,7 +36,7 @@ Per P0 screen, a table: element | copy (user language) | tone note. Must cover:
 
 ## Gate
 
-- [ ] Every P0 screen has its rows; every state-matrix cell that shows text has copy
+- [ ] Every manifest P0 surface has its rows; every required state/action that shows text has copy keyed by the same ID
 - [ ] Zero jargon-ban violations (grep the ban list against the sheet)
 - [ ] Paid/destructive/verification moments disclose cost/consequence in the copy itself
 

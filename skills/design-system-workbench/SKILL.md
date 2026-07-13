@@ -47,6 +47,7 @@ A production-grade design-system workbench must look and behave closer to Storyb
 - `04.3-design-system.md`
 - Design-system research notes when quality has been challenged
 - Screen contracts and PRD scope
+- `02.6-service-manifest.json` (authoritative P0 surface/state/action set)
 - Any reference design-system examples, token files, or style exports supplied by the user
 
 ## Output Language And Stage Exit
@@ -85,8 +86,8 @@ The React workbench must include these sections:
 3. **Component Documentation**: for each priority component show purpose, anatomy, variants, states, behavior, accessibility, content rules, do/don't, and token mapping.
 4. **Pattern Library**: the product's real cross-component patterns, derived from *its* PRD and screen contracts. (Example set for a character-chat product: discovery grid, ranking list, detail reading flow, persona setup, chat thread, tool panel, memory correction, checkpoint copy, locked/error recovery. Substitute your product's actual patterns — a commerce or data product will have entirely different ones.)
 5. **State Lab**: loading, empty, locked/safety, error/retry, paid confirmation, success, correction/recovery, disabled, long-content, image-failure, and permission states.
-6. **Production Screen Set**: high-fidelity mockups for all P0 surfaces from the screen contracts. For character-chat products this usually means home, search/all characters, ranking, character detail, persona gate, chat, chat side panel/tools, and conversations/library.
-7. **All-P0 Coverage Matrix (exit gate)**: a table in `04.32-design-system-workbench.md` — every P0 screen from `02.5-screen-contracts.md` | rendered artifact (workbench section or demo screen) | visual-gate status. **A row with no rendered artifact fails the phase.** "Propagated from the ceiling" is a technique, not coverage — coverage is a render you can screenshot.
+6. **Production Screen Set**: high-fidelity mockups for all P0 surfaces from the service manifest. For character-chat products this usually means home, search/all characters, ranking, character detail, persona gate, chat, chat side panel/tools, and conversations/library.
+7. **All-P0 Coverage Matrix (exit gate)**: a table in `04.32-design-system-workbench.md` — every P0 surface ID from `02.6-service-manifest.json` | rendered artifact (workbench section or demo screen) | required state IDs | visual-gate status. **A row with no rendered artifact fails the phase.** "Propagated from the ceiling" is a technique, not coverage — coverage is a render you can screenshot.
 8. **Flow Wiring**: arrows, labels, and review notes outside the product screen frames. Product frames must contain only user-facing UI.
 9. **Dark mode & motion**: a dark token pair (OKLCH makes this cheap) with at least one screen rendered dark + contrast re-checked, and a motion spec (durations, easing curve, enter/exit patterns, waiting-state behavior — motion explains, never decorates). Mark dark mode "explicitly deferred" only with a user decision logged.
 10. **Governance note**: how tokens/components change after handoff — where the SoT lives (tokens files + DESIGN.md), who approves additions, and the rule that screens never introduce off-token values.
@@ -95,6 +96,7 @@ The React workbench must include these sections:
 ## Product Rules
 
 - Do not invent new primary navigation just to show components.
+- Do not invent surface/action/state IDs. Update the service contract first when the design reveals a real missing surface.
 - Do not promote internal mechanisms into main tabs without user approval. (Domain example: for character-chat, persona/setup belongs after character detail and before chat, and memory/checkpoint belong in the chat tool surface, unless the user changed the model. For other domains, apply the neutral rule — an internal mechanism earns a primary surface only when the user's task requires it.)
 - Do not use blank image wells for character/product-heavy domains. Use reference screenshots, generated images, or repeated safe assets with different crops.
 - Do not let the workbench become a generic SaaS kit. Components must use product-specific content, states, and vocabulary.

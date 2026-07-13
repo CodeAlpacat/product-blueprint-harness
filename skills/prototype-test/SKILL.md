@@ -7,6 +7,8 @@ description: Tests clickable or screenshot-based prototypes against concrete use
 
 Use this before accepting a storyboard, design-system workbench, or high-fidelity mockup. The goal is not code QA; it is product-flow validation.
 
+Use `02.6-service-manifest.json` journeys as the task inventory. Do not invent a task path in this artifact; if a real task is missing, add the journey and rerun the contract/prototype gates.
+
 ## Test Setup
 
 Define 5 to 8 task prompts:
@@ -27,6 +29,7 @@ For each task, record:
 - Misleading action to watch for
 - Pass/fail signal
 - Observed confusion or evidence gap
+- Journey ID, action IDs, expected end surface ID, and exception state/recovery IDs
 
 ## Checks
 
@@ -43,6 +46,8 @@ For each task, record:
 2. **Real-user protocol (recommend when stakes justify it)**: 5 target-audience users, the same task prompts, think-aloud, success signal per task, confusion notes. Provide the ready-to-run protocol in the artifact (tasks, script, what to record) so the founder can execute it without design-research background.
 
 Until level 2 runs, every downstream artifact that claims the flow "works" carries the label **`실사용자 미검증`** — the handoff readiness checklist must show it. A heuristic pass upgraded to "validated" is a false claim.
+
+After testing, update manifest `user_validation.status/evidence` and the affected surface `verified` fields. Then rerun the prototype-stage validator; heuristic evidence may pass the structural gate but keeps `user_validated=false`.
 
 ## Rules
 
