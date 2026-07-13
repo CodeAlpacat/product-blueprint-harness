@@ -28,8 +28,8 @@ class ServiceBlueprintValidatorTest(unittest.TestCase):
     def tearDown(self) -> None:
         self.temp.cleanup()
 
-    def validate(self, profile: str | None = None):
-        return MODULE.Validator(self.root, profile).run()
+    def validate(self, profile: str | None = None, stage: str = "handoff"):
+        return MODULE.Validator(self.root, profile, stage).run()
 
     def manifest(self) -> dict:
         return json.loads((self.root / "02.6-service-manifest.json").read_text(encoding="utf-8"))
@@ -184,6 +184,23 @@ class ServiceBlueprintValidatorTest(unittest.TestCase):
         written = json.loads((self.root / "05-readiness-report.json").read_text(encoding="utf-8"))
         self.assertEqual(written["manifest_sha256"], report["manifest_sha256"])
         self.assertIn("Status: **pass**", (self.root / "05-readiness-report.md").read_text(encoding="utf-8"))
+
+    def test_contract_stage_passes_before_prototype_exists(self) -> None:
+        manifest = self.manifest()
+        for surface in manifest["surfaces"]:
+            surface["status"] = {"defined": True, "prototyped": False, "wired": False, "contracted": False, "verified": False}
+        self.write_manifest(manifest)
+        shutil.rmtree(self.root / "prototypes")
+        report = self.validate(stage="contract")
+        self.assertEqual(report["status"], "contract-pass")
+        self.assertFalse(report["engineering_ready"])
+
+    def test_prototype_stage_does_not_require_handoff_yet(self) -> None:
+        (self.root / "04.4-prototype-test.md").unlink()
+        (self.root / "05-engineering-handoff.md").unlink()
+        report = self.validate(stage="prototype")
+        self.assertEqual(report["status"], "prototype-pass")
+        self.assertFalse(report["engineering_ready"])
 
 
 if __name__ == "__main__":

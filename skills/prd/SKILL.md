@@ -32,6 +32,7 @@ Write the PRD after research or ideation, not before.
 11. Metrics and qualitative success signals
 12. Open questions and unverified flows
 13. Acceptance criteria
+14. Entry-point inventory: route/deep link, in-product navigation, auth gate, external/notification, returning/cross-device; mark `n/a` with reason
 
 ## Required Feature Table
 
@@ -65,12 +66,16 @@ Evidence values:
 - Include empty, error, locked, loading, paid, and completion states.
 - For AI/system-judged features, include user promise, controls, transparency, failure UX, and acceptance examples.
 - Do not specify database tables yet. Name product concepts first.
+- Give every user story a stable ID (`us-<job>-<nn>`). These IDs must survive copy and screen-number changes.
+- Before detailed requirements, enumerate the product category's baseline surfaces and classify each `P0 / P1 / P2 / excluded`, with a decision reference and current-release entry behavior for every exclusion.
+- Map each P0 story to its starting entry point, required end result, exception, and boundary state. A nav label is not a surface definition.
 
 ## Output
 
-Create `02-prd.md`. End with a feature-by-feature checklist that can drive storyboard, design-system work, feasibility review, and engineering handoff.
+Create `02-prd.md`. End with a feature-by-feature checklist and a `Service Manifest Seed` table: story ID | persona/role | entry point | required result | required surfaces | exception/boundary. This drives `02.6-service-manifest.json`.
 
 ## Next Step
 
 - Use `product-blueprint:screen-contract` to define each priority screen's job, allowed actions, forbidden shortcuts, states, and transitions.
+- Then use `product-blueprint:service-contract` to bind stories, surfaces, actions, states, operations, and journeys before visual design.
 - Then use `product-blueprint:storyboard`.

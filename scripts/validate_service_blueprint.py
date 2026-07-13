@@ -43,6 +43,21 @@ LITE_ARTIFACTS = (
     "03-storyboard.html",
 )
 
+CONTRACT_ARTIFACTS = (
+    "00-brief.md",
+    "00-decision-log.md",
+    "00-review-dashboard.html",
+    "02-prd.md",
+    "02.5-screen-contracts.md",
+    "02.6-service-manifest.json",
+)
+
+PROTOTYPE_ARTIFACTS = CONTRACT_ARTIFACTS + (
+    "03-storyboard.html",
+    "04.2-backend-systems-brief.md",
+    "04.36-clickable-demo.md",
+)
+
 SURFACE_TYPES = {"screen", "overlay", "sheet", "dialog", "panel", "background"}
 ACTION_TYPES = {"navigate", "open-overlay", "close-overlay", "read", "write", "destructive", "external"}
 STATE_TYPES = {"default", "loading", "empty", "error", "success", "locked", "permission", "offline", "conflict", "paid"}
@@ -90,9 +105,10 @@ class DemoParser(HTMLParser):
 
 
 class Validator:
-    def __init__(self, root: Path, profile: str | None = None) -> None:
+    def __init__(self, root: Path, profile: str | None = None, stage: str = "handoff") -> None:
         self.root = root.resolve()
         self.profile_override = profile
+        self.stage = stage
         self.manifest_path = self.root / "02.6-service-manifest.json"
         self.manifest: dict[str, Any] = {}
         self.findings: list[Finding] = []
@@ -104,11 +120,12 @@ class Validator:
     def run(self) -> dict[str, Any]:
         self._load_manifest()
         profile = self._profile()
-        self._validate_artifacts(profile)
+        self._validate_artifacts(profile, self.stage)
         if self.manifest:
             self._validate_shape(profile)
-            self._validate_contract(profile)
-            self._validate_readiness_claims()
+            self._validate_contract(profile, self.stage)
+            if self.stage == "handoff":
+                self._validate_readiness_claims()
         return self._report(profile)
 
     def _load_manifest(self) -> None:
@@ -137,8 +154,13 @@ class Validator:
         mode = project.get("mode", "standard") if isinstance(project, dict) else "standard"
         return mode if mode in {"lite", "standard", "deep"} else "standard"
 
-    def _validate_artifacts(self, profile: str) -> None:
-        required = LITE_ARTIFACTS if profile == "lite" else STANDARD_ARTIFACTS
+    def _validate_artifacts(self, profile: str, stage: str) -> None:
+        if stage == "contract":
+            required = CONTRACT_ARTIFACTS
+        elif stage == "prototype":
+            required = PROTOTYPE_ARTIFACTS
+        else:
+            required = LITE_ARTIFACTS if profile == "lite" else STANDARD_ARTIFACTS
         for relative in required:
             if not (self.root / relative).is_file():
                 self.add(
@@ -185,7 +207,7 @@ class Validator:
         if status == "real-user" and not validation.get("evidence"):
             self.add("REAL_USER_EVIDENCE_MISSING", "real-user status requires evidence.", "user_validation.evidence", "prototype-test")
 
-    def _validate_contract(self, profile: str) -> None:
+    def _validate_contract(self, profile: str, stage: str) -> None:
         surfaces = self._index("surfaces", "screen-contract")
         actions = self._index("actions", "screen-contract")
         states = self._index("states", "screen-contract")
@@ -193,14 +215,15 @@ class Validator:
         ai_assists = self._index("ai_assists", "service-contract")
         journeys = self._index("journeys", "service-contract")
 
-        self._validate_surfaces(surfaces, actions, states, profile)
-        self._validate_actions(actions, surfaces, operations, profile)
-        self._validate_states(states, surfaces, actions, profile)
+        self._validate_surfaces(surfaces, actions, states, profile, stage)
+        self._validate_actions(actions, surfaces, operations, profile, stage)
+        self._validate_states(states, surfaces, actions, profile, stage)
         self._validate_operations(operations, profile)
         self._validate_ai_assists(ai_assists, actions)
         self._validate_journeys(journeys, surfaces, actions, states, profile)
         if profile != "lite":
             self._validate_reachability(surfaces, actions, journeys)
+        if profile != "lite" and stage in {"prototype", "handoff"}:
             self._validate_uncontracted_controls(actions)
 
     def _mapping(self, key: str) -> dict[str, Any]:
@@ -262,6 +285,7 @@ class Validator:
         actions: dict[str, dict[str, Any]],
         states: dict[str, dict[str, Any]],
         profile: str,
+        stage: str,
     ) -> None:
         responsive_web = "responsive-web" in self._mapping("project").get("platforms", [])
         for surface_id, surface in surfaces.items():
@@ -286,8 +310,14 @@ class Validator:
                     self.add("UNKNOWN_STATE_REFERENCE", f"Unknown state {ref!r}.", f"{path}.required_state_ids", "screen-contract")
 
             if surface.get("priority") == "P0" and surface.get("type") != "background" and profile != "lite":
-                self._validate_dom_reference(surface.get("prototype"), surface_id, "data-surface", "SURFACE_NOT_PROTOTYPED", path, "clickable-demo")
-                self._validate_status(surface.get("status"), path, require_verified=True)
+                required_status = ("defined",)
+                if stage == "prototype":
+                    required_status = STATUS_KEYS[:-1]
+                elif stage == "handoff":
+                    required_status = STATUS_KEYS
+                self._validate_status(surface.get("status"), path, required_status)
+                if stage in {"prototype", "handoff"}:
+                    self._validate_dom_reference(surface.get("prototype"), surface_id, "data-surface", "SURFACE_NOT_PROTOTYPED", path, "clickable-demo")
 
             if responsive_web and surface.get("priority") == "P0" and surface.get("type") == "screen" and profile != "lite":
                 responsive = surface.get("responsive", {})
@@ -298,12 +328,12 @@ class Validator:
                     has_rule = self._meaningful(responsive.get("derivation_rule"))
                     if not (has_desktop or has_rule):
                         self.add("RESPONSIVE_EVIDENCE_MISSING", "Provide desktop evidence or an explicit derivation rule.", f"{path}.responsive", "clickable-demo")
-                    if has_desktop:
+                    if has_desktop and stage in {"prototype", "handoff"}:
                         prototype = surface.get("prototype", {})
                         reference = {"file": prototype.get("file"), "element_id": responsive.get("desktop_element_id")}
                         self._validate_dom_reference(reference, None, None, "RESPONSIVE_EVIDENCE_MISSING", f"{path}.responsive", "clickable-demo")
 
-    def _validate_status(self, status: Any, path: str, require_verified: bool) -> None:
+    def _validate_status(self, status: Any, path: str, required_status: tuple[str, ...]) -> None:
         if not isinstance(status, dict):
             self.add("SURFACE_STATUS_MISSING", "P0 surface needs five evidence-backed status fields.", f"{path}.status", "service-contract")
             return
@@ -316,8 +346,9 @@ class Validator:
             if seen_false and value:
                 self.add("INVALID_STATUS_PROGRESSION", f"{key} cannot be true after an earlier stage is false.", f"{path}.status.{key}", "service-contract")
             seen_false = seen_false or not value
-        if require_verified and any(status.get(key) is not True for key in STATUS_KEYS):
-            self.add("SURFACE_NOT_VERIFIED", "Every P0 surface maturity stage must be true before readiness.", f"{path}.status", "implementation-readiness")
+        if any(status.get(key) is not True for key in required_status):
+            code = "SURFACE_NOT_VERIFIED" if "verified" in required_status else "SURFACE_STAGE_INCOMPLETE"
+            self.add(code, f"Required maturity stages are not complete for {self.stage}: {', '.join(required_status)}.", f"{path}.status", "implementation-readiness")
 
     def _validate_actions(
         self,
@@ -325,6 +356,7 @@ class Validator:
         surfaces: dict[str, dict[str, Any]],
         operations: dict[str, dict[str, Any]],
         profile: str,
+        stage: str,
     ) -> None:
         for action_id, action in actions.items():
             path = f"actions.{action_id}"
@@ -363,7 +395,7 @@ class Validator:
                     if not self._meaningful(values.get(key)):
                         self.add("INCOMPLETE_ACTION_CONTRACT", f"{group}.{key} is required; use n/a:<reason> only when inapplicable.", f"{path}.{group}.{key}", "screen-contract")
 
-            if profile != "lite":
+            if profile != "lite" and stage in {"prototype", "handoff"}:
                 self._validate_action_dom(action_id, action)
 
     def _validate_states(
@@ -372,6 +404,7 @@ class Validator:
         surfaces: dict[str, dict[str, Any]],
         actions: dict[str, dict[str, Any]],
         profile: str,
+        stage: str,
     ) -> None:
         for state_id, state in states.items():
             path = f"states.{state_id}"
@@ -384,7 +417,7 @@ class Validator:
             recovery = state.get("recovery_action_id")
             if recovery and recovery not in actions:
                 self.add("UNKNOWN_ACTION_REFERENCE", f"Unknown recovery action {recovery!r}.", f"{path}.recovery_action_id", "screen-contract")
-            if state.get("required") is True and profile != "lite":
+            if state.get("required") is True and profile != "lite" and stage in {"prototype", "handoff"}:
                 self._validate_dom_reference(state.get("prototype"), None, None, "STATE_NOT_REPRODUCIBLE", path, "clickable-demo")
 
     def _validate_operations(self, operations: dict[str, dict[str, Any]], profile: str) -> None:
@@ -623,6 +656,12 @@ class Validator:
         if errors:
             status = "fail"
             engineering_ready = False
+        elif self.stage == "contract":
+            status = "contract-pass"
+            engineering_ready = False
+        elif self.stage == "prototype":
+            status = "prototype-pass"
+            engineering_ready = False
         elif profile == "lite":
             status = "lite-pass"
             engineering_ready = False
@@ -632,6 +671,7 @@ class Validator:
         return {
             "schema_version": "1.0",
             "status": status,
+            "stage": self.stage,
             "profile": profile,
             "engineering_ready": engineering_ready,
             "user_validated": user_validated,
@@ -676,6 +716,7 @@ def parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("planning_dir", type=Path)
     parser.add_argument("--profile", choices=("lite", "standard", "deep"))
+    parser.add_argument("--stage", choices=("contract", "prototype", "handoff"), default="handoff")
     parser.add_argument("--no-write", action="store_true", help="Print findings without writing readiness reports")
     parser.add_argument("--json", action="store_true", help="Print the full JSON report")
     return parser.parse_args(argv)
@@ -687,8 +728,8 @@ def main(argv: Iterable[str] | None = None) -> int:
     if not root.is_dir():
         print(f"Planning directory does not exist: {root}", file=sys.stderr)
         return 2
-    report = Validator(root, args.profile).run()
-    if not args.no_write:
+    report = Validator(root, args.profile, args.stage).run()
+    if not args.no_write and args.stage == "handoff":
         write_report(root, report)
     if args.json:
         print(json.dumps(report, ensure_ascii=False, indent=2))
@@ -696,7 +737,7 @@ def main(argv: Iterable[str] | None = None) -> int:
         print(f"{report['status']}: {len(report['findings'])} finding(s)")
         for finding in report["findings"]:
             print(f"- {finding['code']} [{finding['severity']}]: {finding['message']} ({finding['path']})")
-    return 0 if report["status"] in {"pass", "lite-pass"} else 1
+    return 0 if report["status"] in {"contract-pass", "prototype-pass", "pass", "lite-pass"} else 1
 
 
 if __name__ == "__main__":

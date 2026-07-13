@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import re
 from pathlib import Path
 
@@ -346,9 +347,15 @@ Not legal advice — real counsel reviews before launch.
 
 ## Acceptance Checks
 
+## Stable ID Registry
+
+## Action Feedback & Accessibility Matrix
+
+## Operation References
+
 ## Next Step
 
-- Use product-blueprint:storyboard.
+- Use product-blueprint:service-contract, then product-blueprint:storyboard.
 """,
     "03-storyboard.html": """<!doctype html>
 <html lang="ko">
@@ -578,6 +585,14 @@ def main() -> int:
     (target / "prototypes").mkdir(exist_ok=True)
     (target / "tokens").mkdir(exist_ok=True)
 
+    template_path = Path(__file__).resolve().parent.parent / "assets" / "templates" / "service-manifest.json"
+    manifest = json.loads(template_path.read_text(encoding="utf-8"))
+    manifest["project"]["name"] = args.name
+    manifest["project"]["mode"] = "lite" if args.lite else "standard"
+    manifest["evidence"]["demo_file"] = f"prototypes/{slugify(args.name)}-demo.html"
+    files = dict(FILES)
+    files["02.6-service-manifest.json"] = json.dumps(manifest, ensure_ascii=False, indent=2) + "\n"
+
     LITE_FILES = {
         "00-brief.md",
         "00-decision-log.md",
@@ -586,10 +601,11 @@ def main() -> int:
         "01-ideation.md",
         "02-prd.md",
         "02.5-screen-contracts.md",
+        "02.6-service-manifest.json",
         "03-storyboard.html",
     }
 
-    for filename, content in FILES.items():
+    for filename, content in files.items():
         if args.lite and filename not in LITE_FILES:
             continue
         path = target / filename

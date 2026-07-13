@@ -21,6 +21,8 @@ Use this before storyboard and before high-fidelity UI. It prevents attractive s
 
 For each screen, define:
 
+0. **Stable surface ID and type**: `[a-z][a-z0-9-]*`; type is screen, overlay, sheet, dialog, panel, or background. Never use display order as identity.
+
 1. **Screen purpose**: One sentence. If there are two competing purposes, split the screen.
 2. **User question**: What is the user trying to decide here?
 3. **Allowed actions**: Actions that may be available on this screen.
@@ -32,6 +34,9 @@ For each screen, define:
 9. **Mechanism surfaces**: Memory, judging, ranking, personalization, cost, safety.
 10. **Surface level**: main content, inline hint, bottom sheet, side panel, settings, modal, dedicated screen, or background-only. **Challenge every "dedicated screen" (direction-challenges C1)**: in the REPEAT-use flow, is it a wasted hop? Is a "gate" actually a data contract (enforced in schema/API) that should render as a sheet/dialog over its parent context? Prefer the surface that keeps the deciding context visible.
 11. **Acceptance checks**: How to tell if the screen is doing its job.
+12. **Stable action/state IDs**: every allowed action and required state gets an ID reused in the manifest and demo DOM.
+13. **Transition feedback**: every action has T0 (immediate), During, and Done behavior plus keyboard, focus, and announcement behavior.
+14. **Operation reference**: read/write/destructive/external actions name the product operation that owns data, permission, persistence, and recovery.
 
 ## Rules
 
@@ -49,6 +54,8 @@ For each screen, define:
 - On discovery-first home screens, do not make "resume/continue conversation" the main first-viewport module unless the user explicitly approves it. Returning conversations should default to a conversations/library surface, a bottom tab, or a character-detail secondary entry.
 - If a required screen is listed in the PRD, it must receive a screen contract. Do not leave it as a nav label only.
 - If a feature is P1 or later, do not include it as a P0 screen. Add a deferred contract only if it affects current decisions.
+- Entry and exit lists are bidirectional: an action listed on its source must be listed as an entry on its target. Same-surface effects use a stable effect ID.
+- Do not mark a surface implemented or verified here. Use the five manifest maturity fields and evidence.
 
 ## Output
 
@@ -61,9 +68,13 @@ Create `02.5-screen-contracts.md` with:
 - State matrix
 - Forbidden shortcut list
 - Acceptance checks
+- Stable ID registry: user story → surface/action/state IDs
+- Action feedback/accessibility matrix: action ID → T0/During/Done → keyboard/focus/announcement
+- Operation reference column for every data/external action
 - Feed `02.8-undefined-surfaces.md` (coverage self-audit): any surface an action points to that has no contract gets a 3-line mini-contract or an explicit derivation/deferral — developers must never have to invent a referenced screen.
 
 ## Next Step
 
-- Use `product-blueprint:storyboard` to visualize the contracted screens and transitions.
+- Use `product-blueprint:service-contract` and pass its contract-stage validator before storyboard.
+- Then use `product-blueprint:storyboard` to visualize the contracted screens and transitions.
 - If the screen depends on hidden system behavior, use or update `product-blueprint:experience-mechanisms` before storyboarding.

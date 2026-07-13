@@ -21,6 +21,7 @@ Use this before technical architecture. It is not a DB/API design. It prepares b
 
 - Product mechanisms
 - PRD requirements
+- `02.6-service-manifest.json` actions and operations
 - Storyboard flows
 - Feasibility checkpoint verdicts (`02.7-feasibility-checkpoint.md`) — carry them forward; do not re-litigate settled verdicts
 - Monetization, safety, creator, and result-state requirements
@@ -44,6 +45,19 @@ Use this before technical architecture. It is not a DB/API design. It prepares b
 8. **Engineering decisions later**
    - Questions for architecture, not decisions.
 
+## Operation Contract Matrix (required)
+
+For every P0 read/write/destructive/external action in the service manifest, fill the operation row in product language:
+
+- owner and source of truth
+- input/output user promise
+- authorization and persistence
+- idempotency, consistency, and conflict strategy
+- failure and recovery
+- audit/retention, latency/cost, observability, and abuse boundary
+
+Use `n/a:<reason>` when inapplicable. Use `decision-needed:<id>` only for a real blocker; readiness will fail until it is resolved. Keep endpoints, tables, providers, queues, and framework choices out of this artifact.
+
 ## Rules
 
 - Do not write tables, columns, endpoints, queues, cron jobs, model providers, or storage choices.
@@ -61,6 +75,7 @@ Create `04.2-backend-systems-brief.md` with:
 - Permission and lifecycle map
 - High-risk invariants
 - Scope-out and staged implementation questions
+- Operation matrix keyed by the exact IDs in `02.6-service-manifest.json`; update the manifest in the same change
 
 Use `references/backend-brief-checklist.md` for detailed prompts.
 

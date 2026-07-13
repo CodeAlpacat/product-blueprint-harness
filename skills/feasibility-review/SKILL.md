@@ -11,10 +11,10 @@ Two modes. Both protect product intent while making hard tradeoffs visible.
 
 Run right after screen contracts, before the storyboard renders anything. This is the "engineer in the room" moment — it prevents mockups from promising the impossible, which is far cheaper than reconciling after screens are polished.
 
-1. List every mechanism that a P0 screen depends on (from `02.5-screen-contracts.md` × `02-mechanisms.md`).
+1. List every mechanism and operation that a P0 surface/action depends on (from `02.6-service-manifest.json` × `02-mechanisms.md`). Preserve the exact surface/action/operation IDs.
 2. Give each a one-line verdict with the frontend/backend/AI lens: **feasible** / **conditional** (state the condition and rough cost driver) / **infeasible as specified** (state the closest feasible version).
 3. `infeasible` or expensive-`conditional` verdicts go to the user BEFORE that screen is storyboarded — offer staged alternatives, never silently downgrade.
-4. Output `02.7-feasibility-checkpoint.md`: mechanism | depending screens | verdict | condition/alternative | user decision needed. Keep it under a page — this is a checkpoint, not the full review.
+4. Output `02.7-feasibility-checkpoint.md`: mechanism/operation ID | depending surface/action IDs | verdict | condition/alternative | user decision needed. Keep it under a page — this is a checkpoint, not the full review.
 
 ## Mode B — Full Feasibility Review (before handoff)
 
@@ -28,6 +28,7 @@ Use after product/design artifacts exist and before engineering handoff. This is
 - Backend systems brief
 - Design-system direction
 - Verified and unverified reference flows
+- Current `02.6-service-manifest.json`
 
 ## Workflow
 
@@ -49,6 +50,7 @@ Use after product/design artifacts exist and before engineering handoff. This is
 - Do not force one architecture before engineering review.
 - Do not treat unresolved feasibility as a reason to erase the user experience requirement.
 - Distinguish `must-have for MVP`, `can be approximated`, `needs experiment`, and `scope out`.
+- A changed verdict updates the affected manifest operation, exclusion, or accepted limitation in the same phase; do not leave feasibility and the service contract disagreeing.
 
 ## Output
 

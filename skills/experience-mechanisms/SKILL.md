@@ -29,6 +29,8 @@ Examples:
 
 For each product-defining mechanism, write:
 
+0. **Stable mechanism ID**: reused by PRD, service operations, feasibility, risk, and handoff.
+
 1. **User promise**: what the user believes the system can do.
 2. **Terminology mapping**: internal planning name, user-facing label, and user-confirmed wording.
 3. **Moment of use**: where the mechanism affects the journey.
@@ -43,6 +45,7 @@ For each product-defining mechanism, write:
 12. **Feasibility questions**: questions for engineering later, without preselecting architecture.
 13. **Scope decision**: Core P0, P0 support, P1 differentiator, P2 expansion, or out of scope.
 14. **Evidence status**: observed, user-confirmed, proposed, assumed, or unverified.
+15. **Service-contract links**: action IDs that expose/trigger it and operation IDs that preserve its promise.
 
 ## Surface Discipline
 
@@ -79,6 +82,8 @@ Use `references/mechanism-patterns.md` for examples covering:
 ## Output
 
 Create `02-mechanisms.md` or add a `Product Mechanisms` section to the PRD. Every major storyboard frame should point back to at least one mechanism contract when its behavior depends on hidden system judgment.
+
+If an AI mechanism creates, drafts, recommends, judges, or summarizes, its linked `ai_assists` row must define input, result widget, editable unit, save destination, and failure/truncation UI before the contract gate passes.
 
 ## Next Step
 
