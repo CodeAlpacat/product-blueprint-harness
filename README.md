@@ -14,9 +14,9 @@ Cross-agent plugin for pre-development product planning and production-grade vis
 
    | Mode | You get | Rough effort |
    |---|---|---|
-   | **Lite** | brief → research/ideation → PRD → screen contracts → storyboard + dashboard (~8 files) | one short session |
-   | **Standard** (default) | full pipeline: research → brand/naming → mechanisms → screens → design system → all-P0 mockups → clickable demo → handoff | several sessions |
-   | **Deep** | Standard + richer evidence, risk register, stronger states | multi-day |
+   | **Lite** | brief → research/ideation → PRD → screen contracts + compact service manifest → storyboard + dashboard | one short session |
+   | **Standard** (default) | full pipeline: research → mechanisms/screens → service contract → design system → all-P0 clickable prototype → deterministic readiness → handoff | several sessions |
+   | **Deep** | Standard + richer evidence, risk register, stronger boundary/role coverage | multi-day |
 
 4. Want it hands-off? Say **"쭉 진행해"** — the orchestrator chains phases and only stops at the decisions that are genuinely yours (direction, brand, MVP scope, design acceptance, handoff). Every response ends with a `다음 단계` block: the recommended next skill, what you must decide, and where you are in the pipeline.
 5. Review visually, not by reading markdown: open `00-review-dashboard.html` (always current), the storyboard, and the clickable demo. The `.md` files are the detail source of truth.
@@ -29,7 +29,7 @@ This repository contains only the reusable plugin:
 - `.codex-plugin/plugin.json` (Codex)
 - `skills/*/SKILL.md` (shared — same SKILL.md format on both hosts)
 - `references/*.md` (anti-slop craft doctrine — the visual quality spine)
-- `scripts/init_prd_project.py`
+- `scripts/init_prd_project.py` + `scripts/validate_service_blueprint.py`
 - `assets/templates/storyboard-section.html`
 
 It intentionally does not include any project-specific planning outputs, benchmark captures, or screenshots from dogfood runs.
@@ -54,6 +54,7 @@ Product Blueprint guides an idea or reference product through:
 - ideation and parallel concepts
 - positioning, naming (taste-first rounds + availability signals), brand voice, mascot direction
 - PRD, experience mechanisms, and screen contracts
+- a machine-readable service contract connecting stories, surfaces, actions, states, frontend feedback, backend/data ownership, and journeys
 - feasibility checkpoint BEFORE visual design (so mockups never promise the impossible)
 - storyboard visualization
 - art direction and adversarial visual quality gates (with an all-P0 coverage matrix)
@@ -64,6 +65,7 @@ Product Blueprint guides an idea or reference product through:
 - backend systems briefing and risk register
 - feasibility review
 - engineering handoff with an Entity & State Contract developers can architect from
+- deterministic contract/prototype/handoff gates and a manifest-hash-bound readiness report, so documents cannot self-declare completion
 
 The plugin is for planning before implementation. Frontend/backend technical architecture is a later handoff step, not the default starting point.
 
@@ -111,6 +113,8 @@ product-blueprint:orchestrate
 | Definition | `experience-mechanisms` | `02-mechanisms.md` (invisible behavior: memory, scoring, safety, paid) |
 | Definition | `prd` | `02-prd.md` (MVP lock input) |
 | Definition | `screen-contract` | `02.5-screen-contracts.md` (per-screen actions/states/wiring) |
+| Definition | `service-contract` | `02.6-service-manifest.json` (stable IDs, operations, journeys, evidence maturity) |
+| Gate | `implementation-readiness` | contract/prototype/handoff validation + `05-readiness-report.*` |
 | Definition | `feasibility-review` (checkpoint mode) | `02.7-feasibility-checkpoint.md` — BEFORE any visual design |
 | Existing assets | `feature-adoption` (optional) | adoption map when you already own a mature codebase |
 | Visual | `storyboard` | `03-storyboard.html` (flow board) |
@@ -142,6 +146,7 @@ Common partial asks:
 |---|---|---|
 | Rename / rebrand | `positioning-brand` | art-direction → design-system → workbench → demo |
 | Add or change one screen | `screen-contract` | storyboard → workbench (if new components) → demo |
+| Add or change a flow/state/data responsibility | `service-contract` | storyboard → demo → prototype test → readiness report |
 | Rebuild just the demo | `clickable-demo` | — (reads existing contracts) |
 | Strengthen form/component states | `design-system-workbench` | demo (if shared components changed) |
 | Redo the visual direction | `art-direction-brief` | visual-quality-gate → design-system → workbench → demo |
@@ -151,3 +156,19 @@ Common partial asks:
 | Mine an existing codebase | `feature-adoption` | screen-contract deltas → demo → tech-plan |
 
 If you're unsure which skill owns what you want to change, ask `orchestrate` to route it ("X만 다시") — it will identify the owning skill and the downstream update list instead of restarting the pipeline.
+
+## Service contract and readiness gates
+
+Standard/Deep runs use `02.6-service-manifest.json` as the stable identity and wiring source. Markdown explains decisions; the manifest makes them checkable. A P0 surface is not simply “complete”: it moves through `defined → prototyped → wired → contracted → verified` with concrete evidence.
+
+Run the same validator at three boundaries:
+
+```bash
+python3 scripts/validate_service_blueprint.py docs/product-planning/<slug> --stage contract --no-write
+python3 scripts/validate_service_blueprint.py docs/product-planning/<slug> --stage prototype --no-write
+python3 scripts/validate_service_blueprint.py docs/product-planning/<slug> --stage handoff
+```
+
+The final command writes `05-readiness-report.json` and `.md`. Dashboard and handoff readiness must be derived from that report. Lite can pass its compact contract but always keeps `engineering_ready=false`.
+
+The architecture follows the useful parts of [Matt Pocock's skills](https://github.com/mattpocock/skills): small composable skills, test seams fixed in the spec, prototypes that answer concrete questions, independently demonstrable vertical slices, and separate standards-vs-spec review. Product Blueprint extends that pattern with a mandatory whole-service prototype contract; a throwaway exploration prototype is not treated as implementation readiness.

@@ -93,3 +93,15 @@ P0 미해소 0. 실사용자 만족은 결정론으로 닫지 않고 `user_valid
 | 구조적 방지 | pass | ready를 자연어 자기판정이 아니라 validator-derived report로만 표현 |
 
 Critical 1건(옛 screen-contract만 소비하는 downstream dual-SoT 위험)을 위 접점 확장으로 해소했다. Warning 0.
+
+## 8. Code Review
+
+구현자의 완료 설명을 제외하고 `origin/main` 대비 diff와 실제 validator/test 파일만 다시 검토했다.
+
+| Severity | Finding | Resolution |
+| --- | --- | --- |
+| P0 | handoff 필수 산출물 집합이 배선 파일 중심이라 undefined-surface/workbench/visual/critique/feasibility 누락을 통과시킬 수 있음 | `STANDARD_ARTIFACTS` 확장 + 조건부 risk register 검사 |
+| P0 | 자연어 `not ready for engineering`이 ready substring으로 오인될 수 있음 | structured status/Korean legacy marker만 인식 + regression test |
+| P1 | report 두 파일 쓰기 중단 시 부분 갱신 가능 | temp file replace로 각 파일 원자적 교체 |
+
+수정 후 코드 리뷰 판정: P0 0, P1 0. 코드 리뷰는 시나리오 실행을 대신하지 않으므로 별도 E2E evidence를 남긴다.

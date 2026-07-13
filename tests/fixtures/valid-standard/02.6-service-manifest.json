@@ -9,6 +9,7 @@
     "id": "p0",
     "roles": ["guest"],
     "viewports": ["mobile", "desktop"],
+    "risk_domains": [],
     "excluded": [],
     "accepted_limitations": []
   },

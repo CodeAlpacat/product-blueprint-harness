@@ -50,4 +50,3 @@ Do not infer legacy markdown into a ready manifest. Migrate it, run the validato
 
 - Use `product-blueprint:feasibility-review` checkpoint mode, then `product-blueprint:storyboard`.
 - After the demo exists, run `product-blueprint:implementation-readiness` at prototype stage.
-

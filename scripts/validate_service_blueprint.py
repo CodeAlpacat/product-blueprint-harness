@@ -26,10 +26,17 @@ STANDARD_ARTIFACTS = (
     "02-prd.md",
     "02.5-screen-contracts.md",
     "02.6-service-manifest.json",
+    "02.8-undefined-surfaces.md",
     "03-storyboard.html",
+    "03.7-ux-writing.md",
+    "04.1-visual-quality-gate.md",
     "04.2-backend-systems-brief.md",
+    "04.3-design-system.md",
+    "04.32-design-system-workbench.md",
     "04.36-clickable-demo.md",
     "04.4-prototype-test.md",
+    "04.45-design-critique.md",
+    "04.5-feasibility-review.md",
     "05-engineering-handoff.md",
 )
 
@@ -64,6 +71,7 @@ STATE_TYPES = {"default", "loading", "empty", "error", "success", "locked", "per
 OPERATION_TYPES = {"read", "write", "destructive", "external"}
 OPERATION_OWNERS = {"frontend-local", "backend", "external"}
 PERSISTENCE_TYPES = {"none", "session", "account", "cross-device"}
+RISK_DOMAINS = {"adult", "minors", "payments", "ugc", "pii", "ai-generated"}
 STATUS_KEYS = ("defined", "prototyped", "wired", "contracted", "verified")
 
 
@@ -190,6 +198,11 @@ class Validator:
             self.add("RELEASE_ROLES_MISSING", "release_profile.roles needs at least one role.", "release_profile.roles", "prd")
         self._validate_exclusions(release.get("excluded", []))
         self._validate_accepted_limitations(release.get("accepted_limitations", []))
+        risk_domains = release.get("risk_domains", [])
+        if not isinstance(risk_domains, list) or any(item not in RISK_DOMAINS for item in risk_domains):
+            self.add("INVALID_RISK_DOMAINS", f"risk_domains must contain only: {', '.join(sorted(RISK_DOMAINS))}.", "release_profile.risk_domains", "risk-register")
+        elif self.stage == "handoff" and risk_domains and not (self.root / "04.55-risk-register.md").is_file():
+            self.add("RISK_REGISTER_MISSING", "A risk register is mandatory for the declared risk domains.", "04.55-risk-register.md", "risk-register")
 
         for key in ("surfaces", "actions", "states", "operations", "ai_assists", "journeys"):
             if not isinstance(self.manifest.get(key), list):
@@ -630,7 +643,7 @@ class Validator:
         claims_pass = False
         if dashboard.exists():
             text = dashboard.read_text(encoding="utf-8", errors="replace")
-            claims_pass = bool(re.search(r'data-readiness-status=["\']pass["\']|개발 착수 준비 완료|ready for engineering', text, re.IGNORECASE))
+            claims_pass = bool(re.search(r'data-readiness-status=["\']pass["\']|개발 착수 준비 완료', text, re.IGNORECASE))
         if handoff.exists():
             text = handoff.read_text(encoding="utf-8", errors="replace")
             claims_pass = claims_pass or bool(re.search(r"planning-readiness:\s*pass", text, re.IGNORECASE))
@@ -683,7 +696,7 @@ class Validator:
 def write_report(root: Path, report: dict[str, Any]) -> None:
     json_path = root / "05-readiness-report.json"
     md_path = root / "05-readiness-report.md"
-    json_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    _atomic_write(json_path, json.dumps(report, ensure_ascii=False, indent=2) + "\n")
 
     lines = [
         "# Service Readiness Report",
@@ -707,7 +720,13 @@ def write_report(root: Path, report: dict[str, Any]) -> None:
             lines.append(f"- {json.dumps(item, ensure_ascii=False)}")
     else:
         lines.append("- None")
-    md_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    _atomic_write(md_path, "\n".join(lines) + "\n")
+
+
+def _atomic_write(path: Path, content: str) -> None:
+    temporary = path.with_name(f".{path.name}.tmp")
+    temporary.write_text(content, encoding="utf-8")
+    temporary.replace(path)
 
 
 def parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:

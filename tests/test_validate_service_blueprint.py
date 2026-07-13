@@ -188,6 +188,32 @@ class ServiceBlueprintValidatorTest(unittest.TestCase):
         report = self.validate()
         self.assertIn("ACCEPTED_LIMITATION_INCOMPLETE", self.codes(report))
 
+    def test_declared_risk_domain_requires_risk_register(self) -> None:
+        manifest = self.manifest()
+        manifest["release_profile"]["risk_domains"] = ["payments"]
+        self.write_manifest(manifest)
+        report = self.validate()
+        self.assertIn("RISK_REGISTER_MISSING", self.codes(report))
+
+    def test_evidence_cannot_escape_planning_directory(self) -> None:
+        manifest = self.manifest()
+        manifest["surfaces"][0]["prototype"]["file"] = "../outside.html"
+        self.write_manifest(manifest)
+        report = self.validate()
+        self.assertIn("EVIDENCE_PATH_OUTSIDE_PROJECT", self.codes(report))
+
+    def test_not_ready_phrase_is_not_a_positive_readiness_claim(self) -> None:
+        dashboard = self.root / "00-review-dashboard.html"
+        dashboard.write_text("<html><body>Not ready for engineering</body></html>", encoding="utf-8")
+        handoff = self.root / "05-engineering-handoff.md"
+        handoff.write_text(handoff.read_text(encoding="utf-8").replace("planning-readiness: pass", "planning-readiness: pending"), encoding="utf-8")
+        manifest = self.manifest()
+        manifest["surfaces"][0]["purpose"] = ""
+        self.write_manifest(manifest)
+        report = self.validate()
+        conflicts = [item for item in report["findings"] if item["code"] == "READINESS_CLAIM_CONFLICT"]
+        self.assertEqual(conflicts, [])
+
     def test_report_files_are_generated(self) -> None:
         report = self.validate()
         MODULE.write_report(self.root, report)

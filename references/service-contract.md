@@ -75,4 +75,3 @@ python3 <plugin-root>/scripts/validate_service_blueprint.py <planning-dir> --sta
 - `handoff`: full artifact set and authoritative `05-readiness-report.{json,md}`.
 
 Failure codes route back to the owning skill. Do not edit the generated report to manufacture a pass.
-

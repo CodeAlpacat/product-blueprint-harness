@@ -53,4 +53,3 @@ Use the error code and `owner` returned by the validator. Do not patch unrelated
 
 - On failure: run the reported owner skill, then rerun the same stage.
 - On handoff pass: present the report and vertical implementation slices for user approval. Use `tech-plan` only when the user requests concrete API/DB/frontend/backend architecture.
-

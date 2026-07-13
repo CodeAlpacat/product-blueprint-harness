@@ -1,7 +1,7 @@
 {
   "name": "product-blueprint",
-  "version": "0.1.0+codex.20260709020125",
-  "description": "Guided pre-development product blueprint workflow for turning ideas and reference services into research-backed PRDs, decision logs, visual decision dashboards, reference deconstructions, parallel concepts, screen contracts, mechanism contracts, storyboards, art direction briefs, visual quality gates, backend systems briefs, design-system briefs, React design-system workbenches, high-fidelity screen specimens, prototype tests, design critiques, feasibility reviews, and engineering handoff packets.",
+  "version": "0.3.0+codex.20260713064823",
+  "description": "Guided pre-development product blueprint workflow for turning ideas into research-backed PRDs, stable service manifests, fully wired clickable prototypes, product-level frontend/backend operation contracts, deterministic readiness reports, production-grade visual systems, and traceable engineering handoffs.",
   "author": {
     "name": "Local developer"
   },
@@ -21,6 +21,8 @@
       "parallel-concepting",
       "prd-writing",
       "screen-contracts",
+      "service-contracts",
+      "implementation-readiness",
       "storyboard-visualization",
       "art-direction",
       "experience-mechanism-design",
@@ -35,7 +37,7 @@
       "engineering-handoff"
     ],
     "defaultPrompt": [
-      "Guide me from idea to product blueprint, PRD, screens, design gates, critique, and handoff. Ask when decisions are needed."
+      "Guide me from idea to a fully wired product blueprint: PRD, service manifest, clickable whole-service prototype, deterministic readiness gates, design critique, and traceable engineering handoff. Ask only when a product decision is genuinely needed."
     ]
   }
 }
