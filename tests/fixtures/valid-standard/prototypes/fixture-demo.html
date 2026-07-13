@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en">
+<body>
+  <nav data-demo-control><button id="demo-board" data-demo-control>Board</button></nav>
+  <section id="surface-home" data-surface="home">
+    <button id="action-open-detail" data-action="open-detail" data-go="detail">Open detail</button>
+    <div id="state-home-loading">Loading items…</div>
+  </section>
+  <section id="surface-detail" data-surface="detail">
+    <button id="action-retry-detail" data-action="retry-detail" data-effect="replace-error-with-detail">Retry</button>
+    <div id="state-detail-error" role="alert">Could not load this item.</div>
+  </section>
+</body>
+</html>

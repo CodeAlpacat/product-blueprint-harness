@@ -1,0 +1,136 @@
+{
+  "schema_version": "1.0",
+  "project": {
+    "name": "Validator Fixture",
+    "mode": "standard",
+    "platforms": ["responsive-web"]
+  },
+  "release_profile": {
+    "id": "p0",
+    "roles": ["guest"],
+    "viewports": ["mobile", "desktop"],
+    "excluded": [],
+    "accepted_limitations": []
+  },
+  "surfaces": [
+    {
+      "id": "home",
+      "label": "Home",
+      "type": "screen",
+      "priority": "P0",
+      "purpose": "Choose an item.",
+      "route_or_trigger": "/",
+      "entry_action_ids": [],
+      "exit_action_ids": ["open-detail"],
+      "required_state_ids": ["home-loading"],
+      "prototype": {"file": "prototypes/fixture-demo.html", "element_id": "surface-home"},
+      "responsive": {"strategy": "mobile-extended", "mobile_element_id": "surface-home", "desktop_element_id": "", "derivation_rule": "Keep the content column and promote navigation."},
+      "status": {"defined": true, "prototyped": true, "wired": true, "contracted": true, "verified": true}
+    },
+    {
+      "id": "detail",
+      "label": "Detail",
+      "type": "screen",
+      "priority": "P0",
+      "purpose": "Review the chosen item.",
+      "route_or_trigger": "/items/:id",
+      "entry_action_ids": ["open-detail"],
+      "exit_action_ids": ["retry-detail"],
+      "required_state_ids": ["detail-error"],
+      "prototype": {"file": "prototypes/fixture-demo.html", "element_id": "surface-detail"},
+      "responsive": {"strategy": "mobile-extended", "mobile_element_id": "surface-detail", "desktop_element_id": "", "derivation_rule": "Keep the content column and promote navigation."},
+      "status": {"defined": true, "prototyped": true, "wired": true, "contracted": true, "verified": true}
+    }
+  ],
+  "actions": [
+    {
+      "id": "open-detail",
+      "label": "Open detail",
+      "source_surface_id": "home",
+      "control_element_id": "action-open-detail",
+      "kind": "navigate",
+      "intent": "Inspect the selected item.",
+      "preconditions": ["Item exists"],
+      "target": {"surface_id": "detail"},
+      "operation_id": null,
+      "feedback": {"t0": "Pressed state", "during": "Route pending", "done": "Detail is visible"},
+      "accessibility": {"keyboard": "Enter activates", "focus": "Move to detail heading", "announcement": "n/a:navigation changes the document title"}
+    },
+    {
+      "id": "retry-detail",
+      "label": "Retry",
+      "source_surface_id": "detail",
+      "control_element_id": "action-retry-detail",
+      "kind": "read",
+      "intent": "Reload the item.",
+      "preconditions": ["Previous load failed"],
+      "target": {"effect": "replace-error-with-detail"},
+      "operation_id": "load-detail",
+      "feedback": {"t0": "Button becomes pending", "during": "Content-shaped skeleton remains", "done": "Detail content replaces the error"},
+      "accessibility": {"keyboard": "Enter or Space activates", "focus": "Keep focus on retry until content loads", "announcement": "Announce load success or error"}
+    }
+  ],
+  "states": [
+    {
+      "id": "home-loading",
+      "surface_id": "home",
+      "kind": "loading",
+      "required": true,
+      "trigger": "Initial load",
+      "recovery_action_id": null,
+      "prototype": {"file": "prototypes/fixture-demo.html", "element_id": "state-home-loading"}
+    },
+    {
+      "id": "detail-error",
+      "surface_id": "detail",
+      "kind": "error",
+      "required": true,
+      "trigger": "Item request fails",
+      "recovery_action_id": "retry-detail",
+      "prototype": {"file": "prototypes/fixture-demo.html", "element_id": "state-detail-error"}
+    }
+  ],
+  "operations": [
+    {
+      "id": "load-detail",
+      "kind": "read",
+      "owner": "backend",
+      "source_of_truth": "Item service",
+      "input_promise": "Stable item identifier",
+      "output_promise": "Visible item or explicit not-found/error",
+      "authorization": "Public items only",
+      "persistence": "none",
+      "idempotency": "Safe repeat read",
+      "consistency": "Latest committed item",
+      "conflict_strategy": "n/a:read-only",
+      "failure": "Show detail-error without losing selection",
+      "recovery": "Manual retry",
+      "audit_retention": "n/a:no sensitive write",
+      "latency_class": "interactive under 1s target",
+      "cost_class": "low",
+      "observability": "Request success, latency, and error code",
+      "abuse_boundary": "Rate limit repeated anonymous reads"
+    }
+  ],
+  "ai_assists": [],
+  "journeys": [
+    {
+      "id": "guest-inspects-item",
+      "persona": "Guest",
+      "start_surface_id": "home",
+      "preconditions": ["Public catalog is available"],
+      "steps": ["open-detail"],
+      "expected_end_surface_id": "detail",
+      "exception_paths": [{"state_id": "detail-error", "recovery_action_id": "retry-detail"}],
+      "refresh_resume": "Reload the same public item route",
+      "back_behavior": "Return to home with selection context",
+      "cross_device_behavior": "n/a:no account state"
+    }
+  ],
+  "user_validation": {"status": "heuristic", "evidence": ["04.4-prototype-test.md"]},
+  "evidence": {
+    "contract_file": "02.5-screen-contracts.md",
+    "demo_file": "prototypes/fixture-demo.html",
+    "prototype_test_file": "04.4-prototype-test.md"
+  }
+}
