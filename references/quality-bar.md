@@ -22,6 +22,7 @@ For the current run mode, walk the applicable table. Report each row as **pass /
 | # | Check | Proof artifact |
 |---|---|---|
 | 7 | Every P0 screen has a contract: purpose, allowed/forbidden actions, entry/exit, states | `02.5-screen-contracts.md` |
+| 7.5 | Service manifest contract-stage validator passes: stable IDs, bidirectional wiring, operation ownership, journeys/lifecycle, explicit exclusions | `02.6-service-manifest.json` + validator output |
 | 8 | Entry/exit map connects every P0 screen with no dead ends; forbidden shortcuts enumerated | same |
 | 9 | State matrix covers empty/loading/locked/error/success per screen where relevant | same |
 | 10 | Storyboard shows every P0 screen as a legible frame with wiring annotations outside the mock UI | `03-storyboard.html` |
@@ -34,7 +35,8 @@ For the current run mode, walk the applicable table. Report each row as **pass /
 |---|---|---|
 | 13 | Art direction is numeric: OKLCH color roles + contrast targets, type ramp (size/lh/weight), spacing grid, radius roles, imagery treatment. Zero adjective-only rules | `03.5-art-direction-brief.md` |
 | 14 | Tokens exist as machine files and are USED by the rendered artifacts (grep a token var in the html) | `tokens/` |
-| 15 | **All-P0 coverage matrix**: every P0 screen from the contracts appears in the workbench/demo AND passed the visual gate. A missing row = fail, not "propagated" | `04.32-design-system-workbench.md` §coverage |
+| 15 | **All-P0 coverage matrix**: every P0 surface/state from the service manifest appears in the workbench/demo AND passed the visual gate. A missing row = fail, not "propagated" | `04.32-design-system-workbench.md` §coverage |
+| 15.5 | Prototype-stage validator passes: DOM surface/action/state IDs, transitions/effects, reachability, responsive evidence, no uncontracted/dead controls | validator output |
 | 16 | Adversarial gate ran with fresh context; measurable checks (WCAG ratios, grid sampling, palette count, ≥3 type roles) recorded with numbers | `04.1-visual-quality-gate.md` |
 | 17 | Non-happy states are RENDERED somewhere reviewable (states screen / state lab), not just listed in prose | workbench or demo |
 | 18 | Screenshot evidence exists for every rendered artifact claim ("rendered and verified" without a screenshot = fail) | `screenshots/` |
@@ -45,6 +47,7 @@ For the current run mode, walk the applicable table. Report each row as **pass /
 | # | Check | Proof artifact |
 |---|---|---|
 | 20 | Entity & State Contract present: entities + relationships (descriptive), per-screen state machines, invariants as testable assertions. No storage schema (that stays out of scope) | `05-engineering-handoff.md` |
+| 21 | Handoff-stage validator generated a current manifest-hash-bound readiness report; dashboard/handoff consume it and do not self-declare readiness | `05-readiness-report.{json,md}` |
 | 21 | Forbidden shortcuts restated as routing/model invariants a developer can enforce structurally | same |
 | 22 | Risk register exists for policy/age/PII/moderation exposure with P0 mitigations (mandatory when the domain touches adult content, payments, minors, or UGC) | `04.55-risk-register.md` |
 | 23 | Open questions and approved compromises are explicit — the developer knows what was decided vs deferred | handoff |

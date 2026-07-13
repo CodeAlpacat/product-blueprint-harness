@@ -23,7 +23,7 @@ The itemized companion to `visual-quality-gate`. Every row is checkable by looki
 
 ## C. Contract fidelity
 
-- [ ] Every P0 screen from `02.5-screen-contracts.md` appears (all-P0 coverage matrix — enumerate, don't sample)
+- [ ] Every P0 surface and required state from `02.6-service-manifest.json` appears (all-P0 coverage matrix — enumerate, don't sample)
 - [ ] Transitions/entry/exit visible in wiring annotations OUTSIDE the mock UI
 - [ ] No invented screens/features that aren't in the contract; no dropped contracted ones
 - [ ] Forbidden shortcuts not violated by any CTA (e.g. no "start chat" on a card that must route through a gate)

@@ -43,6 +43,7 @@ Render full-size at real viewport (mobile 390×844, desktop 1440), screenshot at
 ## Required Inputs
 
 - `02.5-screen-contracts.md`
+- `02.6-service-manifest.json` surface/action/state IDs for the chosen specimen
 - `03-storyboard.html`
 - `03.5-art-direction-brief.md`
 - `04.1-visual-quality-gate.md`

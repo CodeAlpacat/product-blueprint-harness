@@ -6,6 +6,8 @@ Dogfood evidence (2026-07-10): three separate founder questions — "where are t
 
 Mandatory once per run, after the clickable demo exists and BEFORE `engineering-handoff` declares readiness. Re-run after any screen-set change.
 
+`02.6-service-manifest.json` is the enumerated set. This audit may discover and classify missing surfaces, but every closure must update the manifest; the registry is not a second wiring SoT.
+
 ## The scan (all six, yes/no + evidence path)
 
 1. **Responsive grammar rendered?** Desktop views exist for at least discovery, detail, and the core-action screen — drawn as *the mobile experience extended* (app max-width cap, single breakpoint, nav promotion, content column keeps the mobile layout; a persistent side panel is allowed only as the opened form of an existing mobile sheet). Screens not drawn must be covered by an explicit derivation rule. "Desktop-only grammar" (new grids, split layouts) fails.
@@ -29,3 +31,9 @@ Registry header must say: **"이 목록에 없는 화면을 개발 중 임의 �
 ## Gate
 
 Handoff readiness fails while any scan item is "no" without an ACCEPT-FLAG, or while the registry has an unclassified row. Surface the registry in the decision dashboard ("남은 갭" section).
+
+After closing the registry, run the prototype-stage validator. A prose audit cannot self-upgrade missing DOM/transition evidence:
+
+```bash
+python3 <plugin-root>/scripts/validate_service_blueprint.py <planning-dir> --stage prototype --no-write
+```

@@ -1,7 +1,7 @@
 {
   "name": "product-blueprint",
-  "version": "0.2.0",
-  "description": "Guided pre-development product blueprint workflow for Claude Code: turns a vague idea and reference services into research-backed PRDs, decision logs, screen contracts, mechanism contracts, storyboards, and a production-grade visual craft spine (measured art direction, shadcn/Radix + OKLCH token substrate, impeccable hero-screen craft loop, adversarial visual quality gate) that reaches real design-system output instead of AI slop.",
+  "version": "0.3.0",
+  "description": "Guided pre-development product blueprint workflow for Claude Code: turns ideas into research-backed PRDs, stable service manifests, fully wired screen/action/state contracts, clickable whole-service prototypes, product-level frontend/backend operation contracts, deterministic readiness reports, and production-grade visual design instead of prose-only or self-graded handoff.",
   "author": {
     "name": "CodeAlpacat",
     "url": "https://github.com/CodeAlpacat"
@@ -20,7 +20,9 @@
     "shadcn",
     "radix",
     "design-tokens",
-    "engineering-handoff"
+    "engineering-handoff",
+    "service-contract",
+    "implementation-readiness"
   ],
   "skills": "./skills/"
 }

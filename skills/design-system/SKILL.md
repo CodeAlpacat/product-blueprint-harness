@@ -31,6 +31,8 @@ HTML storyboards are acceptable inputs here because they are flow/IA contracts. 
 8. Produce a design-system board or document.
 9. Identify what still requires a human designer, React design-system workbench, high-fidelity screen specimen, or frontend implementation workflow.
 
+Read `02.6-service-manifest.json` before steps 5–7. Every component/state/screen rule maps to a surface/action/state ID; visual work cannot add product behavior outside the contract.
+
 ## Rules
 
 - Do not use generic SaaS or AI-gradient styling by default.

@@ -23,6 +23,7 @@ The default storyboard artifact is a Figma-like HTML board that lays out screens
 
 - Research or ideation artifact
 - PRD or at least a stable MVP loop
+- `02.6-service-manifest.json` with a passing contract-stage report
 - Experience mechanism contracts for memory, judging, scoring, recommendations, paid actions, or other hidden system behavior
 - Screenshot evidence when using references
 - List of verified and unverified flows
@@ -44,6 +45,8 @@ The default storyboard artifact is a Figma-like HTML board that lays out screens
 
 Every screen frame must show or annotate outside the product screen:
 
+- Stable surface ID from the service manifest. Transition arrows carry stable action IDs.
+
 - Entry source: where the user came from.
 - User decision: what the user decides on this screen.
 - Primary action: exactly where the happy path exits.
@@ -51,7 +54,7 @@ Every screen frame must show or annotate outside the product screen:
 - State represented: default, empty, returning, locked, paid, error, loading, or success.
 - Evidence status: observed, user-confirmed, proposed, assumed, or unverified.
 
-If any priority screen from the screen contract has no frame, the storyboard fails.
+If any P0 surface from the service manifest has no frame or approved background-only treatment, the storyboard fails. The storyboard may not invent a surface/action/state outside the manifest; update the contract first.
 
 ## Visual Rules
 

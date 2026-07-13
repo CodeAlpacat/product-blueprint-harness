@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import re
 from pathlib import Path
 
@@ -80,7 +81,7 @@ Use this file to keep user decisions, assumptions, and gate status from getting 
     code{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--accent)}
   </style>
 </head>
-<body>
+<body data-readiness-status="not-evaluated">
   <div class="wrap">
     <h1>Review Dashboard</h1>
     <div class="sub">이 대시보드가 유일한 리뷰 진입점입니다. 각 md는 상세 SoT — 유저가 20개 문서를 하나하나 읽게 하지 마세요.</div>
@@ -346,9 +347,15 @@ Not legal advice — real counsel reviews before launch.
 
 ## Acceptance Checks
 
+## Stable ID Registry
+
+## Action Feedback & Accessibility Matrix
+
+## Operation References
+
 ## Next Step
 
-- Use product-blueprint:storyboard.
+- Use product-blueprint:service-contract, then product-blueprint:storyboard.
 """,
     "03-storyboard.html": """<!doctype html>
 <html lang="ko">
@@ -533,7 +540,11 @@ Render the product's visual system as a React/Tailwind workbench before technica
 
 - Use product-blueprint:engineering-handoff.
 """,
-    "05-engineering-handoff.md": """# Engineering Handoff
+    "05-engineering-handoff.md": """---
+planning-readiness: pending
+---
+
+# Engineering Handoff
 
 ## Product Thesis
 
@@ -553,13 +564,18 @@ Render the product's visual system as a React/Tailwind workbench before technica
 
 ## Open Questions
 
+## Vertical Implementation Slices
+
+| Slice | Journey IDs | Surfaces | Actions | Operations | Persistence / invariants | Verification seam |
+| --- | --- | --- | --- | --- | --- | --- |
+
 ## Evidence Links
 
 ## Technical Design Readiness Checklist
 
 ## Next Step
 
-- Stop here by default. Use product-blueprint:tech-plan only if the user explicitly asks for technical architecture.
+- Run product-blueprint:implementation-readiness. Stop after an approved pass by default; use tech-plan only when explicitly requested.
 """,
 }
 
@@ -578,6 +594,14 @@ def main() -> int:
     (target / "prototypes").mkdir(exist_ok=True)
     (target / "tokens").mkdir(exist_ok=True)
 
+    template_path = Path(__file__).resolve().parent.parent / "assets" / "templates" / "service-manifest.json"
+    manifest = json.loads(template_path.read_text(encoding="utf-8"))
+    manifest["project"]["name"] = args.name
+    manifest["project"]["mode"] = "lite" if args.lite else "standard"
+    manifest["evidence"]["demo_file"] = f"prototypes/{slugify(args.name)}-demo.html"
+    files = dict(FILES)
+    files["02.6-service-manifest.json"] = json.dumps(manifest, ensure_ascii=False, indent=2) + "\n"
+
     LITE_FILES = {
         "00-brief.md",
         "00-decision-log.md",
@@ -586,10 +610,11 @@ def main() -> int:
         "01-ideation.md",
         "02-prd.md",
         "02.5-screen-contracts.md",
+        "02.6-service-manifest.json",
         "03-storyboard.html",
     }
 
-    for filename, content in FILES.items():
+    for filename, content in files.items():
         if args.lite and filename not in LITE_FILES:
             continue
         path = target / filename

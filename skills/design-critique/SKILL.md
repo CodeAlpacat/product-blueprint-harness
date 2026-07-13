@@ -20,6 +20,13 @@ Use this as a critique, not a compliment pass. Findings should lead.
 9. **Component-system coverage**: Are tokens, components, variants, states, and P0 screen applications visible enough to move later into frontend work?
 10. **Handoff readiness**: Can designers and engineers act without guessing?
 
+Run two independent verdict axes:
+
+- **Visual/UX quality**: hierarchy, craft, copy, accessibility, state presentation.
+- **Service-contract fidelity**: every manifest P0 surface/action/state/journey appears without invented or dropped behavior, and operation promises remain visible where users need them.
+
+A design can pass visual quality and fail contract fidelity, or the reverse. Do not average them into one score.
+
 ## Severity
 
 - `P0`: Breaks product promise, trust, safety, payment, or core flow.
@@ -44,6 +51,7 @@ Create `04.45-design-critique.md` with:
 - Optional improvements
 - Pass/fail decision (+ACCEPT-FLAG rows)
 - Handoff readiness note
+- Separate visual/UX and service-contract fidelity verdicts, with exact manifest IDs for every fidelity finding
 
 ## Next Step
 

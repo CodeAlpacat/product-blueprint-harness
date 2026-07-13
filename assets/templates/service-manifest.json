@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "project": {
+    "name": "",
+    "mode": "standard",
+    "platforms": [
+      "responsive-web"
+    ]
+  },
+  "release_profile": {
+    "id": "p0",
+    "roles": [],
+    "viewports": [
+      "mobile",
+      "desktop"
+    ],
+    "risk_domains": [],
+    "excluded": [],
+    "accepted_limitations": []
+  },
+  "surfaces": [],
+  "actions": [],
+  "states": [],
+  "operations": [],
+  "ai_assists": [],
+  "journeys": [],
+  "user_validation": {
+    "status": "not-run",
+    "evidence": []
+  },
+  "evidence": {
+    "contract_file": "02.5-screen-contracts.md",
+    "demo_file": "prototypes/product-demo.html",
+    "runtime_report_file": "04.37-runtime-verification.json",
+    "prototype_test_file": "04.4-prototype-test.md"
+  }
+}

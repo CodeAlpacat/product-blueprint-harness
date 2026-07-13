@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0",
+  "runner": "browser",
+  "checked_at": "2026-07-13T00:00:00Z",
+  "manifest_sha256": "304bfc41e2a95820da33f484cd091d0f5e438b12275a54bc29ee05c4af7c6fae",
+  "demo_sha256": "1039bb33f6d2a2a5158674b34a829131b64f01bba9c5e8765f2c9e37e152e6b8",
+  "transitions": [
+    {
+      "action_id": "open-detail",
+      "from_surface_id": "home",
+      "expected_surface_id": "detail",
+      "landed_surface_id": "detail",
+      "status": "pass"
+    }
+  ],
+  "effects": [
+    {
+      "action_id": "retry-detail",
+      "source_surface_id": "detail",
+      "expected_effect": "replace-error-with-detail",
+      "observed_effect": "replace-error-with-detail",
+      "status": "pass"
+    }
+  ],
+  "states": [
+    {"state_id": "home-loading", "reproduction": "board:#state-home-loading", "status": "pass"},
+    {"state_id": "detail-error", "reproduction": "board:#state-detail-error", "status": "pass"}
+  ]
+}

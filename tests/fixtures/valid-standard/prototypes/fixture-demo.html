@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<body>
+  <nav data-demo-control><button id="demo-board" data-demo-control>Board</button></nav>
+  <section id="surface-home" data-surface="home">
+    <button id="action-open-detail" data-action="open-detail" data-go="detail">Open detail</button>
+    <div id="state-home-loading">Loading items…</div>
+  </section>
+  <section id="surface-detail" data-surface="detail" hidden>
+    <button id="action-retry-detail" data-action="retry-detail" data-effect="replace-error-with-detail">Retry</button>
+    <div id="state-detail-error" role="alert">Could not load this item.</div>
+  </section>
+  <script data-service-demo-runtime>
+    document.addEventListener('click', (event) => {
+      const demoControl = event.target.closest('[data-demo-control]');
+      if (demoControl?.id === 'demo-board') {
+        document.querySelectorAll('[data-surface]').forEach((surface) => { surface.hidden = false; });
+        document.documentElement.dataset.mode = 'board';
+        return;
+      }
+      const control = event.target.closest('[data-action]');
+      if (!control) return;
+      const destination = control.dataset.go;
+      if (destination) {
+        document.querySelectorAll('[data-surface]').forEach((surface) => { surface.hidden = surface.dataset.surface !== destination; });
+        document.documentElement.dataset.activeSurface = destination;
+      }
+      if (control.dataset.effect) document.documentElement.dataset.lastEffect = control.dataset.effect;
+    });
+  </script>
+</body>
+</html>

@@ -19,7 +19,7 @@ Each item: name — what it does (1 line) | UI surface | file evidence path | de
 ## 2. Adoption map (`07-feature-adoption.md`)
 
 Per feature, verdict with reason:
-- **P0 adopt (adapted)** — feeds the screen contracts/demo NOW (name the screen delta).
+- **P0 adopt (adapted)** — feeds the screen contracts and service manifest NOW (name the surface/action/operation delta).
 - **P1 adopt** — contract anchor only.
 - **Reject** — including features the source itself deprecated (do not inherit sunk costs) and features that conflict with the new product's identity/philosophy.
 - Rewrite jargon into the new product's voice; never copy surface labels verbatim.
@@ -31,7 +31,9 @@ Per feature, verdict with reason:
 2. **High coupling + simpler requirements in the new product → reference-rewrite** (take the schema, edge-case list, and hook structure; write fresh): the surgery to detach exceeds rewriting, and forks drift.
 Everything product-identity-specific is **new**. State fork-drift as a named cost of any transplant.
 
+Before the next step, run `product-blueprint:service-contract` so adopted, adapted, rejected, and deferred surfaces do not live only in this report.
+
 ## Next Step
 
-- 다음 추천: 화면 델타를 `product-blueprint:screen-contract`/`clickable-demo`에 반영 → `product-blueprint:tech-plan`(§3 표를 이식/재작성 근거로 사용).
+- 다음 추천: 화면 델타를 `product-blueprint:screen-contract`/`service-contract`/`clickable-demo`에 반영 → `product-blueprint:tech-plan`(§3 표를 이식/재작성 근거로 사용).
 - 사용자가 결정할 것: 채택/제외 이견, 이식 범위(돈·법 영역 확인).

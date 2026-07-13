@@ -9,7 +9,7 @@ A product that touches adult content, payments, minors, UGC, PII, or AI generati
 
 ## Inputs
 
-- `02-prd.md`, `02-mechanisms.md`, `02.5-screen-contracts.md`, `04.2-backend-systems-brief.md`, target market/jurisdiction from the brief
+- `02-prd.md`, `02-mechanisms.md`, `02.5-screen-contracts.md`, `02.6-service-manifest.json`, `04.2-backend-systems-brief.md`, target market/jurisdiction from the brief
 
 ## Output
 
@@ -17,7 +17,7 @@ A product that touches adult content, payments, minors, UGC, PII, or AI generati
 
 ## The register
 
-One table, sorted by severity: risk | trigger surface (screen/mechanism) | jurisdiction note | P0 mitigation (what the PRODUCT does, structurally) | owner decision needed | status.
+One table, sorted by severity: risk | trigger surface/action/operation IDs | jurisdiction note | P0 mitigation (what the PRODUCT does, structurally) | owner decision needed | status.
 
 Sweep at minimum these categories (mark n.a. explicitly when they don't apply — an unexamined category is a gap, an n.a. is a decision):
 
@@ -34,6 +34,7 @@ Sweep at minimum these categories (mark n.a. explicitly when they don't apply �
 - Mitigations must be structural where possible (the gate/flow makes violation impossible) rather than reactive (moderation cleans up later) — mirror the product's forbidden-shortcuts style.
 - Distinguish 관찰 (regulation text/precedent found) from 가정 (our reading). Cite sources for 관찰.
 - Do not soften findings to keep the plan pretty. A red row before handoff is the artifact working.
+- When mitigation changes permission, gating, retention, failure, or current-release behavior, update the linked manifest row in the same phase.
 
 ## Next Step
 
