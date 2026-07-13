@@ -16,7 +16,7 @@ Markdown remains the source of truth. The dashboard is the user's decision cockp
 - Storyboard or workbench HTML when available
 - Screenshots when available
 - Open questions and gate status
-- `05-readiness-report.json` when implementation readiness has run
+- `05-readiness-report.json` when design readiness has run
 
 ## Output
 
@@ -47,8 +47,8 @@ Create or update:
 - Show unresolved issues honestly; do not make a polished dashboard hide missing work.
 - When production design is not ready, say so visibly.
 - Dashboard readiness is derived, never self-declared. Its root element carries `data-readiness-status="not-evaluated|fail|pass|lite-pass"` matching the latest report.
-- Before a handoff report exists, say `구현 준비 미평가` or `기획 진행 중`, not ready. After a report exists, show its manifest SHA-256, checked time, findings count, `engineering_ready`, `user_validated`, and accepted limitations.
-- If the current manifest hash differs from the report hash, show `stale/fail` and rerun `implementation-readiness`; do not preserve an old green badge.
+- Before a handoff report exists, say `디자인 확정 진행 중`, not implementation-ready. After a report exists, show its manifest SHA-256, checked time, findings count, `design_accepted`, `ready_for_technical_design`, `user_validated`, and accepted limitations.
+- If the current manifest hash differs from the report hash, show `stale/fail` and rerun `design-readiness`; do not preserve an old green badge.
 
 ## Pass / Fail
 

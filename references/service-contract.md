@@ -1,13 +1,13 @@
-# Service Contract — canonical implementation-readiness model
+# Service Contract — canonical product/design continuity model
 
-Use this reference when creating or consuming `02.6-service-manifest.json`. Markdown explains intent; this manifest is the machine-readable identity and wiring source for readiness.
+Use this reference when creating or consuming `02.6-service-manifest.json`. Markdown explains intent; this manifest is the machine-readable identity and wiring source for product/design readiness.
 
 `02.1-product-definition.json` is the confirmed source set. The service manifest does not decide which user requirements or entry points exist; it proves how that set becomes surfaces, actions, operations, states, and journeys.
 
 ## Stable IDs
 
 - IDs match `[a-z][a-z0-9-]*` and survive label, route, and file-number changes.
-- Use the same surface/action/state/operation/journey ID in PRD, screen contract, storyboard, demo DOM, prototype test, handoff, and optional tech plan.
+- Use the same surface/action/state/operation/journey ID in PRD, screen contract, storyboard, demo DOM, prototype test, feasibility consultation, design acceptance, and handoff.
 - `S1`, `screen-3`, array positions, and visible Korean/English labels are not stable identity.
 
 ## Collections
@@ -57,7 +57,7 @@ Static DOM agreement is not runtime proof. Browser-drive every manifest transiti
 
 ## Operation boundary
 
-Operations define what implementation must preserve without prematurely choosing schema/API:
+Operations define the product behavior and constraints the design must represent without prematurely choosing schema/API:
 
 - owner and source of truth
 - input/output user promise
@@ -73,11 +73,13 @@ Use `n/a:<reason>` when a field truly does not apply. Use `decision-needed:<deci
 ```bash
 python3 <plugin-root>/scripts/validate_service_blueprint.py <planning-dir> --stage contract --no-write
 python3 <plugin-root>/scripts/validate_service_blueprint.py <planning-dir> --stage prototype --no-write
+python3 <plugin-root>/scripts/validate_service_blueprint.py <planning-dir> --stage design --no-write
 python3 <plugin-root>/scripts/validate_service_blueprint.py <planning-dir> --stage handoff
 ```
 
 - `contract`: graph, references, operations, journey lifecycle. Prototype may not exist yet.
 - `prototype`: DOM evidence, states, controls, transitions. Handoff may not exist yet.
-- `handoff`: full artifact set and authoritative `05-readiness-report.{json,md}`.
+- `design`: visual/state evidence, feasibility consultation, absorbed constraints, and explicit user approval.
+- `handoff`: full product/design artifact set and authoritative `05-readiness-report.{json,md}`. It does not claim technical or implementation readiness.
 
 Failure codes route back to the owning skill. Do not edit the generated report to manufacture a pass.

@@ -5,7 +5,7 @@ description: Creates a React/Tailwind design-system workbench that visualizes to
 
 # Product Blueprint Design System Workbench
 
-Use this after `product-blueprint:design-system` and before accepting visual design as implementation-ready. This skill turns the design-system brief into a rendered artifact that a founder, designer, and engineer can inspect.
+Use this after `product-blueprint:design-system` and before accepting the visual design baseline. This skill turns the design-system brief into a rendered artifact that a founder, designer, and feasibility reviewer can inspect.
 
 This is not the production app. It is a portable design artifact for product planning, design review, and later frontend handoff.
 

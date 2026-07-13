@@ -1,11 +1,11 @@
 ---
 name: service-contract
-description: Creates and maintains the machine-readable service manifest that connects Product Blueprint user stories, screens, actions, states, frontend feedback, backend/data responsibilities, journeys, and prototype evidence. Use after PRD and screen contracts, after any screen/flow/scope change, or whenever implementation-readiness must be checked without relying on prose self-assessment.
+description: Creates and maintains the machine-readable service manifest that connects Product Blueprint user stories, screens, actions, states, frontend feedback, backend/data responsibilities, journeys, and prototype evidence. Use after PRD and screen contracts, after any screen/flow/scope change, or whenever product/design continuity must be checked without relying on prose self-assessment.
 ---
 
 # Product Blueprint Service Contract
 
-Create or update `02.6-service-manifest.json`. This is the stable identity and wiring source for implementation readiness; markdown remains the human explanation.
+Create or update `02.6-service-manifest.json`. This is the stable identity and wiring source for product/design continuity; markdown remains the human explanation.
 
 Read `${CLAUDE_PLUGIN_ROOT}/references/service-contract.md` before editing the manifest. Start from `${CLAUDE_PLUGIN_ROOT}/assets/templates/service-manifest.json` for a new project.
 
@@ -50,4 +50,4 @@ Do not infer legacy markdown into a ready manifest. Migrate it, run the validato
 ## Next Step
 
 - Use `product-blueprint:feasibility-review` checkpoint mode, then `product-blueprint:storyboard`.
-- After the demo exists, run `product-blueprint:implementation-readiness` at prototype stage.
+- After the demo exists, run `product-blueprint:design-readiness` at prototype stage.

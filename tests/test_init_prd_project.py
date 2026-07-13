@@ -22,8 +22,13 @@ class InitPrdProjectTest(unittest.TestCase):
             self.assertEqual(manifest["evidence"]["demo_file"], "prototypes/서비스-계약-demo.html")
             dashboard = (manifest_path.parent / "00-review-dashboard.html").read_text(encoding="utf-8")
             handoff = (manifest_path.parent / "05-engineering-handoff.md").read_text(encoding="utf-8")
+            product_definition = json.loads((manifest_path.parent / "02.1-product-definition.json").read_text(encoding="utf-8"))
+            design_acceptance = json.loads((manifest_path.parent / "05-design-acceptance.json").read_text(encoding="utf-8"))
             self.assertIn('data-readiness-status="not-evaluated"', dashboard)
             self.assertIn("planning-readiness: pending", handoff)
+            self.assertEqual(product_definition["status"], "draft")
+            self.assertEqual(design_acceptance["status"], "pending")
+            self.assertIn("feasibility_checks", design_acceptance)
 
     def test_lite_scaffold_keeps_manifest_but_marks_lite(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
@@ -31,6 +36,8 @@ class InitPrdProjectTest(unittest.TestCase):
             target = Path(temp) / "lite-product"
             manifest = json.loads((target / "02.6-service-manifest.json").read_text(encoding="utf-8"))
             self.assertEqual(manifest["project"]["mode"], "lite")
+            self.assertTrue((target / "02.1-product-definition.json").exists())
+            self.assertFalse((target / "05-design-acceptance.json").exists())
             self.assertFalse((target / "04.36-clickable-demo.md").exists())
 
 
