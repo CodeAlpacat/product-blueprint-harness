@@ -536,15 +536,20 @@ Render the product's visual system as a React/Tailwind workbench before technica
 
 ## Decision Log
 
+## Stable-ID Feasibility Matrix
+
+| Check ID | Subject kind / ID | Lens | Verdict | Product-visible constraint | Design owner | Regenerated evidence |
+| --- | --- | --- | --- | --- | --- | --- |
+
 ## Next Step
 
-- Use product-blueprint:engineering-handoff.
+- Use product-blueprint:design-acceptance. Conditional constraints must be absorbed before user approval.
 """,
     "05-engineering-handoff.md": """---
 planning-readiness: pending
 ---
 
-# Engineering Handoff
+# Product/Design Handoff
 
 ## Product Thesis
 
@@ -564,18 +569,18 @@ planning-readiness: pending
 
 ## Open Questions
 
-## Vertical Implementation Slices
+## Journey Continuity Matrix
 
-| Slice | Journey IDs | Surfaces | Actions | Operations | Persistence / invariants | Verification seam |
-| --- | --- | --- | --- | --- | --- | --- |
+| Journey ID | Entry points | Surfaces | Actions | States | Operations | Recovery | Feasibility constraints |
+| --- | --- | --- | --- | --- | --- | --- | --- |
 
 ## Evidence Links
 
-## Technical Design Readiness Checklist
+## Design Handoff Completeness Checklist
 
 ## Next Step
 
-- Run product-blueprint:implementation-readiness. Stop after an approved pass by default; use tech-plan only when explicitly requested.
+- Run product-blueprint:design-readiness at handoff stage. Stop after an approved pass by default; technical design is a separate, explicit workflow.
 """,
 }
 
@@ -601,6 +606,10 @@ def main() -> int:
     manifest["evidence"]["demo_file"] = f"prototypes/{slugify(args.name)}-demo.html"
     files = dict(FILES)
     files["02.6-service-manifest.json"] = json.dumps(manifest, ensure_ascii=False, indent=2) + "\n"
+    product_definition_path = Path(__file__).resolve().parent.parent / "assets" / "templates" / "product-definition.json"
+    files["02.1-product-definition.json"] = product_definition_path.read_text(encoding="utf-8")
+    design_acceptance_path = Path(__file__).resolve().parent.parent / "assets" / "templates" / "design-acceptance.json"
+    files["05-design-acceptance.json"] = design_acceptance_path.read_text(encoding="utf-8")
 
     LITE_FILES = {
         "00-brief.md",
@@ -609,6 +618,7 @@ def main() -> int:
         "01-reference-research.md",
         "01-ideation.md",
         "02-prd.md",
+        "02.1-product-definition.json",
         "02.5-screen-contracts.md",
         "02.6-service-manifest.json",
         "03-storyboard.html",

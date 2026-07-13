@@ -37,14 +37,28 @@ class ServiceBlueprintValidatorTest(unittest.TestCase):
     def write_manifest(self, manifest: dict) -> None:
         (self.root / "02.6-service-manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
 
+    def product_definition(self) -> dict:
+        return json.loads((self.root / "02.1-product-definition.json").read_text(encoding="utf-8"))
+
+    def write_product_definition(self, definition: dict) -> None:
+        (self.root / "02.1-product-definition.json").write_text(json.dumps(definition, indent=2) + "\n", encoding="utf-8")
+
+    def design_acceptance(self) -> dict:
+        return json.loads((self.root / "05-design-acceptance.json").read_text(encoding="utf-8"))
+
+    def write_design_acceptance(self, acceptance: dict) -> None:
+        (self.root / "05-design-acceptance.json").write_text(json.dumps(acceptance, indent=2) + "\n", encoding="utf-8")
+
     @staticmethod
     def codes(report: dict) -> set[str]:
         return {finding["code"] for finding in report["findings"]}
 
     def test_ac10_valid_standard_passes(self) -> None:
         report = self.validate()
-        self.assertEqual(report["status"], "pass")
-        self.assertTrue(report["engineering_ready"])
+        self.assertEqual(report["status"], "handoff-pass")
+        self.assertFalse(report["engineering_ready"])
+        self.assertTrue(report["design_accepted"])
+        self.assertTrue(report["product_handoff_ready"])
         self.assertFalse(report["user_validated"])
         self.assertEqual(report["findings"], [])
 
@@ -115,7 +129,7 @@ class ServiceBlueprintValidatorTest(unittest.TestCase):
 
     def test_ac11_heuristic_does_not_claim_user_validation(self) -> None:
         report = self.validate()
-        self.assertEqual(report["status"], "pass")
+        self.assertEqual(report["status"], "handoff-pass")
         self.assertFalse(report["user_validated"])
 
     def test_ac12_lite_can_pass_but_is_not_engineering_ready(self) -> None:
@@ -140,6 +154,46 @@ class ServiceBlueprintValidatorTest(unittest.TestCase):
         self.write_manifest(manifest)
         report = self.validate(stage="contract")
         self.assertIn("CONTRACT_COLLECTION_EMPTY", self.codes(report))
+
+    def test_unconfirmed_product_definition_blocks_contract(self) -> None:
+        definition = self.product_definition()
+        definition["status"] = "draft"
+        self.write_product_definition(definition)
+        report = self.validate(stage="contract")
+        self.assertIn("PRODUCT_DEFINITION_UNCONFIRMED", self.codes(report))
+
+    def test_p0_requirement_without_required_mapping_blocks_contract(self) -> None:
+        definition = self.product_definition()
+        definition["requirements"].append({
+            "id": "save-favorite",
+            "statement": "A guest can save a favorite.",
+            "kind": "interaction",
+            "priority": "P0",
+            "status": "included",
+            "persona_ids": ["guest"],
+            "source_refs": ["02-prd.md#favorite"],
+            "decision_ref": "DEC-2",
+            "acceptance_outcomes": ["The favorite is visible after refresh."],
+        })
+        self.write_product_definition(definition)
+        report = self.validate(stage="contract")
+        self.assertIn("P0_REQUIREMENT_UNCOVERED", self.codes(report))
+
+    def test_entry_point_without_journey_blocks_contract(self) -> None:
+        definition = self.product_definition()
+        definition["entry_points"].append({
+            "id": "shared-link",
+            "label": "Shared link",
+            "persona_id": "guest",
+            "trigger": "Open a shared item URL",
+            "context": "The item may no longer exist",
+            "expected_outcome": "See the item or a recoverable not-found state",
+            "lifecycle": ["external-result", "refresh", "back"],
+            "source_refs": ["02-prd.md#shared-link"],
+        })
+        self.write_product_definition(definition)
+        report = self.validate(stage="contract")
+        self.assertIn("ENTRY_POINT_UNCOVERED", self.codes(report))
 
     def test_transition_dom_must_match_manifest_target(self) -> None:
         demo = self.root / "prototypes" / "fixture-demo.html"
@@ -219,7 +273,7 @@ class ServiceBlueprintValidatorTest(unittest.TestCase):
         MODULE.write_report(self.root, report)
         written = json.loads((self.root / "05-readiness-report.json").read_text(encoding="utf-8"))
         self.assertEqual(written["manifest_sha256"], report["manifest_sha256"])
-        self.assertIn("Status: **pass**", (self.root / "05-readiness-report.md").read_text(encoding="utf-8"))
+        self.assertIn("Status: **handoff-pass**", (self.root / "05-readiness-report.md").read_text(encoding="utf-8"))
 
     def test_runtime_report_must_match_current_manifest_and_demo_hashes(self) -> None:
         runtime = self.root / "04.37-runtime-verification.json"
@@ -252,6 +306,124 @@ class ServiceBlueprintValidatorTest(unittest.TestCase):
         (self.root / "05-engineering-handoff.md").unlink()
         report = self.validate(stage="prototype")
         self.assertEqual(report["status"], "prototype-pass")
+        self.assertFalse(report["engineering_ready"])
+
+    def test_prototype_stage_does_not_require_design_acceptance_yet(self) -> None:
+        (self.root / "05-design-acceptance.json").unlink()
+        report = self.validate(stage="prototype")
+        self.assertEqual(report["status"], "prototype-pass")
+        self.assertTrue(report["prototype_ready"])
+
+    def test_design_stage_requires_explicit_approval(self) -> None:
+        acceptance = self.design_acceptance()
+        acceptance["status"] = "pending"
+        self.write_design_acceptance(acceptance)
+        report = self.validate(stage="design")
+        self.assertIn("DESIGN_NOT_APPROVED", self.codes(report))
+        self.assertFalse(report["design_accepted"])
+
+    def test_design_stage_rejects_stale_bound_source(self) -> None:
+        prd = self.root / "02-prd.md"
+        prd.write_text(prd.read_text(encoding="utf-8") + "\nchanged\n", encoding="utf-8")
+        report = self.validate(stage="design")
+        self.assertIn("DESIGN_BASELINE_STALE", self.codes(report))
+
+    def test_design_stage_requires_every_p0_viewport(self) -> None:
+        acceptance = self.design_acceptance()
+        acceptance["visual_evidence"] = [row for row in acceptance["visual_evidence"] if row["id"] != "detail-desktop"]
+        acceptance["review_rounds"][1]["reviewed_evidence_ids"].remove("detail-desktop")
+        self.write_design_acceptance(acceptance)
+        report = self.validate(stage="design")
+        self.assertIn("VISUAL_VIEWPORT_COVERAGE_MISSING", self.codes(report))
+
+    def test_design_stage_requires_states_at_each_viewport(self) -> None:
+        acceptance = self.design_acceptance()
+        next(row for row in acceptance["visual_evidence"] if row["id"] == "detail-desktop")["state_ids"] = []
+        self.write_design_acceptance(acceptance)
+        report = self.validate(stage="design")
+        self.assertIn("VISUAL_STATE_COVERAGE_MISSING", self.codes(report))
+
+    def test_design_stage_rejects_stale_visual_evidence(self) -> None:
+        visual = self.root / "screenshots" / "visual-home-mobile.svg"
+        visual.write_text(visual.read_text(encoding="utf-8") + "\n", encoding="utf-8")
+        report = self.validate(stage="design")
+        self.assertIn("VISUAL_EVIDENCE_STALE", self.codes(report))
+
+    def test_unresolved_p0_design_finding_blocks_acceptance(self) -> None:
+        acceptance = self.design_acceptance()
+        acceptance["findings"][0]["status"] = "deferred"
+        self.write_design_acceptance(acceptance)
+        report = self.validate(stage="design")
+        self.assertIn("UNRESOLVED_P0_DESIGN_FINDING", self.codes(report))
+
+    def test_owner_approval_does_not_claim_target_user_validation(self) -> None:
+        report = self.validate(stage="design")
+        self.assertTrue(report["design_owner_approved"])
+        self.assertTrue(report["design_accepted"])
+        self.assertFalse(report["user_validated"])
+
+    def test_design_stage_requires_developer_lens_coverage(self) -> None:
+        acceptance = self.design_acceptance()
+        acceptance["feasibility_checks"] = [row for row in acceptance["feasibility_checks"] if row["id"] != "load-detail-backend"]
+        acceptance["approval"]["feasibility_check_ids"].remove("load-detail-backend")
+        self.write_design_acceptance(acceptance)
+        report = self.validate(stage="design")
+        self.assertIn("FEASIBILITY_COVERAGE_MISSING", self.codes(report))
+
+    def test_infeasible_behavior_blocks_design_acceptance(self) -> None:
+        acceptance = self.design_acceptance()
+        acceptance["feasibility_checks"][0]["verdict"] = "infeasible"
+        self.write_design_acceptance(acceptance)
+        report = self.validate(stage="design")
+        self.assertIn("FEASIBILITY_BLOCKER_OPEN", self.codes(report))
+
+    def test_constraint_requires_absorbed_design_evidence(self) -> None:
+        acceptance = self.design_acceptance()
+        check = next(row for row in acceptance["feasibility_checks"] if row["id"] == "detail-frontend")
+        check["design_resolution"] = ""
+        check["resolution_evidence_refs"] = []
+        self.write_design_acceptance(acceptance)
+        report = self.validate(stage="design")
+        self.assertIn("FEASIBILITY_CONSTRAINT_UNABSORBED", self.codes(report))
+
+    def test_constraint_rejects_unknown_design_evidence(self) -> None:
+        acceptance = self.design_acceptance()
+        check = next(row for row in acceptance["feasibility_checks"] if row["id"] == "detail-frontend")
+        check["resolution_evidence_refs"] = ["missing-visual"]
+        self.write_design_acceptance(acceptance)
+        report = self.validate(stage="design")
+        self.assertIn("FEASIBILITY_CONSTRAINT_UNABSORBED", self.codes(report))
+
+    def test_constraint_rejects_unrelated_design_evidence(self) -> None:
+        acceptance = self.design_acceptance()
+        check = next(row for row in acceptance["feasibility_checks"] if row["id"] == "detail-frontend")
+        check["resolution_evidence_refs"] = ["home-mobile"]
+        self.write_design_acceptance(acceptance)
+        report = self.validate(stage="design")
+        self.assertIn("FEASIBILITY_CONSTRAINT_UNABSORBED", self.codes(report))
+
+    def test_changed_feasibility_review_requires_user_reapproval(self) -> None:
+        acceptance = self.design_acceptance()
+        acceptance["approval"]["feasibility_check_ids"].remove("detail-frontend")
+        self.write_design_acceptance(acceptance)
+        report = self.validate(stage="design")
+        self.assertIn("FEASIBILITY_REAPPROVAL_REQUIRED", self.codes(report))
+
+    def test_changed_feasibility_verdict_with_same_id_requires_user_reapproval(self) -> None:
+        acceptance = self.design_acceptance()
+        check = next(row for row in acceptance["feasibility_checks"] if row["id"] == "home-frontend")
+        check["evidence"] = "04.5-feasibility-review.md#revised-consultation"
+        self.write_design_acceptance(acceptance)
+        report = self.validate(stage="design")
+        self.assertIn("FEASIBILITY_REAPPROVAL_REQUIRED", self.codes(report))
+
+    def test_handoff_stops_at_accepted_design_boundary(self) -> None:
+        report = self.validate(stage="handoff")
+        self.assertEqual(report["status"], "handoff-pass")
+        self.assertTrue(report["design_handoff_ready"])
+        self.assertTrue(report["ready_for_technical_design"])
+        self.assertFalse(report["technical_design_ready"])
+        self.assertFalse(report["implementation_ready"])
         self.assertFalse(report["engineering_ready"])
 
 

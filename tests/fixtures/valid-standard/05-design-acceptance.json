@@ -1,0 +1,249 @@
+{
+  "schema_version": "1.1",
+  "status": "user-approved",
+  "approval": {
+    "kind": "explicit-user",
+    "decision_ref": "DEC-20",
+    "approved_at": "2026-07-13T00:30:00Z",
+    "scope": "all-p0",
+    "evidence": "The founder walked the complete demo after feasibility constraints were absorbed and approved all P0 evidence in review round round-2.",
+    "feasibility_check_ids": [
+      "home-frontend",
+      "home-accessibility",
+      "detail-frontend",
+      "detail-accessibility",
+      "open-detail-frontend",
+      "retry-detail-frontend",
+      "retry-detail-backend",
+      "load-detail-backend",
+      "guest-journey-platform"
+    ],
+    "feasibility_sha256": "0cf1aef0049865ab2ee5aa0c31d395157f26ed010b6b9d359bcd2555cc8e594d"
+  },
+  "source_hashes": {
+    "02.1-product-definition.json": "6630546c56313c1602507d5c7a17492fdbb247d705a94fb7b970bec64dd8e93d",
+    "02-prd.md": "b8a77d5befd48189990441072247b4bc72d8ab67a8f90140336ddc9353006fcf",
+    "02.5-screen-contracts.md": "3e80311d65474b63532ae71f4c4595c0f5f6fad525106fcc4796e72e1f41e375",
+    "02.6-service-manifest.json": "973c99e296648aa593cd79cb45942f64e4b930dd9f7503f4f4a20fda9c7623b7",
+    "02.8-undefined-surfaces.md": "ad65e639d0f15dd26a293ec5f35acf464f68966bb42ea68db9b32439a0cab5c5",
+    "03-storyboard.html": "31956c073a053a05d59e96fb0cc90c1a156390dc707b66724ebf8d30026611e3",
+    "03.7-ux-writing.md": "e9ff79a85b67c36f2c1ba2b78cc738bcd52ced030056330d3c43f52b8f1ba207",
+    "04.1-visual-quality-gate.md": "a8e51031690a7b5e06f19e49d5e6a0b9c267f8b9a80dde4ccd24e0c6e4721461",
+    "04.2-backend-systems-brief.md": "b934bc566e6f55c981e3a5c4bdd6bb52501b870ee1e93031a79aad9dd17be0a2",
+    "04.3-design-system.md": "7435e3cb32d9d84451dffa358ce13ee27ca366676f78e2bfc74bbd40a124c557",
+    "04.32-design-system-workbench.md": "e3627b95ade07a1a0bd3bbbb66d57051ded8b47cf84c4712e81c99f1e8c72f4d",
+    "04.36-clickable-demo.md": "fc0d2d2ab0e65937219d4bee32b14054c6ed1baf9688c258a2b10263b1ca3e80",
+    "04.37-runtime-verification.json": "a107b47c5dd49637e3233f292b4a922b252f440bccb2aa1eee62efa27570e845",
+    "04.4-prototype-test.md": "cc02e81cb51e3f7eeb137f8cb0324bbfc28ed3863bc581e7a444b908b1890f5b",
+    "04.45-design-critique.md": "8d7d1f2681a9bc892b7b95851179462b96cdd38fe7a26bd2d3f6ae2ff49de019",
+    "04.5-feasibility-review.md": "53c09e0d97d8431564b061df1e935614b5f98a60382c9636780b7af4ca081622"
+  },
+  "component_contracts": [
+    {
+      "id": "primary-button",
+      "purpose": "Start or retry the primary action with immediate feedback.",
+      "variants": ["primary", "secondary"],
+      "states": ["default", "focus", "pending", "disabled"],
+      "token_refs": ["color.action.primary", "space.control.inline", "radius.control"],
+      "accessibility": "Keyboard activation, visible focus, and pending announcement.",
+      "evidence": {
+        "file": "screenshots/component-button.svg",
+        "sha256": "9c1ee95ae51f84ca2d333d403007bf6d2406f7df03b7e9b4378fc9e944f1ce71"
+      }
+    }
+  ],
+  "visual_evidence": [
+    {
+      "id": "home-mobile",
+      "surface_id": "home",
+      "viewport": "mobile",
+      "file": "screenshots/visual-home-mobile.svg",
+      "sha256": "3c3ac172f0292d87d817e2db8c06471af681e1e14c1b36bdc4d9d4adcbc7ed6a",
+      "state_ids": ["home-loading"],
+      "component_ids": ["primary-button"],
+      "visual_gate": "pass",
+      "review_round_id": "round-2"
+    },
+    {
+      "id": "home-desktop",
+      "surface_id": "home",
+      "viewport": "desktop",
+      "file": "screenshots/visual-home-desktop.svg",
+      "sha256": "3cfc153e3965c083caed520f818f312efb52c59a7088a00a0205a03047cfe96c",
+      "state_ids": ["home-loading"],
+      "component_ids": ["primary-button"],
+      "visual_gate": "pass",
+      "review_round_id": "round-2"
+    },
+    {
+      "id": "detail-mobile",
+      "surface_id": "detail",
+      "viewport": "mobile",
+      "file": "screenshots/visual-detail-mobile.svg",
+      "sha256": "ac95d7650b1d4e757536701bb9292224216fcb1c994745d199da7b62bf5a237a",
+      "state_ids": ["detail-error"],
+      "component_ids": ["primary-button"],
+      "visual_gate": "pass",
+      "review_round_id": "round-2"
+    },
+    {
+      "id": "detail-desktop",
+      "surface_id": "detail",
+      "viewport": "desktop",
+      "file": "screenshots/visual-detail-desktop.svg",
+      "sha256": "69b673a8b2e06f05272909992fb71027c2fcd46e4ea5d1e1feae984b23e60a7e",
+      "state_ids": ["detail-error"],
+      "component_ids": ["primary-button"],
+      "visual_gate": "pass",
+      "review_round_id": "round-2"
+    }
+  ],
+  "review_rounds": [
+    {
+      "id": "round-1",
+      "status": "revised",
+      "reviewed_evidence_ids": ["home-mobile", "detail-mobile"],
+      "summary": "The founder requested desktop coverage and clearer recovery feedback."
+    },
+    {
+      "id": "round-2",
+      "status": "completed",
+      "reviewed_evidence_ids": ["home-mobile", "home-desktop", "detail-mobile", "detail-desktop"],
+      "summary": "All current P0 surfaces, viewports, states, and flows were reviewed."
+    }
+  ],
+  "findings": [
+    {
+      "id": "finding-recovery-feedback",
+      "category": "flow",
+      "severity": "P0",
+      "status": "resolved",
+      "evidence": "detail-mobile and detail-desktop",
+      "resolution": "Retry keeps context and replaces the error with content-shaped loading feedback.",
+      "decision_ref": "DEC-19"
+    }
+  ],
+  "feasibility_checks": [
+    {
+      "id": "home-frontend",
+      "subject_kind": "surface",
+      "subject_id": "home",
+      "lens": "frontend",
+      "verdict": "feasible",
+      "constraint": "n/a:no special product constraint",
+      "design_resolution": "n/a:no design change required",
+      "resolution_evidence_refs": [],
+      "evidence": "04.5-feasibility-review.md#feasibility-review",
+      "decision_ref": "DEC-18"
+    },
+    {
+      "id": "home-accessibility",
+      "subject_kind": "surface",
+      "subject_id": "home",
+      "lens": "accessibility",
+      "verdict": "feasible",
+      "constraint": "n/a:no special product constraint",
+      "design_resolution": "n/a:no design change required",
+      "resolution_evidence_refs": [],
+      "evidence": "04.5-feasibility-review.md#feasibility-review",
+      "decision_ref": "DEC-18"
+    },
+    {
+      "id": "detail-frontend",
+      "subject_kind": "surface",
+      "subject_id": "detail",
+      "lens": "frontend",
+      "verdict": "feasible-with-constraint",
+      "constraint": "A recoverable load failure must preserve the selected item context.",
+      "design_resolution": "The detail error state keeps the item context visible and makes retry the primary action.",
+      "resolution_evidence_refs": ["detail-mobile", "detail-desktop"],
+      "evidence": "04.5-feasibility-review.md#feasibility-review",
+      "decision_ref": "DEC-19"
+    },
+    {
+      "id": "detail-accessibility",
+      "subject_kind": "surface",
+      "subject_id": "detail",
+      "lens": "accessibility",
+      "verdict": "feasible",
+      "constraint": "n/a:no special product constraint",
+      "design_resolution": "n/a:no design change required",
+      "resolution_evidence_refs": [],
+      "evidence": "04.5-feasibility-review.md#feasibility-review",
+      "decision_ref": "DEC-18"
+    },
+    {
+      "id": "open-detail-frontend",
+      "subject_kind": "action",
+      "subject_id": "open-detail",
+      "lens": "frontend",
+      "verdict": "feasible",
+      "constraint": "n/a:no special product constraint",
+      "design_resolution": "n/a:no design change required",
+      "resolution_evidence_refs": [],
+      "evidence": "04.5-feasibility-review.md#feasibility-review",
+      "decision_ref": "DEC-18"
+    },
+    {
+      "id": "retry-detail-frontend",
+      "subject_kind": "action",
+      "subject_id": "retry-detail",
+      "lens": "frontend",
+      "verdict": "feasible-with-constraint",
+      "constraint": "Retry needs immediate pending feedback while the request is in flight.",
+      "design_resolution": "The accepted detail state replaces the error action with content-shaped loading feedback.",
+      "resolution_evidence_refs": ["detail-mobile", "detail-desktop"],
+      "evidence": "04.5-feasibility-review.md#feasibility-review",
+      "decision_ref": "DEC-19"
+    },
+    {
+      "id": "retry-detail-backend",
+      "subject_kind": "action",
+      "subject_id": "retry-detail",
+      "lens": "backend",
+      "verdict": "feasible-with-constraint",
+      "constraint": "The service can fail repeatedly, so retry cannot imply guaranteed success.",
+      "design_resolution": "Copy promises another attempt and preserves the recoverable error state instead of promising completion.",
+      "resolution_evidence_refs": ["detail-mobile", "detail-desktop"],
+      "evidence": "04.5-feasibility-review.md#feasibility-review",
+      "decision_ref": "DEC-19"
+    },
+    {
+      "id": "load-detail-backend",
+      "subject_kind": "operation",
+      "subject_id": "load-detail",
+      "lens": "backend",
+      "verdict": "feasible-with-constraint",
+      "constraint": "The read operation has a visible latency and failure boundary.",
+      "design_resolution": "The flow includes content-shaped loading, contextual error, and retry states.",
+      "resolution_evidence_refs": ["detail-mobile", "detail-desktop"],
+      "evidence": "04.5-feasibility-review.md#feasibility-review",
+      "decision_ref": "DEC-19"
+    },
+    {
+      "id": "guest-journey-platform",
+      "subject_kind": "journey",
+      "subject_id": "guest-inspects-item",
+      "lens": "platform",
+      "verdict": "feasible-with-constraint",
+      "constraint": "The journey must remain understandable across load, failure, retry, and success transitions.",
+      "design_resolution": "The accepted prototype keeps one selected-item context throughout the full lifecycle.",
+      "resolution_evidence_refs": ["home-mobile", "home-desktop", "detail-mobile", "detail-desktop"],
+      "evidence": "04.5-feasibility-review.md#feasibility-review",
+      "decision_ref": "DEC-19"
+    }
+  ],
+  "mental_model_checks": [
+    {
+      "persona_id": "guest",
+      "requirement_ids": ["inspect-item", "recover-item-load"],
+      "journey_ids": ["guest-inspects-item"],
+      "verdict": "pass",
+      "evidence": "round-2 complete-service walkthrough"
+    }
+  ],
+  "target_user_validation": {
+    "status": "heuristic",
+    "evidence": ["04.4-prototype-test.md"]
+  }
+}

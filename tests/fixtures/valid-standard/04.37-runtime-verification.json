@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "runner": "browser",
   "checked_at": "2026-07-13T00:00:00Z",
-  "manifest_sha256": "304bfc41e2a95820da33f484cd091d0f5e438b12275a54bc29ee05c4af7c6fae",
+  "manifest_sha256": "973c99e296648aa593cd79cb45942f64e4b930dd9f7503f4f4a20fda9c7623b7",
   "demo_sha256": "1039bb33f6d2a2a5158674b34a829131b64f01bba9c5e8765f2c9e37e152e6b8",
   "transitions": [
     {

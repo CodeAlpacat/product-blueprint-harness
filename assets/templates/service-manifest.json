@@ -18,6 +18,7 @@
     "excluded": [],
     "accepted_limitations": []
   },
+  "product_definition_file": "02.1-product-definition.json",
   "surfaces": [],
   "actions": [],
   "states": [],

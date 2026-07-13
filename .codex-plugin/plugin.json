@@ -1,7 +1,7 @@
 {
   "name": "product-blueprint",
-  "version": "0.3.0+codex.20260713065159",
-  "description": "Guided pre-development product blueprint workflow for turning ideas into research-backed PRDs, stable service manifests, fully wired clickable prototypes, product-level frontend/backend operation contracts, deterministic readiness reports, production-grade visual systems, and traceable engineering handoffs.",
+  "version": "0.4.0+codex.20260713073806",
+  "description": "Guided product/design freeze workflow for confirmed mental models, continuous user flows, complete visual/state evidence, developer-lens feasibility consultation, explicit user approval, and honest design handoff before technical architecture.",
   "author": {
     "name": "Local developer"
   },
@@ -22,7 +22,7 @@
       "prd-writing",
       "screen-contracts",
       "service-contracts",
-      "implementation-readiness",
+      "design-readiness",
       "storyboard-visualization",
       "art-direction",
       "experience-mechanism-design",
@@ -37,7 +37,7 @@
       "engineering-handoff"
     ],
     "defaultPrompt": [
-      "Guide me from idea to a fully wired product blueprint: PRD, service manifest, clickable whole-service prototype, deterministic readiness gates, design critique, and traceable engineering handoff. Ask only when a product decision is genuinely needed."
+      "Guide me from idea to an explicitly approved product/design baseline: confirm the user's mental model, wire every P0 flow and state, build a clickable whole-service prototype, consult developer feasibility without designing implementation, absorb constraints into the UX, regenerate evidence, and stop at design handoff."
     ]
   }
 }

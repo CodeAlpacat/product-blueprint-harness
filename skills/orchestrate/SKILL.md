@@ -218,7 +218,7 @@ Lite mode runs phases 1, 2, 7, 8, 8.5, 10 only (with the dashboard). Standard/De
 6. **Experience Mechanisms**: Use `product-blueprint:experience-mechanisms` for invisible product behavior such as memory, judging, ranking, scoring, recommendations, personalization, safety gates, and paid actions.
 7. **User Stories And PRD**: Use `product-blueprint:prd`. Define MVP loops, requirements, non-goals, states, risks, and mechanism-dependent requirements. **Red-team this phase**: when multi-agent support exists, spawn a fresh-context critic to attack the PRD (missing loop steps, unowned states, scope lies) before MVP lock; inline adversarial pass otherwise. Record what it found.
 8. **Screen Contracts**: Use `product-blueprint:screen-contract`. Define each priority screen's purpose, allowed actions, forbidden shortcuts, states, entry paths, and exit paths with stable IDs.
-8.5. **Service Contract Gate**: Use `product-blueprint:service-contract`. Bind stories, surfaces, actions, required states, product-level frontend/backend operation ownership, AI-assist review loops, and journeys in `02.6-service-manifest.json`. Run `implementation-readiness` at `contract` stage; no storyboard on findings.
+8.5. **Service Contract Gate**: Use `product-blueprint:service-contract`. Bind stories, surfaces, actions, required states, product-level frontend/backend operation ownership, AI-assist review loops, and journeys in `02.6-service-manifest.json`. Run `design-readiness` at `contract` stage; no storyboard on findings.
 9. **Feasibility Checkpoint (lightweight, BEFORE any visual design)**: Use `product-blueprint:feasibility-review` in checkpoint mode. Every mechanism a P0 screen depends on gets a verdict — feasible / conditional (state the condition) / infeasible — so mockups never promise the impossible. Output `02.7-feasibility-checkpoint.md`. An `infeasible` verdict goes back to the user BEFORE the storyboard renders that screen. This is the "engineer in the room" moment; do not defer it to the full feasibility review (phase 22).
 10. **Storyboard Board**: Use `product-blueprint:storyboard`. Visualize flows screen-by-screen with evidence, state, transition wiring, and mechanism surfaces as a Figma-like board. This is the default visual planning artifact; do not replace it with a rough clickable demo.
 11. **Art Direction Brief**: Use `product-blueprint:art-direction-brief`. Define product world, design thesis, imagery, typography, color roles, signature element, and anti-aesthetic — consuming the brand lock (wordmark face, mascot palette rule, voice).
@@ -229,14 +229,15 @@ Lite mode runs phases 1, 2, 7, 8, 8.5, 10 only (with the dashboard). Standard/De
 16. **Design System Workbench**: Use `product-blueprint:design-system-workbench` to render tokens, component catalog, state lab, and P0 production screen mockups. **All-P0 coverage matrix is the exit gate**: every P0 screen from the contracts → a workbench/demo mockup → visual-gate pass. A missing row fails the phase; "propagated from the ceiling" without a rendered artifact is not coverage.
 17. **High-Fidelity Screen Specimen**: Use `product-blueprint:high-fidelity-screen` only when one screen from the workbench needs an additional pixel-level pass. This is the ceiling screen, not a substitute for all-P0 coverage.
 18. **Clickable Demo**: Use `product-blueprint:clickable-demo`. Single-file HTML: every P0 screen, real transitions matching the contract map (script-verified), board mode for Figma-like review, rendered non-happy-states sample. This is the founder's primary review artifact.
-18.5. **Prototype Contract Gate**: Use `product-blueprint:implementation-readiness` at `prototype` stage. DOM surface/action/state IDs, transitions/effects, reachability, responsive evidence, and dead controls must pass before task testing.
+18.5. **Prototype Contract Gate**: Use `product-blueprint:design-readiness` at `prototype` stage. DOM surface/action/state IDs, transitions/effects, reachability, responsive evidence, and dead controls must pass before task testing.
 19. **Prototype Test**: Use `product-blueprint:prototype-test` for the manifest journeys against the demo/workbench. Distinguish heuristic self-walkthrough (always) from a real-user protocol (recommend when stakes justify it); the loop stays labeled "실사용자 미검증" until real users run it. Update manifest evidence and rerun prototype stage.
 20. **Design Critique**: Use `product-blueprint:design-critique` to review product intent, UX flow, visual quality, states, system trust, component reuse, and handoff readiness.
 21. **Risk Register**: Use `product-blueprint:risk-register` when the product touches adult content, minors, payments, UGC, PII, or AI-generated content (mandatory then; recommended otherwise). P0 risks need mitigations before handoff.
-22. **Feasibility Review (full)**: Use `product-blueprint:feasibility-review` to prepare product/design/engineering tradeoff discussions without silently downgrading the product. Reconcile against the phase-9 checkpoint verdicts.
+22. **Feasibility Consultation (full)**: Use `product-blueprint:feasibility-review` as the final developer lens on every P0 surface/action/operation/journey. Reconcile phase-9 verdicts. `infeasible` blocks; every conditional product-visible constraint routes back into design and invalidates downstream evidence.
 22.5. **Coverage Self-Audit (mandatory — do not wait for the founder to ask)**: run the six-point developer-lens scan in `references/coverage-self-audit.md` (responsive grammar / Storybook-style state enumeration / wiring matrix / global fallbacks + cross-cutting sheets / form policy / undefined-surface registry). Output `02.8-undefined-surfaces.md` — every referenced-but-undrawn surface classified as 정의됨 / 규칙 파생 / 지금 계약(3-line mini-contract) / P1 명시 이연 — and surface it in the dashboard "남은 갭" section. Dogfood evidence: three founder questions each hit a real P0 gap this scan would have caught first.
-23. **Engineering Handoff Draft**: Use `product-blueprint:engineering-handoff`. Must include the Entity & State Contract plus manifest-ID-linked vertical implementation slices. Keep `planning-readiness: pending`.
-24. **Implementation Readiness Close**: Use `product-blueprint:implementation-readiness` at `handoff` stage. It generates `05-readiness-report.{json,md}`. Only a real pass may update handoff/dashboard to ready; failure routes upstream by finding owner.
+22.75. **Design Acceptance Loop**: Use `product-blueprint:design-acceptance`. Absorb feasibility constraints, regenerate the affected prototype/visual evidence, and repeat user review until the user explicitly approves the current whole-service baseline. No autonomous retry cap may manufacture approval.
+23. **Product/Design Handoff Draft**: Use `product-blueprint:engineering-handoff` for the compatibility-named handoff file. Preserve accepted behaviors, states, constraints, evidence, and journey continuity without selecting implementation architecture. Keep `planning-readiness: pending`.
+24. **Design Readiness Close**: Use `product-blueprint:design-readiness` at `handoff` stage. It generates `05-readiness-report.{json,md}`. Only a real pass may set `design_handoff_ready` and `ready_for_technical_design`; it never sets implementation readiness. Failure routes upstream by finding owner.
 
 After each phase, explicitly recommend one next phase and explain why (the `다음 단계` block — mandatory on every response). If required inputs for the next phase are missing, stop and ask the user for those inputs instead of proceeding with invented assumptions.
 
@@ -283,7 +284,7 @@ Run these lenses inline by default. Use subagents only when the environment has 
 - **Retry cap + ACCEPT-FLAG**: any gate loops at most 3 fix cycles per artifact. Still failing → do not loop forever, do not silently pass: record ACCEPT-FLAG in the decision log (what failed, why accepted, later fix) and surface it in the dashboard and handoff. See `references/quality-bar.md`.
 - No lock (concept, screen contracts, scope, tech-plan) without a recorded direction-challenge pass (`references/direction-challenges.md`).
 - No handoff readiness before the coverage self-audit has run and `02.8-undefined-surfaces.md` has zero unclassified rows (`references/coverage-self-audit.md`).
-- No handoff/dashboard ready claim without a current handoff-stage readiness report whose manifest hash matches and `engineering_ready=true`.
+- No handoff/dashboard design-ready claim without a current handoff-stage report whose manifest hash matches and `design_handoff_ready=true`.
 - Non-visual red-team: PRD/mechanism lock gets a fresh-context adversarial pass (subagent when available, inline otherwise) — the visual gate must not be the only place a critic exists.
 
 ## Required Outputs
@@ -324,7 +325,7 @@ Create or update a folder such as `docs/product-planning/<slug>/` with:
 - `05-readiness-report.json` + `05-readiness-report.md` (generated at the final gate)
 - `screenshots/` when references are researched
 
-Lite mode creates only: `00-brief.md`, `00-decision-log.md`, `00-review-dashboard.html`, `01-*(research|ideation).md`, `02-prd.md`, `02.5-screen-contracts.md`, `02.6-service-manifest.json`, `03-storyboard.html` (init with `--lite`). Lite contract validation may pass, but it never claims engineering readiness.
+Lite mode creates only: `00-brief.md`, `00-decision-log.md`, `00-review-dashboard.html`, `01-*(research|ideation).md`, `02-prd.md`, `02.5-screen-contracts.md`, `02.6-service-manifest.json`, `03-storyboard.html` (init with `--lite`). Lite contract validation may pass, but it never claims accepted-design or implementation readiness.
 
 To initialize the artifact structure, run:
 
@@ -336,7 +337,7 @@ If `python3` is unavailable, do not stall: create the folder and the stub files 
 
 ## Completion
 
-Use `references/quality-bar.md` for human/visual quality and `implementation-readiness` for deterministic wiring/readiness. Report which gates are complete, which flows are unverified, which mechanisms still need feasibility review, and quote the generated readiness status instead of self-declaring.
+Use `references/quality-bar.md` for human/visual quality and `design-readiness` for deterministic product/design continuity. Report which gates are complete, which flows are unverified, which constraints still need design absorption, and quote the generated readiness status instead of self-declaring.
 
 ## Next Step
 

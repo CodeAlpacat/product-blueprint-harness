@@ -12,7 +12,7 @@
     {
       "name": "product-blueprint",
       "source": "./",
-      "description": "Guided product planning and production-grade visual design harness: research, PRD, screen contracts, mechanism contracts, storyboards, measured art direction, shadcn/Radix + OKLCH token substrate, impeccable hero-screen craft loop, adversarial anti-slop visual quality gate, and engineering handoff.",
+      "description": "Guided product/design freeze harness: confirmed mental models, continuous user flows, complete screen/state/viewport evidence, developer-lens feasibility consultation, iterative user approval, and an honest design handoff before separate technical architecture.",
       "category": "design",
       "tags": [
         "product-planning",

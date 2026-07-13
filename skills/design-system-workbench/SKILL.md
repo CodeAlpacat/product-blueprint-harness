@@ -5,7 +5,7 @@ description: Creates a React/Tailwind design-system workbench that visualizes to
 
 # Product Blueprint Design System Workbench
 
-Use this after `product-blueprint:design-system` and before accepting visual design as implementation-ready. This skill turns the design-system brief into a rendered artifact that a founder, designer, and engineer can inspect.
+Use this after `product-blueprint:design-system` and before accepting the visual design baseline. This skill turns the design-system brief into a rendered artifact that a founder, designer, and feasibility reviewer can inspect.
 
 This is not the production app. It is a portable design artifact for product planning, design review, and later frontend handoff.
 
@@ -88,6 +88,7 @@ The React workbench must include these sections:
 5. **State Lab**: loading, empty, locked/safety, error/retry, paid confirmation, success, correction/recovery, disabled, long-content, image-failure, and permission states.
 6. **Production Screen Set**: high-fidelity mockups for all P0 surfaces from the service manifest. For character-chat products this usually means home, search/all characters, ranking, character detail, persona gate, chat, chat side panel/tools, and conversations/library.
 7. **All-P0 Coverage Matrix (exit gate)**: a table in `04.32-design-system-workbench.md` — every P0 surface ID from `02.6-service-manifest.json` | rendered artifact (workbench section or demo screen) | required state IDs | visual-gate status. **A row with no rendered artifact fails the phase.** "Propagated from the ceiling" is a technique, not coverage — coverage is a render you can screenshot.
+8. **Acceptance-ready component IDs**: give every implementation-bearing component a stable ID and record purpose, variants, states, token refs, accessibility behavior, and evidence location. `design-acceptance` consumes this inventory; unnamed visual fragments are not a handoff contract.
 8. **Flow Wiring**: arrows, labels, and review notes outside the product screen frames. Product frames must contain only user-facing UI.
 9. **Dark mode & motion**: a dark token pair (OKLCH makes this cheap) with at least one screen rendered dark + contrast re-checked, and a motion spec (durations, easing curve, enter/exit patterns, waiting-state behavior — motion explains, never decorates). Mark dark mode "explicitly deferred" only with a user decision logged.
 10. **Governance note**: how tokens/components change after handoff — where the SoT lives (tokens files + DESIGN.md), who approves additions, and the rule that screens never introduce off-token values.

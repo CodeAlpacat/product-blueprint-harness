@@ -1,7 +1,7 @@
 {
   "name": "product-blueprint",
-  "version": "0.3.0",
-  "description": "Guided pre-development product blueprint workflow for Claude Code: turns ideas into research-backed PRDs, stable service manifests, fully wired screen/action/state contracts, clickable whole-service prototypes, product-level frontend/backend operation contracts, deterministic readiness reports, and production-grade visual design instead of prose-only or self-graded handoff.",
+  "version": "0.4.0",
+  "description": "Guided product/design definition workflow for Claude Code: turns ideas into confirmed mental models, fully wired screen/action/state contracts, clickable whole-service prototypes, production visual evidence, developer-lens feasibility consultation, explicit user design approval, and honest design handoff without claiming implementation readiness.",
   "author": {
     "name": "CodeAlpacat",
     "url": "https://github.com/CodeAlpacat"
@@ -20,9 +20,11 @@
     "shadcn",
     "radix",
     "design-tokens",
+    "design-readiness",
+    "design-acceptance",
+    "feasibility-consultation",
     "engineering-handoff",
-    "service-contract",
-    "implementation-readiness"
+    "service-contract"
   ],
   "skills": "./skills/"
 }

@@ -1,6 +1,6 @@
 ---
 name: feasibility-review
-description: Facilitates product-design-backend-to-engineering feasibility review without prematurely locking technical architecture. Use after PRD, mechanisms, storyboard, backend systems brief, and design direction when the team needs to identify feasibility risks, tradeoffs, scope-outs, staged compromises, or technical questions before implementation planning.
+description: Brings a developer lens into product/design decisions without turning the work into implementation planning. Use before visual design and again before final design acceptance to decide whether promised behaviors are feasible, which product-visible constraints the design must absorb, and which flows must be redesigned or scoped out.
 ---
 
 # Product Blueprint Feasibility Review
@@ -18,7 +18,7 @@ Run right after screen contracts, before the storyboard renders anything. This i
 
 ## Mode B — Full Feasibility Review (before handoff)
 
-Use after product/design artifacts exist and before engineering handoff. This is a meeting-prep artifact for product, design, and engineering. Reconcile against the Mode A verdicts: any screen that shipped visuals against a `conditional` verdict must show the condition was addressed.
+Use after product/design artifacts exist and before final design acceptance. This is a product/design consultation with an engineer in the room, not a tech spec. Reconcile against Mode A: any screen rendered against a conditional verdict must show the condition in the current user flow, state, copy, or limitation.
 
 ## Review Inputs
 
@@ -32,25 +32,22 @@ Use after product/design artifacts exist and before engineering handoff. This is
 
 ## Workflow
 
-1. List product outcomes that must survive implementation.
-2. List mechanisms that require engineering feasibility review.
-3. For each mechanism, define:
-   - product non-negotiable
-   - negotiable experience detail
-   - likely technical uncertainty
-   - possible staged versions
-   - explicit scope-out option
-   - user-facing consequence of compromise
-4. Identify decisions that need engineering input, legal/safety input, or user validation.
-5. Produce a decision log with owner, deadline, and evidence needed.
+1. Enumerate every P0 surface, action, operation, and journey by its stable service-manifest ID.
+2. Review each through the required developer lens: surface=`frontend`+`accessibility`, action=`frontend` (+`backend` when it invokes an operation), operation=`backend`, journey=`platform`.
+3. Give each row a final verdict: `feasible`, `feasible-with-constraint`, or `infeasible`.
+4. State only product-visible constraints: latency, failure/retry, persistence/lifecycle, permission, platform capability, accessibility, safety, or material cost. Do not choose endpoints, tables, component architecture, state libraries, migrations, or rollout.
+5. For `feasible-with-constraint`, identify the earliest product/design owner and the exact evidence that must be regenerated. For `infeasible`, offer a closest feasible experience and block approval.
+6. Route constraints back into PRD/screen/service contract/storyboard/copy/design/demo as appropriate. Rerun the prototype and visual proof.
+7. Write the final rows into `05-design-acceptance.json.feasibility_checks`; user approval happens only after these rows and regenerated evidence are current.
 
 ## Rules
 
 - Do not silently downgrade the product to what is easy to build.
 - Do not force one architecture before engineering review.
+- Do not let technical convenience redefine the user's mental model. The consultation changes design only when a real platform/product constraint demands it.
 - Do not treat unresolved feasibility as a reason to erase the user experience requirement.
 - Distinguish `must-have for MVP`, `can be approximated`, `needs experiment`, and `scope out`.
-- A changed verdict updates the affected manifest operation, exclusion, or accepted limitation in the same phase; do not leave feasibility and the service contract disagreeing.
+- A changed verdict updates the affected contract, design, evidence, and approval state in the same phase; do not leave feasibility and the accepted experience disagreeing.
 
 ## Output
 
@@ -62,10 +59,11 @@ Create `04.5-feasibility-review.md` with:
 - Scope-out candidates
 - Questions for engineering/design/product
 - Decision log
+- Stable-ID feasibility matrix and regenerated-evidence references
 
-Then use `product-blueprint:engineering-handoff` for the approved pre-development package. Use `product-blueprint:tech-plan` only if the user explicitly asks to proceed into technical architecture.
+Then use `product-blueprint:design-acceptance`. Conditional constraints are not complete until the design evidence is regenerated and the user explicitly approves the revised whole.
 
 ## Next Step
 
 - 사용자가 결정할 것: infeasible/conditional 판정 메커니즘의 staged 대안 채택 또는 scope-out.
-- Use `product-blueprint:engineering-handoff` when tradeoffs and unresolved questions are documented.
+- Use `product-blueprint:design-acceptance` after all infeasible rows are redesigned/scoped and all conditional rows are visibly absorbed.

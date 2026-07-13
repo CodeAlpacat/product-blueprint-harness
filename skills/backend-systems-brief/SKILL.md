@@ -1,11 +1,11 @@
 ---
 name: backend-systems-brief
-description: Creates a pre-architecture backend and systems brief from product mechanisms without deciding schema, APIs, or implementation. Use before technical design when the product depends on memory, judging, ranking, billing, moderation, permissions, creator publishing, safety, analytics, or other server-side/system behavior.
+description: Creates a product-level backend and systems brief that gives designers the constraints needed to finalize flows without deciding schema, APIs, or implementation. Use during product/design definition when the experience depends on memory, judging, ranking, billing, moderation, permissions, publishing, safety, analytics, or other system behavior.
 ---
 
 # Product Blueprint Backend Systems Brief
 
-Use this before technical architecture. It is not a DB/API design. It prepares backend engineers to evaluate product-critical system behavior.
+Use this inside product/design definition. It is not a DB/API design. It exposes system behavior and failure boundaries that the user experience must represent before approval.
 
 ## Output Language And Stage Exit
 
@@ -74,7 +74,7 @@ Create `04.2-backend-systems-brief.md` with:
 - Data category map
 - Permission and lifecycle map
 - High-risk invariants
-- Scope-out and staged implementation questions
+- Scope-out and staged experience options
 - Operation matrix keyed by the exact IDs in `02.6-service-manifest.json`; update the manifest in the same change
 
 Use `references/backend-brief-checklist.md` for detailed prompts.

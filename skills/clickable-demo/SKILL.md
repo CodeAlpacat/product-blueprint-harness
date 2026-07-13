@@ -35,6 +35,7 @@ One self-contained HTML file = the product, walkable. This is usually the single
 - **Runtime report**: browser-drive every manifest transition, same-surface effect, and required state reproduction. Write `04.37-runtime-verification.json` with `runner: browser`, current manifest/demo SHA-256 values, and pass/fail rows keyed by action/state ID. A hand-written claim without current hashes is stale evidence.
 - **Deterministic contract check**: run `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/validate_service_blueprint.py" <planning-dir> --stage prototype --no-write`. Fix every missing DOM ID, uncontracted control, mismatched `data-go`/`data-effect`, unreachable P0 surface, and unreproducible state.
 - **Render check**: open in a real browser, screenshot demo mode (2–3 key screens) AND board mode (full page). Fix visual defects before declaring done.
+- **Acceptance candidates**: render every P0 surface at every release viewport with its required states at readable size. These files become candidates for the design-acceptance matrix; the 2–3 key-screen smoke check alone is not design approval.
 - **Gate**: run `product-blueprint:visual-quality-gate` over the board-mode screenshot — this is where all-P0 coverage is easiest to scan at once.
 
 ## Forbidden
@@ -46,5 +47,5 @@ One self-contained HTML file = the product, walkable. This is usually the single
 
 ## Next Step
 
-- 다음 추천: `product-blueprint:prototype-test` (이 데모로 실제 태스크 워크스루) → `product-blueprint:design-critique`.
+- 다음 추천: `product-blueprint:prototype-test` → `product-blueprint:design-critique` → `product-blueprint:design-acceptance`.
 - 사용자가 결정할 것: 데모가 보여준 흐름/카피 승인, 화면 추가·수정 요청.

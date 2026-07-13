@@ -112,9 +112,10 @@ product-blueprint:orchestrate
 | Brand | `positioning-brand` | `01.8-positioning-brand.md` (name, voice, mascot direction) |
 | Definition | `experience-mechanisms` | `02-mechanisms.md` (invisible behavior: memory, scoring, safety, paid) |
 | Definition | `prd` | `02-prd.md` (MVP lock input) |
+| Definition | `product-definition` | `02.1-product-definition.json` (confirmed personas, mental models, P0 requirements, entry points) |
 | Definition | `screen-contract` | `02.5-screen-contracts.md` (per-screen actions/states/wiring) |
 | Definition | `service-contract` | `02.6-service-manifest.json` (stable IDs, operations, journeys, evidence maturity) |
-| Gate | `implementation-readiness` | contract/prototype/handoff validation + `05-readiness-report.*` |
+| Gate | `design-readiness` | contract/prototype/design/handoff validation + `05-readiness-report.*` |
 | Definition | `feasibility-review` (checkpoint mode) | `02.7-feasibility-checkpoint.md` — BEFORE any visual design |
 | Existing assets | `feature-adoption` (optional) | adoption map when you already own a mature codebase |
 | Visual | `storyboard` | `03-storyboard.html` (flow board) |
@@ -128,8 +129,9 @@ product-blueprint:orchestrate
 | Validation | `prototype-test`, `design-critique` | `04.4-*`, `04.45-*` |
 | Validation | `risk-register` | `04.55-risk-register.md` (mandatory for adult/minors/payments/UGC/PII/AI content) |
 | Validation | `feasibility-review` (full) | `04.5-feasibility-review.md` |
+| Acceptance | `design-acceptance` | `05-design-acceptance.json` (absorbed constraints + explicit current user approval) |
 | Handoff | `backend-systems-brief` | `04.2-backend-systems-brief.md` |
-| Handoff | `engineering-handoff` | `05-engineering-handoff.md` (Entity & State Contract) |
+| Handoff | `engineering-handoff` | compatibility-named `05-engineering-handoff.md` (accepted product/design contract, not implementation readiness) |
 | Post-handoff | `tech-plan` (opt-in only) | technical architecture — only when explicitly requested |
 
 ### Improving one part mid-stream (partial use)
@@ -153,7 +155,7 @@ Common partial asks:
 | Generate/curate art assets | `art-production` | demo (asset wiring) |
 | Audit what's still undefined | run the coverage self-audit (`references/coverage-self-audit.md`) | `02.8-undefined-surfaces.md` + dashboard |
 | Check risk/compliance only | `risk-register` | handoff |
-| Mine an existing codebase | `feature-adoption` | screen-contract deltas → demo → tech-plan |
+| Mine an existing codebase | `feature-adoption` | screen-contract deltas → demo → feasibility consultation |
 
 If you're unsure which skill owns what you want to change, ask `orchestrate` to route it ("X만 다시") — it will identify the owning skill and the downstream update list instead of restarting the pipeline.
 
@@ -161,16 +163,17 @@ If you're unsure which skill owns what you want to change, ask `orchestrate` to 
 
 Standard/Deep runs use `02.6-service-manifest.json` as the stable identity and wiring source. Markdown explains decisions; the manifest makes them checkable. A P0 surface is not simply “complete”: it moves through `defined → prototyped → wired → contracted → verified` with concrete evidence.
 
-Run the same validator at three boundaries:
+Run the same validator at four product/design boundaries:
 
 ```bash
 python3 scripts/validate_service_blueprint.py docs/product-planning/<slug> --stage contract --no-write
 python3 scripts/validate_service_blueprint.py docs/product-planning/<slug> --stage prototype --no-write
+python3 scripts/validate_service_blueprint.py docs/product-planning/<slug> --stage design --no-write
 python3 scripts/validate_service_blueprint.py docs/product-planning/<slug> --stage handoff
 ```
 
-The final command writes `05-readiness-report.json` and `.md`. Dashboard and handoff readiness must be derived from that report. Lite can pass its compact contract but always keeps `engineering_ready=false`.
+The final command writes `05-readiness-report.json` and `.md`. Dashboard and handoff readiness must be derived from that report. A pass means the accepted product/design contract is ready to begin a separate technical-design process; it never means implementation-ready. Lite keeps all accepted-design dimensions false.
 
 Prototype validation also requires `04.37-runtime-verification.json`, produced from a real browser walkthrough. It records every transition/effect/required-state result and the current manifest/demo SHA-256 values. Changing either source makes the report stale and blocks readiness until the browser scenario is rerun.
 
-The architecture follows the useful parts of [Matt Pocock's skills](https://github.com/mattpocock/skills): small composable skills, test seams fixed in the spec, prototypes that answer concrete questions, independently demonstrable vertical slices, and separate standards-vs-spec review. Product Blueprint extends that pattern with a mandatory whole-service prototype contract; a throwaway exploration prototype is not treated as implementation readiness.
+The architecture follows the useful parts of [Matt Pocock's skills](https://github.com/mattpocock/skills): small composable skills, test seams fixed in the spec, prototypes that answer concrete questions, and separate standards-vs-spec review. Product Blueprint extends that pattern with a mandatory whole-service prototype contract and a developer-lens consultation that feeds constraints back into design; neither is treated as implementation readiness.

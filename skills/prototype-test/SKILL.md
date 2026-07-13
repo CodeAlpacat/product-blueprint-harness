@@ -49,6 +49,8 @@ Until level 2 runs, every downstream artifact that claims the flow "works" carri
 
 After testing, update manifest `user_validation.status/evidence` and the affected surface `verified` fields. Then rerun the prototype-stage validator; heuristic evidence may pass the structural gate but keeps `user_validated=false`.
 
+Copy the same honest validation status into the pending design-acceptance contract. Owner design approval never upgrades heuristic evidence to `real-user`.
+
 ## Rules
 
 - Do not call a prototype tested because it renders.

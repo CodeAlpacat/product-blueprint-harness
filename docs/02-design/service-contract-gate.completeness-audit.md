@@ -118,7 +118,7 @@ Critical 1건(옛 screen-contract만 소비하는 downstream dual-SoT 위험)을
 | 실제 same-surface effect | agent-browser로 `retry-detail` 클릭 | observed effect=`replace-error-with-detail` |
 | 실제 state board | agent-browser로 Board 클릭 | home/detail과 loading/error state 모두 visible |
 | prototype gate | hash-bound runtime report 포함 `--stage prototype` | `prototype-pass`, finding 0 |
-| handoff gate | full fixture `--stage handoff` | `pass`, engineering_ready=true, user_validated=false |
+| handoff gate | full fixture `--stage handoff` | superseded by v0.4 design semantics: `handoff-pass`, `design_handoff_ready=true`, `engineering_ready=false`, `user_validated=false` |
 | 기존 dogfood 기준선 | read-only handoff validation | manifest, UX-writing, clickable-demo note 누락으로 fail |
 
 E2E 중 발견한 P0: DOM ID와 `data-go`만 맞고 JavaScript가 없어도 prototype-pass가 가능했다. 이를 runtime report(브라우저 runner + manifest/demo SHA-256 + action/state별 결과) 필수화로 닫았다. 비결정 영역인 실제 사용자 만족도는 `user_validated=false`로 남는다.
