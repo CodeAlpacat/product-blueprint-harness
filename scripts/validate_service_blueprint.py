@@ -195,10 +195,9 @@ class Validator:
             if not isinstance(self.manifest.get(key), list):
                 self.add("MANIFEST_INVALID_SHAPE", f"{key} must be an array.", key, "service-contract")
 
-        if profile != "lite":
-            for key in ("surfaces", "actions", "journeys"):
-                if not self.manifest.get(key):
-                    self.add("CONTRACT_COLLECTION_EMPTY", f"{key} cannot be empty for {profile}.", key, "service-contract")
+        for key in ("surfaces", "actions", "journeys"):
+            if not self.manifest.get(key):
+                self.add("CONTRACT_COLLECTION_EMPTY", f"{key} cannot be empty for {profile}.", key, "service-contract")
 
         validation = self._mapping("user_validation")
         status = validation.get("status")
@@ -221,8 +220,7 @@ class Validator:
         self._validate_operations(operations, profile)
         self._validate_ai_assists(ai_assists, actions)
         self._validate_journeys(journeys, surfaces, actions, states, profile)
-        if profile != "lite":
-            self._validate_reachability(surfaces, actions, journeys)
+        self._validate_reachability(surfaces, actions, journeys)
         if profile != "lite" and stage in {"prototype", "handoff"}:
             self._validate_uncontracted_controls(actions)
 

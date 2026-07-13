@@ -11,7 +11,7 @@ Use this only after product/design intent, feasibility review, and engineering h
 
 1. Read PRD, mechanism contracts, storyboard, design-system, feasibility-review, and engineering-handoff artifacts.
 2. Preserve product non-negotiables and approved compromises.
-3. Build an action map: screen, user action, precondition, result, data read/write, failure state.
+3. Build the action map from `02.6-service-manifest.json`: preserve every surface/action/state/operation/journey ID while adding concrete implementation names.
 4. Define domain entities in product language first.
 5. Draft API contracts and event flows.
 6. Draft DB/schema concepts and permissions.
@@ -26,6 +26,7 @@ Use this only after product/design intent, feasibility review, and engineering h
 - Separate product vocabulary from implementation names.
 - Mark high-risk invariants: auth, billing, age gates, deletion, publishing, ranking, scoring.
 - Include migration and rollout risks if building in an existing repo.
+- Every route/component/API/schema/service/test row must reverse-reference the service-manifest IDs it implements. An implementation element with no product ID needs justification; a product ID with no implementation mapping is a blocker.
 
 ## Reuse verdicts (when an existing codebase is in play)
 
@@ -44,6 +45,7 @@ Create `06-technical-plan.md` with:
 - Frontend plan
 - Backend plan
 - Verification matrix
+- Traceability matrix: service manifest ID → frontend → API/backend → persistence → test
 - Open technical decisions
 
 ## Next Step

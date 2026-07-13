@@ -20,6 +20,10 @@ class InitPrdProjectTest(unittest.TestCase):
             self.assertEqual(manifest["project"]["name"], "서비스 계약")
             self.assertEqual(manifest["project"]["mode"], "standard")
             self.assertEqual(manifest["evidence"]["demo_file"], "prototypes/서비스-계약-demo.html")
+            dashboard = (manifest_path.parent / "00-review-dashboard.html").read_text(encoding="utf-8")
+            handoff = (manifest_path.parent / "05-engineering-handoff.md").read_text(encoding="utf-8")
+            self.assertIn('data-readiness-status="not-evaluated"', dashboard)
+            self.assertIn("planning-readiness: pending", handoff)
 
     def test_lite_scaffold_keeps_manifest_but_marks_lite(self) -> None:
         with tempfile.TemporaryDirectory() as temp:

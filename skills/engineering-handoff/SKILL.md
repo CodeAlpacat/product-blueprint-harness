@@ -19,6 +19,8 @@ Use this as the final default phase of Product Blueprint. It is not the technica
 - High-fidelity screen specimen when one screen received an extra pixel-level pass
 - Backend systems brief
 - Feasibility review
+- `02.6-service-manifest.json`
+- Latest prototype-stage validator result and prototype-test evidence
 
 ## Handoff Contents
 
@@ -39,6 +41,8 @@ Use this as the final default phase of Product Blueprint. It is not the technica
 11. High-fidelity visual evidence: design-system workbench screenshots, clickable-demo link, token/component/state coverage, and optional single-screen pixel pass when the product requires production-grade UI confidence before technical design.
 12. Risk register status: P0 risks and their mitigations (from `04.55-risk-register.md` when it exists); handoff is not ready with unmitigated P0 risks.
 13. Readiness checklist for starting technical design.
+14. **Vertical implementation slices**: journey-by-journey table with journey IDs, surfaces, actions, operations, persistence/invariants, and verification seam. Each slice reaches one user-visible result across UI and backend/data responsibility.
+15. **Readiness status block**: frontmatter starts as `planning-readiness: pending`; final pass/fail is owned by `implementation-readiness`, not this document.
 
 ## Rules
 
@@ -48,14 +52,16 @@ Use this as the final default phase of Product Blueprint. It is not the technica
 - Preserve user experience requirements even when they are difficult.
 - Mark each unresolved question as `must decide before build`, `can decide during technical design`, or `experiment required`.
 - If no React design-system workbench exists and visual quality was a user concern, mark technical design readiness as conditional.
+- Do not write `planning-readiness: pass`, “ready for engineering,” or equivalent from prose review. Create the handoff draft, then call `product-blueprint:implementation-readiness` at handoff stage.
+- Use exact service-manifest IDs in journeys, state machines, invariants, and vertical slices. A handoff row without IDs cannot be traced back to the prototype.
 
 ## Output
 
-Create `05-engineering-handoff.md`. Use `product-blueprint:tech-plan` only if the user explicitly asks to proceed from this handoff into technical architecture.
+Create `05-engineering-handoff.md` as a draft with `planning-readiness: pending`, then run `product-blueprint:implementation-readiness`. The generated `05-readiness-report.{json,md}` is the readiness verdict. Use `product-blueprint:tech-plan` only if the user explicitly asks to proceed from this handoff into technical architecture.
 
 ## Next Step
 
-- 사용자가 결정할 것: 핸드오프 준비 완료 선언, 그리고 남은 open question 각각의 오너/시점 지정.
+- 사용자가 결정할 것: validator pass 이후 핸드오프 승인, 그리고 남은 open question 각각의 오너/시점 지정.
 - Stop here by default. This is the end of Product Blueprint's pre-development workflow.
 - If visual quality is still the main risk, use `product-blueprint:design-system-workbench` before `product-blueprint:tech-plan`.
 - Use `product-blueprint:tech-plan` only when the user explicitly asks to proceed into implementation architecture.

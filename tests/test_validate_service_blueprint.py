@@ -131,6 +131,16 @@ class ServiceBlueprintValidatorTest(unittest.TestCase):
         self.assertEqual(report["status"], "lite-pass")
         self.assertFalse(report["engineering_ready"])
 
+    def test_lite_manifest_cannot_be_an_empty_scaffold(self) -> None:
+        manifest = self.manifest()
+        manifest["project"]["mode"] = "lite"
+        manifest["surfaces"] = []
+        manifest["actions"] = []
+        manifest["journeys"] = []
+        self.write_manifest(manifest)
+        report = self.validate(stage="contract")
+        self.assertIn("CONTRACT_COLLECTION_EMPTY", self.codes(report))
+
     def test_transition_dom_must_match_manifest_target(self) -> None:
         demo = self.root / "prototypes" / "fixture-demo.html"
         demo.write_text(demo.read_text().replace('data-go="detail"', 'data-go="home"'), encoding="utf-8")
