@@ -1,12 +1,24 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "status": "user-approved",
   "approval": {
     "kind": "explicit-user",
     "decision_ref": "DEC-20",
     "approved_at": "2026-07-13T00:30:00Z",
     "scope": "all-p0",
-    "evidence": "The founder walked the complete demo and approved all P0 evidence in review round round-2."
+    "evidence": "The founder walked the complete demo after feasibility constraints were absorbed and approved all P0 evidence in review round round-2.",
+    "feasibility_check_ids": [
+      "home-frontend",
+      "home-accessibility",
+      "detail-frontend",
+      "detail-accessibility",
+      "open-detail-frontend",
+      "retry-detail-frontend",
+      "retry-detail-backend",
+      "load-detail-backend",
+      "guest-journey-platform"
+    ],
+    "feasibility_sha256": "0cf1aef0049865ab2ee5aa0c31d395157f26ed010b6b9d359bcd2555cc8e594d"
   },
   "source_hashes": {
     "02.1-product-definition.json": "6630546c56313c1602507d5c7a17492fdbb247d705a94fb7b970bec64dd8e93d",
@@ -24,7 +36,7 @@
     "04.37-runtime-verification.json": "a107b47c5dd49637e3233f292b4a922b252f440bccb2aa1eee62efa27570e845",
     "04.4-prototype-test.md": "cc02e81cb51e3f7eeb137f8cb0324bbfc28ed3863bc581e7a444b908b1890f5b",
     "04.45-design-critique.md": "8d7d1f2681a9bc892b7b95851179462b96cdd38fe7a26bd2d3f6ae2ff49de019",
-    "04.5-feasibility-review.md": "5f78a3d007c1d68c564ebe1ce6f046037146c9fbaf1589bad45cbb445968f4f1"
+    "04.5-feasibility-review.md": "53c09e0d97d8431564b061df1e935614b5f98a60382c9636780b7af4ca081622"
   },
   "component_contracts": [
     {
@@ -108,6 +120,116 @@
       "status": "resolved",
       "evidence": "detail-mobile and detail-desktop",
       "resolution": "Retry keeps context and replaces the error with content-shaped loading feedback.",
+      "decision_ref": "DEC-19"
+    }
+  ],
+  "feasibility_checks": [
+    {
+      "id": "home-frontend",
+      "subject_kind": "surface",
+      "subject_id": "home",
+      "lens": "frontend",
+      "verdict": "feasible",
+      "constraint": "n/a:no special product constraint",
+      "design_resolution": "n/a:no design change required",
+      "resolution_evidence_refs": [],
+      "evidence": "04.5-feasibility-review.md#feasibility-review",
+      "decision_ref": "DEC-18"
+    },
+    {
+      "id": "home-accessibility",
+      "subject_kind": "surface",
+      "subject_id": "home",
+      "lens": "accessibility",
+      "verdict": "feasible",
+      "constraint": "n/a:no special product constraint",
+      "design_resolution": "n/a:no design change required",
+      "resolution_evidence_refs": [],
+      "evidence": "04.5-feasibility-review.md#feasibility-review",
+      "decision_ref": "DEC-18"
+    },
+    {
+      "id": "detail-frontend",
+      "subject_kind": "surface",
+      "subject_id": "detail",
+      "lens": "frontend",
+      "verdict": "feasible-with-constraint",
+      "constraint": "A recoverable load failure must preserve the selected item context.",
+      "design_resolution": "The detail error state keeps the item context visible and makes retry the primary action.",
+      "resolution_evidence_refs": ["detail-mobile", "detail-desktop"],
+      "evidence": "04.5-feasibility-review.md#feasibility-review",
+      "decision_ref": "DEC-19"
+    },
+    {
+      "id": "detail-accessibility",
+      "subject_kind": "surface",
+      "subject_id": "detail",
+      "lens": "accessibility",
+      "verdict": "feasible",
+      "constraint": "n/a:no special product constraint",
+      "design_resolution": "n/a:no design change required",
+      "resolution_evidence_refs": [],
+      "evidence": "04.5-feasibility-review.md#feasibility-review",
+      "decision_ref": "DEC-18"
+    },
+    {
+      "id": "open-detail-frontend",
+      "subject_kind": "action",
+      "subject_id": "open-detail",
+      "lens": "frontend",
+      "verdict": "feasible",
+      "constraint": "n/a:no special product constraint",
+      "design_resolution": "n/a:no design change required",
+      "resolution_evidence_refs": [],
+      "evidence": "04.5-feasibility-review.md#feasibility-review",
+      "decision_ref": "DEC-18"
+    },
+    {
+      "id": "retry-detail-frontend",
+      "subject_kind": "action",
+      "subject_id": "retry-detail",
+      "lens": "frontend",
+      "verdict": "feasible-with-constraint",
+      "constraint": "Retry needs immediate pending feedback while the request is in flight.",
+      "design_resolution": "The accepted detail state replaces the error action with content-shaped loading feedback.",
+      "resolution_evidence_refs": ["detail-mobile", "detail-desktop"],
+      "evidence": "04.5-feasibility-review.md#feasibility-review",
+      "decision_ref": "DEC-19"
+    },
+    {
+      "id": "retry-detail-backend",
+      "subject_kind": "action",
+      "subject_id": "retry-detail",
+      "lens": "backend",
+      "verdict": "feasible-with-constraint",
+      "constraint": "The service can fail repeatedly, so retry cannot imply guaranteed success.",
+      "design_resolution": "Copy promises another attempt and preserves the recoverable error state instead of promising completion.",
+      "resolution_evidence_refs": ["detail-mobile", "detail-desktop"],
+      "evidence": "04.5-feasibility-review.md#feasibility-review",
+      "decision_ref": "DEC-19"
+    },
+    {
+      "id": "load-detail-backend",
+      "subject_kind": "operation",
+      "subject_id": "load-detail",
+      "lens": "backend",
+      "verdict": "feasible-with-constraint",
+      "constraint": "The read operation has a visible latency and failure boundary.",
+      "design_resolution": "The flow includes content-shaped loading, contextual error, and retry states.",
+      "resolution_evidence_refs": ["detail-mobile", "detail-desktop"],
+      "evidence": "04.5-feasibility-review.md#feasibility-review",
+      "decision_ref": "DEC-19"
+    },
+    {
+      "id": "guest-journey-platform",
+      "subject_kind": "journey",
+      "subject_id": "guest-inspects-item",
+      "lens": "platform",
+      "verdict": "feasible-with-constraint",
+      "constraint": "The journey must remain understandable across load, failure, retry, and success transitions.",
+      "design_resolution": "The accepted prototype keeps one selected-item context throughout the full lifecycle.",
+      "resolution_evidence_refs": ["home-mobile", "home-desktop", "detail-mobile", "detail-desktop"],
+      "evidence": "04.5-feasibility-review.md#feasibility-review",
       "decision_ref": "DEC-19"
     }
   ],

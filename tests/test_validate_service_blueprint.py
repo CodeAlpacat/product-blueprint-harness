@@ -362,6 +362,70 @@ class ServiceBlueprintValidatorTest(unittest.TestCase):
         self.assertTrue(report["design_accepted"])
         self.assertFalse(report["user_validated"])
 
+    def test_design_stage_requires_developer_lens_coverage(self) -> None:
+        acceptance = self.design_acceptance()
+        acceptance["feasibility_checks"] = [row for row in acceptance["feasibility_checks"] if row["id"] != "load-detail-backend"]
+        acceptance["approval"]["feasibility_check_ids"].remove("load-detail-backend")
+        self.write_design_acceptance(acceptance)
+        report = self.validate(stage="design")
+        self.assertIn("FEASIBILITY_COVERAGE_MISSING", self.codes(report))
+
+    def test_infeasible_behavior_blocks_design_acceptance(self) -> None:
+        acceptance = self.design_acceptance()
+        acceptance["feasibility_checks"][0]["verdict"] = "infeasible"
+        self.write_design_acceptance(acceptance)
+        report = self.validate(stage="design")
+        self.assertIn("FEASIBILITY_BLOCKER_OPEN", self.codes(report))
+
+    def test_constraint_requires_absorbed_design_evidence(self) -> None:
+        acceptance = self.design_acceptance()
+        check = next(row for row in acceptance["feasibility_checks"] if row["id"] == "detail-frontend")
+        check["design_resolution"] = ""
+        check["resolution_evidence_refs"] = []
+        self.write_design_acceptance(acceptance)
+        report = self.validate(stage="design")
+        self.assertIn("FEASIBILITY_CONSTRAINT_UNABSORBED", self.codes(report))
+
+    def test_constraint_rejects_unknown_design_evidence(self) -> None:
+        acceptance = self.design_acceptance()
+        check = next(row for row in acceptance["feasibility_checks"] if row["id"] == "detail-frontend")
+        check["resolution_evidence_refs"] = ["missing-visual"]
+        self.write_design_acceptance(acceptance)
+        report = self.validate(stage="design")
+        self.assertIn("FEASIBILITY_CONSTRAINT_UNABSORBED", self.codes(report))
+
+    def test_constraint_rejects_unrelated_design_evidence(self) -> None:
+        acceptance = self.design_acceptance()
+        check = next(row for row in acceptance["feasibility_checks"] if row["id"] == "detail-frontend")
+        check["resolution_evidence_refs"] = ["home-mobile"]
+        self.write_design_acceptance(acceptance)
+        report = self.validate(stage="design")
+        self.assertIn("FEASIBILITY_CONSTRAINT_UNABSORBED", self.codes(report))
+
+    def test_changed_feasibility_review_requires_user_reapproval(self) -> None:
+        acceptance = self.design_acceptance()
+        acceptance["approval"]["feasibility_check_ids"].remove("detail-frontend")
+        self.write_design_acceptance(acceptance)
+        report = self.validate(stage="design")
+        self.assertIn("FEASIBILITY_REAPPROVAL_REQUIRED", self.codes(report))
+
+    def test_changed_feasibility_verdict_with_same_id_requires_user_reapproval(self) -> None:
+        acceptance = self.design_acceptance()
+        check = next(row for row in acceptance["feasibility_checks"] if row["id"] == "home-frontend")
+        check["evidence"] = "04.5-feasibility-review.md#revised-consultation"
+        self.write_design_acceptance(acceptance)
+        report = self.validate(stage="design")
+        self.assertIn("FEASIBILITY_REAPPROVAL_REQUIRED", self.codes(report))
+
+    def test_handoff_stops_at_accepted_design_boundary(self) -> None:
+        report = self.validate(stage="handoff")
+        self.assertEqual(report["status"], "handoff-pass")
+        self.assertTrue(report["design_handoff_ready"])
+        self.assertTrue(report["ready_for_technical_design"])
+        self.assertFalse(report["technical_design_ready"])
+        self.assertFalse(report["implementation_ready"])
+        self.assertFalse(report["engineering_ready"])
+
 
 if __name__ == "__main__":
     unittest.main()

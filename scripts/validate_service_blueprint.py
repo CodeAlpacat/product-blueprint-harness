@@ -110,6 +110,8 @@ ENTRY_POINT_LIFECYCLES = {
     "offline",
 }
 DESIGN_FINDING_CATEGORIES = {"mental-model", "flow", "surface", "responsive", "visual", "copy", "accessibility"}
+FEASIBILITY_LENSES = {"frontend", "backend", "platform", "accessibility", "security", "cost"}
+FEASIBILITY_VERDICTS = {"feasible", "feasible-with-constraint", "infeasible"}
 VISUAL_EVIDENCE_SUFFIXES = {".png", ".jpg", ".jpeg", ".webp", ".svg"}
 
 
@@ -174,7 +176,7 @@ class Validator:
         self._load_manifest()
         self._load_product_definition()
         profile = self._profile()
-        if self.stage in {"design", "handoff", "technical"} and profile != "lite":
+        if self.stage in {"design", "handoff"} and profile != "lite":
             self._load_design_acceptance()
         self._validate_artifacts(profile, self.stage)
         if self.product_definition:
@@ -182,7 +184,7 @@ class Validator:
         if self.manifest:
             self._validate_shape(profile)
             self._validate_contract(profile, self.stage)
-            if self.stage in {"design", "handoff", "technical"} and profile != "lite":
+            if self.stage in {"design", "handoff"} and profile != "lite":
                 self._validate_design_acceptance()
             if self.stage == "handoff":
                 self._validate_readiness_claims()
@@ -539,16 +541,16 @@ class Validator:
 
     def _validate_accepted_limitations(self, limitations: Any) -> None:
         if not isinstance(limitations, list):
-            self.add("MANIFEST_INVALID_SHAPE", "release_profile.accepted_limitations must be an array.", "release_profile.accepted_limitations", "implementation-readiness")
+            self.add("MANIFEST_INVALID_SHAPE", "release_profile.accepted_limitations must be an array.", "release_profile.accepted_limitations", "design-readiness")
             return
         for index, item in enumerate(limitations):
             path = f"release_profile.accepted_limitations[{index}]"
             if not isinstance(item, dict):
-                self.add("MANIFEST_INVALID_SHAPE", f"{path} must be an object.", path, "implementation-readiness")
+                self.add("MANIFEST_INVALID_SHAPE", f"{path} must be an object.", path, "design-readiness")
                 continue
             for key in ("id", "decision_ref", "owner", "consequence"):
                 if not self._meaningful(item.get(key)):
-                    self.add("ACCEPTED_LIMITATION_INCOMPLETE", f"{path}.{key} is required.", f"{path}.{key}", "implementation-readiness")
+                    self.add("ACCEPTED_LIMITATION_INCOMPLETE", f"{path}.{key} is required.", f"{path}.{key}", "design-readiness")
 
     def _validate_surfaces(
         self,
@@ -619,7 +621,7 @@ class Validator:
             seen_false = seen_false or not value
         if any(status.get(key) is not True for key in required_status):
             code = "SURFACE_NOT_VERIFIED" if "verified" in required_status else "SURFACE_STAGE_INCOMPLETE"
-            self.add(code, f"Required maturity stages are not complete for {self.stage}: {', '.join(required_status)}.", f"{path}.status", "implementation-readiness")
+            self.add(code, f"Required maturity stages are not complete for {self.stage}: {', '.join(required_status)}.", f"{path}.status", "design-readiness")
 
     def _validate_actions(
         self,
@@ -992,8 +994,8 @@ class Validator:
         acceptance = self.design_acceptance
         if not acceptance:
             return
-        if acceptance.get("schema_version") != "1.0":
-            self.add("UNSUPPORTED_DESIGN_ACCEPTANCE_VERSION", "schema_version must be 1.0.", "05-design-acceptance.json", "design-acceptance")
+        if acceptance.get("schema_version") != "1.1":
+            self.add("UNSUPPORTED_DESIGN_ACCEPTANCE_VERSION", "schema_version must be 1.1.", "05-design-acceptance.json", "design-acceptance")
         if acceptance.get("status") != "user-approved":
             self.add("DESIGN_NOT_APPROVED", "Design remains blocked until the user explicitly approves the current all-P0 evidence.", "status", "design-acceptance")
         approval = acceptance.get("approval")
@@ -1118,13 +1120,112 @@ class Validator:
                 if not self._meaningful(finding.get(key)):
                     self.add("DESIGN_FINDINGS_INVALID", f"{key} is required.", f"{path}.{key}", "design-acceptance")
 
+        feasibility_checks = self._acceptance_index("feasibility_checks")
+        feasibility_values = acceptance.get("feasibility_checks", [])
+        actions = self._index("actions", "screen-contract")
+        operations = self._index("operations", "service-contract")
+        journeys = self._index("journeys", "service-contract")
+        feasibility_coverage: set[tuple[str, str, str]] = set()
+        for check_id, check in feasibility_checks.items():
+            path = f"feasibility_checks.{check_id}"
+            subject_kind = check.get("subject_kind")
+            subject_id = check.get("subject_id")
+            lens = check.get("lens")
+            verdict = check.get("verdict")
+            subject_indexes = {
+                "surface": surfaces,
+                "action": actions,
+                "operation": operations,
+                "journey": journeys,
+            }
+            if subject_kind not in subject_indexes:
+                self.add("FEASIBILITY_CHECK_INVALID", "subject_kind must be surface, action, operation, or journey.", f"{path}.subject_kind", "feasibility-review")
+            elif subject_id not in subject_indexes[subject_kind]:
+                self.add("FEASIBILITY_CHECK_INVALID", f"Unknown {subject_kind} {subject_id!r}.", f"{path}.subject_id", "feasibility-review")
+            elif lens not in FEASIBILITY_LENSES:
+                self.add("FEASIBILITY_CHECK_INVALID", f"lens must be one of {sorted(FEASIBILITY_LENSES)}.", f"{path}.lens", "feasibility-review")
+            else:
+                feasibility_coverage.add((subject_kind, subject_id, lens))
+            if verdict not in FEASIBILITY_VERDICTS:
+                self.add("FEASIBILITY_CHECK_INVALID", f"verdict must be one of {sorted(FEASIBILITY_VERDICTS)}.", f"{path}.verdict", "feasibility-review")
+            for key in ("evidence", "decision_ref"):
+                if not self._meaningful(check.get(key)):
+                    self.add("FEASIBILITY_CHECK_INVALID", f"{key} is required.", f"{path}.{key}", "feasibility-review")
+            if verdict == "infeasible":
+                self.add("FEASIBILITY_BLOCKER_OPEN", "An infeasible product/design behavior must be redesigned or removed before approval.", path, "feasibility-review")
+            if verdict == "feasible-with-constraint":
+                constraint = check.get("constraint")
+                resolution = check.get("design_resolution")
+                evidence_refs = check.get("resolution_evidence_refs")
+                if not self._meaningful(constraint) or str(constraint).strip().startswith(NA_PREFIX):
+                    self.add("FEASIBILITY_CONSTRAINT_UNABSORBED", "A conditional verdict needs the concrete product constraint.", f"{path}.constraint", "feasibility-review")
+                if not self._meaningful(resolution) or str(resolution).strip().startswith(NA_PREFIX):
+                    self.add("FEASIBILITY_CONSTRAINT_UNABSORBED", "Describe how the design absorbed the constraint.", f"{path}.design_resolution", "design-acceptance")
+                if not isinstance(evidence_refs, list) or not evidence_refs:
+                    self.add("FEASIBILITY_CONSTRAINT_UNABSORBED", "Reference the regenerated design/prototype evidence.", f"{path}.resolution_evidence_refs", "design-acceptance")
+                else:
+                    unknown_evidence = sorted(set(evidence_refs) - set(visual_rows))
+                    if unknown_evidence:
+                        self.add("FEASIBILITY_CONSTRAINT_UNABSORBED", f"Unknown visual evidence refs: {', '.join(unknown_evidence)}.", f"{path}.resolution_evidence_refs", "design-acceptance")
+                    allowed_surfaces: set[str] = set()
+                    if subject_kind == "surface" and subject_id in surfaces:
+                        allowed_surfaces.add(subject_id)
+                    elif subject_kind == "action" and subject_id in actions:
+                        allowed_surfaces.update(self._action_surface_ids(actions[subject_id]))
+                    elif subject_kind == "operation" and subject_id in operations:
+                        for action in actions.values():
+                            if action.get("operation_id") == subject_id:
+                                allowed_surfaces.update(self._action_surface_ids(action))
+                    elif subject_kind == "journey" and subject_id in journeys:
+                        journey = journeys[subject_id]
+                        for key in ("start_surface_id", "expected_end_surface_id"):
+                            if self._meaningful(journey.get(key)):
+                                allowed_surfaces.add(journey[key])
+                        for action_id in journey.get("steps", []):
+                            if action_id in actions:
+                                allowed_surfaces.update(self._action_surface_ids(actions[action_id]))
+                        for exception in journey.get("exception_paths", []):
+                            if isinstance(exception, dict) and exception.get("recovery_action_id") in actions:
+                                allowed_surfaces.update(self._action_surface_ids(actions[exception["recovery_action_id"]]))
+                    mismatched_evidence = sorted(
+                        evidence_id
+                        for evidence_id in evidence_refs
+                        if evidence_id in visual_rows and visual_rows[evidence_id].get("surface_id") not in allowed_surfaces
+                    )
+                    if mismatched_evidence:
+                        self.add("FEASIBILITY_CONSTRAINT_UNABSORBED", f"Evidence does not depict the affected subject: {', '.join(mismatched_evidence)}.", f"{path}.resolution_evidence_refs", "design-acceptance")
+
+        required_feasibility: set[tuple[str, str, str]] = set()
+        for surface_id, surface in surfaces.items():
+            if surface.get("priority") == "P0" and surface.get("type") != "background":
+                required_feasibility.update({("surface", surface_id, "frontend"), ("surface", surface_id, "accessibility")})
+        for action_id, action in actions.items():
+            required_feasibility.add(("action", action_id, "frontend"))
+            if self._meaningful(action.get("operation_id")):
+                required_feasibility.add(("action", action_id, "backend"))
+        for operation_id in operations:
+            required_feasibility.add(("operation", operation_id, "backend"))
+        for journey_id in journeys:
+            required_feasibility.add(("journey", journey_id, "platform"))
+        missing_feasibility = sorted(required_feasibility - feasibility_coverage)
+        if missing_feasibility:
+            labels = ", ".join(f"{kind}:{subject_id}:{lens}" for kind, subject_id, lens in missing_feasibility)
+            self.add("FEASIBILITY_COVERAGE_MISSING", f"Missing developer-lens feasibility consultations: {labels}.", "feasibility_checks", "feasibility-review")
+
+        approved_check_ids = approval.get("feasibility_check_ids", []) if isinstance(approval, dict) else []
+        if not isinstance(approved_check_ids, list) or set(approved_check_ids) != set(feasibility_checks):
+            self.add("FEASIBILITY_REAPPROVAL_REQUIRED", "Explicit user approval must reference every current feasibility check after constraints are absorbed.", "approval.feasibility_check_ids", "design-acceptance")
+        feasibility_json = json.dumps(feasibility_values, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+        feasibility_sha256 = hashlib.sha256(feasibility_json.encode("utf-8")).hexdigest()
+        if not isinstance(approval, dict) or approval.get("feasibility_sha256") != feasibility_sha256:
+            self.add("FEASIBILITY_REAPPROVAL_REQUIRED", f"Explicit user approval is not bound to the current feasibility verdicts and resolutions. After reapproval, bind SHA-256 {feasibility_sha256}.", "approval.feasibility_sha256", "design-acceptance")
+
         checks = acceptance.get("mental_model_checks")
         if not isinstance(checks, list):
             self.add("MENTAL_MODEL_REVIEW_INCOMPLETE", "mental_model_checks must be an array.", "mental_model_checks", "design-acceptance")
             checks = []
         checked_personas: set[str] = set()
         checked_requirements: set[str] = set()
-        journeys = self._index("journeys", "service-contract")
         for index, check in enumerate(checks):
             path = f"mental_model_checks[{index}]"
             if not isinstance(check, dict):
@@ -1166,6 +1267,16 @@ class Validator:
             self.add("TARGET_USER_VALIDATION_MISMATCH", "Design acceptance and service manifest must report the same target-user validation status.", "target_user_validation.status", "prototype-test")
         elif target_validation.get("status") == "real-user" and not target_validation.get("evidence"):
             self.add("REAL_USER_EVIDENCE_MISSING", "real-user status requires evidence.", "target_user_validation.evidence", "prototype-test")
+
+    def _action_surface_ids(self, action: dict[str, Any]) -> set[str]:
+        result: set[str] = set()
+        source_surface_id = action.get("source_surface_id")
+        if self._meaningful(source_surface_id):
+            result.add(source_surface_id)
+        target = action.get("target")
+        if isinstance(target, dict) and self._meaningful(target.get("surface_id")):
+            result.add(target["surface_id"])
+        return result
 
     def _acceptance_index(self, key: str) -> dict[str, dict[str, Any]]:
         result: dict[str, dict[str, Any]] = {}
@@ -1229,14 +1340,21 @@ class Validator:
             return None
         return hashlib.sha256(path.read_bytes()).hexdigest()
 
+    def _feasibility_hash(self) -> str | None:
+        values = self.design_acceptance.get("feasibility_checks") if self.design_acceptance else None
+        if not isinstance(values, list):
+            return None
+        canonical = json.dumps(values, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+        return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
     def _report(self, profile: str) -> dict[str, Any]:
         errors = [finding for finding in self.findings if finding.severity == "error"]
         validation = self.manifest.get("user_validation", {}) if self.manifest else {}
         user_validated = isinstance(validation, dict) and validation.get("status") == "real-user" and bool(validation.get("evidence"))
-        stage_rank = {"contract": 0, "prototype": 1, "design": 2, "handoff": 3, "technical": 4}.get(self.stage, -1)
+        stage_rank = {"contract": 0, "prototype": 1, "design": 2, "handoff": 3}.get(self.stage, -1)
         error_owners = {finding.owner for finding in errors}
         contract_owners = {"product-definition", "prd", "screen-contract", "service-contract", "backend-systems-brief"}
-        prototype_owners = contract_owners | {"clickable-demo", "prototype-test", "implementation-readiness"}
+        prototype_owners = contract_owners | {"clickable-demo", "prototype-test", "design-readiness"}
         design_owners = prototype_owners | {
             "design-acceptance",
             "visual-quality-gate",
@@ -1251,10 +1369,13 @@ class Validator:
         prototype_ready = product_contract_ready and stage_rank >= 1 and not (error_owners & prototype_owners)
         design_owner_approved = self.design_acceptance.get("status") == "user-approved" if self.design_acceptance else False
         design_accepted = prototype_ready and stage_rank >= 2 and design_owner_approved and not (error_owners & design_owners)
-        product_handoff_ready = design_accepted and stage_rank >= 3 and not (error_owners & handoff_owners)
+        design_handoff_ready = design_accepted and stage_rank >= 3 and not (error_owners & handoff_owners)
+        ready_for_technical_design = design_handoff_ready
+        # Compatibility fields remain false by design. This harness freezes product/design
+        # intent; a later project-specific workflow owns technical and implementation readiness.
         technical_design_ready = False
         implementation_ready = False
-        engineering_ready = implementation_ready
+        engineering_ready = False
         if errors:
             status = "fail"
         elif profile == "lite":
@@ -1271,13 +1392,16 @@ class Validator:
             "prototype_ready": prototype_ready,
             "design_owner_approved": design_owner_approved,
             "design_accepted": design_accepted,
-            "product_handoff_ready": product_handoff_ready,
+            "design_handoff_ready": design_handoff_ready,
+            "ready_for_technical_design": ready_for_technical_design,
+            "product_handoff_ready": design_handoff_ready,
             "technical_design_ready": technical_design_ready,
             "implementation_ready": implementation_ready,
             "user_validated": user_validated,
             "manifest_sha256": self._manifest_hash(),
             "product_definition_sha256": self._file_hash(self.product_definition_path),
             "design_acceptance_sha256": self._file_hash(self.design_acceptance_path),
+            "feasibility_sha256": self._feasibility_hash(),
             "checked_at": datetime.now(timezone.utc).isoformat(),
             "findings": [asdict(finding) for finding in self.findings],
             "accepted_limitations": self._mapping("release_profile").get("accepted_limitations", []) if self.manifest else [],
@@ -1290,19 +1414,19 @@ def write_report(root: Path, report: dict[str, Any]) -> None:
     _atomic_write(json_path, json.dumps(report, ensure_ascii=False, indent=2) + "\n")
 
     lines = [
-        "# Service Readiness Report",
+        "# Product Design Readiness Report",
         "",
         f"- Status: **{report['status']}**",
-        f"- Engineering ready: **{str(report['engineering_ready']).lower()}**",
         f"- Product contract ready: **{str(report['product_contract_ready']).lower()}**",
         f"- Prototype ready: **{str(report['prototype_ready']).lower()}**",
         f"- Design owner approved: **{str(report['design_owner_approved']).lower()}**",
         f"- Design accepted: **{str(report['design_accepted']).lower()}**",
-        f"- Product handoff ready: **{str(report['product_handoff_ready']).lower()}**",
-        f"- Technical design ready: **{str(report['technical_design_ready']).lower()}**",
-        f"- Implementation ready: **{str(report['implementation_ready']).lower()}**",
+        f"- Design handoff ready: **{str(report['design_handoff_ready']).lower()}**",
+        f"- Ready to begin technical design: **{str(report['ready_for_technical_design']).lower()}**",
+        "- Technical/implementation readiness: **outside this harness**",
         f"- User validated: **{str(report['user_validated']).lower()}**",
         f"- Manifest SHA-256: `{report['manifest_sha256'] or 'missing'}`",
+        f"- Feasibility SHA-256: `{report['feasibility_sha256'] or 'missing'}`",
         f"- Checked at: `{report['checked_at']}`",
         "",
         "## Findings",
@@ -1331,7 +1455,7 @@ def parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("planning_dir", type=Path)
     parser.add_argument("--profile", choices=("lite", "standard", "deep"))
-    parser.add_argument("--stage", choices=("contract", "prototype", "design", "handoff", "technical"), default="handoff")
+    parser.add_argument("--stage", choices=("contract", "prototype", "design", "handoff"), default="handoff")
     parser.add_argument("--no-write", action="store_true", help="Print findings without writing readiness reports")
     parser.add_argument("--json", action="store_true", help="Print the full JSON report")
     return parser.parse_args(argv)
@@ -1352,7 +1476,7 @@ def main(argv: Iterable[str] | None = None) -> int:
         print(f"{report['status']}: {len(report['findings'])} finding(s)")
         for finding in report["findings"]:
             print(f"- {finding['code']} [{finding['severity']}]: {finding['message']} ({finding['path']})")
-    return 0 if report["status"] in {"contract-pass", "prototype-pass", "pass", "lite-pass"} else 1
+    return 0 if report["status"] in {"contract-pass", "prototype-pass", "design-pass", "handoff-pass", "lite-pass"} else 1
 
 
 if __name__ == "__main__":

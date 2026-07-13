@@ -1,247 +1,114 @@
 # Design Freeze Readiness — Design
 
-## 0. Grounding
+## Product model
 
-### User mental model
+The harness is a product/design studio. Its output is the current experience the user approved, not a prediction that code will require no change.
 
-The harness is a product studio that lets the founder see and walk the whole service, revise it until the intended user's mental model is represented, and explicitly freeze the result before engineering architecture starts.
-
-### Evidence
-
-- v0.3 already has a useful single service graph and browser runtime seam. Preserve both.
-- The current artifact validator checks existence but cannot prove source requirements or visual evidence completeness.
-- The current report labels a product handoff `engineering_ready` although technical planning is optional.
-
-### Minimum model
-
-Add three contracts around the existing service manifest. Do not copy the service graph into them.
-
-```text
-02.1 product definition
-  requirements/personas/entry points
-             ↓ stable refs
-02.6 service manifest
-  surfaces/actions/states/operations/journeys
-             ↓ hashes + complete visual evidence
-05 design acceptance
-  review ledger + explicit owner approval + frozen source hashes
-             ↓ accepted baseline hash
-06 technical plan
-  routes/components/API/data/tests/rollout mappings
+```
+confirmed intent
+  → service graph
+  → whole-service prototype
+  → production visual/state evidence
+  → developer-lens feasibility consultation
+  → design correction + regenerated evidence
+  → explicit user reapproval
+  → product/design handoff
 ```
 
-## 1. Product definition contract
+A later technical workflow consumes the handoff. If it discovers a new product-visible constraint, it returns that constraint to this loop before implementation changes the experience.
 
-File: `02.1-product-definition.json`
+## Sources of truth
 
-### Root
+- `02.1-product-definition.json`: confirmed personas, mental models, requirements, entry points.
+- `02.6-service-manifest.json`: stable surfaces/actions/states/operations/journeys and their continuous wiring.
+- `04.37-runtime-verification.json`: current browser proof of declared prototype behavior.
+- `05-design-acceptance.json`: current visual/component evidence, mental-model checks, feasibility checks, review history, and explicit approval.
+- `05-engineering-handoff.md`: compatibility-named product/design handoff; never technical architecture.
+- `05-readiness-report.*`: derived status; never manually promoted.
 
-- `schema_version`: `1.0`
-- `status`: `draft | user-confirmed`
-- `confirmation`: explicit decision-log reference, timestamp, evidence note
-- `personas[]`
-- `requirements[]`
-- `entry_points[]`
-- `exclusions[]`
+## Feasibility consultation contract
 
-### Persona
+Each row has:
 
-- stable `id`
-- `label`
-- `mental_model` in user language
-- `jobs[]`
-- `source_refs[]`
+- stable `id`;
+- `subject_kind`: surface/action/operation/journey;
+- exact `subject_id`;
+- `lens`: frontend/backend/platform/accessibility/security/cost;
+- `verdict`: feasible / feasible-with-constraint / infeasible;
+- evidence and decision reference;
+- for conditional rows: concrete product-visible constraint, design resolution, and regenerated evidence refs.
 
-### Requirement
+Required minimum coverage:
 
-- stable `id`
-- `statement`
-- `kind`: `journey | content | interaction | system | quality`
-- `priority`: `P0 | P1 | P2`
-- `status`: `included | excluded`
-- `persona_ids[]`
-- `source_refs[]`
-- `decision_ref`
-- `acceptance_outcomes[]`
-- excluded requirements additionally need `current_entry_behavior`
-
-### Entry point
-
-- stable `id`
-- `label`
-- `persona_id`
-- user-language `trigger`, `context`, `expected_outcome`
-- `lifecycle`: one or more of `first-use | returning | external-result | edit | redirect | refresh | back | cross-device | offline`
-- `source_refs[]`
-
-### Contract-stage traceability
-
-- `release_profile.roles` must reference persona IDs.
-- Every included P0 requirement must map to at least one surface and journey.
-- `interaction` requirements additionally need an action.
-- `system` requirements additionally need an operation.
-- Every entry point needs at least one journey.
-- Every journey needs `persona_id`, `requirement_ids[]`, and `entry_point_ids[]` with valid references.
-- Surfaces/actions/operations carry `requirement_ids[]`; surfaces also carry `persona_ids[]`.
-- Product definition must be `user-confirmed` before contract pass. The skill forbids the agent from self-writing confirmation without an explicit user decision.
-
-## 2. Design acceptance and scope-freeze contract
-
-File: `05-design-acceptance.json`
-
-### Approval
-
-- `status`: `pending | rejected | user-approved`
-- `kind`: `explicit-user`
-- `decision_ref`, `approved_at`, `scope: all-p0`
-- This is owner approval, not target-user research.
-
-### Bound sources
-
-`source_hashes` must include current SHA-256 values for:
-
-- product definition, PRD, screen contracts, service manifest
-- storyboard, UX writing
-- visual quality gate, design system, workbench
-- clickable demo, browser runtime report, prototype test, design critique
-- undefined-surface audit, backend systems brief, and feasibility review
-
-Any mismatch yields `DESIGN_BASELINE_STALE` for design/handoff/technical stages. The owning skill reruns only the affected downstream chain, then requests approval again.
-
-### Visual evidence matrix
-
-Each row contains:
-
-- stable evidence `id`
-- `surface_id`
-- one release `viewport`
-- screenshot/visual file and current SHA-256
-- `state_ids[]` visible/reproducible in that evidence
-- `component_ids[]`
-- `visual_gate: pass`
-- `review_round_id`
-
-Required coverage:
-
-- every non-background P0 surface × every release viewport has one current passing row;
-- every required state for that surface appears in the row for every release viewport, so responsive state treatment cannot be inferred from a different layout;
-- every surface row has at least one component ID;
-- evidence must be an image-like artifact (`png`, `jpg`, `jpeg`, `webp`, `svg`).
-
-### Component contracts
-
-Each component contract has stable ID, purpose, variants, states, token refs, accessibility behavior, evidence file/hash. Every component used by a P0 visual row must resolve.
-
-### Review loop
-
-- `review_rounds[]`: round ID, status, reviewed evidence IDs, summary.
-- `findings[]`: category (`mental-model | flow | surface | responsive | visual | copy | accessibility`), severity, status, evidence, resolution, decision ref.
-- Any unresolved P0 finding blocks.
-- A P0 mental-model/flow/surface/visual finding cannot use `deferred` or ACCEPT-FLAG to pass.
-- At least one completed round must cover all visual evidence IDs.
-- User-requested review rounds have no retry cap. Autonomous craft retries may be batched, but a rejected design always returns to the owning artifact and remains pending until the user approves a later current baseline.
-- `mental_model_checks[]` must cover every persona and included P0 requirement through explicit journey IDs with a pass verdict.
-
-### Validation distinction
-
-- `owner_approved`: derived from the explicit approval block.
-- `target_user_validated`: derived only from product-definition/prototype evidence marked real-user.
-- The report displays both; one never implies the other.
-
-## 3. Technical plan contract
-
-Files: `06-technical-plan.md` and `06-technical-plan.json`
-
-### Source binding
-
-The JSON binds the current product-definition, service-manifest, and design-acceptance hashes. Drift blocks technical readiness.
-
-### Target grounding
-
-- `mode`: `greenfield | existing`
-- repository/ref/stack
-- `grounding[]`: claim + evidence + implication
-- Existing target requires at least one repository path/ref claim per frontend/backend/data area used.
-- Greenfield requires explicit chosen constraints instead of fake file evidence.
-
-### Complete mappings
-
-- every included P0 requirement → acceptance test IDs
-- every P0 surface → route, component, state owner, design component IDs
-- every action → handler, feedback owner, operation mapping when applicable
-- every operation → service/API/data/auth/idempotency/consistency/failure/observability/rollout/rollback/test IDs
-- every journey → vertical slice and end-to-end test IDs
-
-### Technical safety
-
-- resolved invariant rows with enforcement and test
-- performance/accessibility/security/cost/observability budgets
-- migration/backfill/verification/rollback, with explicit `n/a:<reason>` where irrelevant
-- rollout strategy, rollback, and feature-flag decision
-- no open blocker
-- all referenced tests exist in the technical contract
-
-## 4. Stage model and readiness semantics
-
-| Stage | Requires | Positive readiness dimension |
-|---|---|---|
-| `contract` | confirmed product definition + traced service graph | `product_contract_ready` |
-| `prototype` | contract + browser runtime proof | `prototype_ready` |
-| `design` | prototype + complete current design acceptance | `design_accepted` |
-| `handoff` | design + engineering handoff artifact | `product_handoff_ready` |
-| `technical` | handoff + complete bound technical plan | `technical_design_ready`, `implementation_ready`, compatibility alias `engineering_ready` |
-
-Lite may produce a compact contract but every readiness dimension above remains false.
-
-Report status values: `contract-pass`, `prototype-pass`, `design-pass`, `handoff-pass`, `technical-pass`, `lite-pass`, `fail`.
-
-## 5. Orchestrator flow
-
-1. Brief/research/concepts/brand/mechanisms.
-2. PRD.
-3. Product-definition lock: user language, requirements, entry points, exclusions.
-4. Screen/service contract and contract gate.
-5. Storyboard/art direction/design system/workbench/clickable demo.
-6. Prototype runtime gate and task walkthrough.
-7. Critique/risk/feasibility/coverage audit.
-8. Design acceptance loop:
-   - assemble complete evidence;
-   - show dashboard/demo/evidence matrix;
-   - record user feedback;
-   - route P0 findings to the owning upstream artifact;
-   - regenerate and revalidate;
-   - request explicit approval only when P0 findings are resolved;
-   - write the hash-bound baseline after approval.
-9. Product handoff.
-10. In build-ready runs, create the target-grounded technical plan and run the technical stage. Design-only runs stop honestly at product handoff.
-
-## 6. Change cascade
-
-| Changed source | Invalidate |
+| Subject | Required lens |
 |---|---|
-| product definition / PRD | service graph → storyboard/design/demo → acceptance → handoff → technical plan |
-| service manifest | runtime report → visual evidence/acceptance → handoff → technical plan |
-| storyboard/copy/design system/workbench | visual evidence/acceptance → handoff → technical plan |
-| demo | runtime report + visual evidence/acceptance → handoff → technical plan |
-| design acceptance | handoff status + technical plan |
+| every non-background P0 surface | frontend + accessibility |
+| every action | frontend |
+| action invoking an operation | backend also |
+| every operation | backend |
+| every journey | platform |
 
-The validator detects stale hashes; skills own regeneration. Never update hashes without re-running their evidence and approval step.
+`infeasible` blocks. `feasible-with-constraint` blocks until the design visibly absorbs the constraint. Approval stores the exact set of current feasibility-check IDs and a canonical SHA-256 of their verdicts/resolutions, so changed consultation content requires user reapproval even when IDs stay stable.
 
-## 7. Failure ownership
+The consultation may discuss latency, failure/retry, persistence/lifecycle, permissions, platform capability, accessibility, safety, and material cost. It may not choose endpoints, tables, component boundaries, libraries, migrations, or rollout.
 
-- product definition/traceability → `product-definition`, `prd`, `service-contract`
-- missing surface/action/state/runtime → existing screen/demo skills
-- missing/stale visual evidence or unresolved review → `design-acceptance` plus the named visual owner
-- stale handoff → `engineering-handoff`
-- technical mapping/blocker → `tech-plan`
+## Stage model
 
-Cross-cutting consumers that must display or preserve the new semantics: `decision-dashboard`, `engineering-handoff`, `feature-adoption`, `quality-bar`, `visual-quality-checklist`, README, initializer, plugin manifests, and all validator fixtures/tests.
+| Stage | Meaning | Positive output |
+|---|---|---|
+| contract | confirmed intent reaches the service graph | `product_contract_ready` |
+| prototype | declared graph works in the browser with required states | `prototype_ready` |
+| design | complete visual/state/component/mental-model/feasibility evidence is current and user-approved | `design_accepted` |
+| handoff | accepted design is packaged without architecture decisions | `design_handoff_ready`, `ready_for_technical_design` |
 
-## 8. Test design
+Compatibility fields `technical_design_ready`, `implementation_ready`, and `engineering_ready` are always false.
 
-- Extend the valid fixture through all five stages.
-- Mutation tests for every AC1–AC16 failure class.
-- Hash-change tests for each baseline layer.
-- Initializer tests for pending contracts and honest dashboard/frontmatter.
-- CLI tests for stage output/report writing.
-- Browser verification remains responsible for actual demo interactions; technical stage consumes its current hash-bound report rather than simulating it.
+## Invalidation
+
+Any change to product definition, PRD, screen/service graph, storyboard, copy, visual gate, backend systems brief, design system/workbench, demo/runtime proof, prototype test, critique, feasibility review, risk register, or visual evidence invalidates the accepted baseline. Rerun only the affected downstream chain, then obtain explicit user reapproval.
+
+## Failure ownership
+
+- intent/traceability → product-definition / PRD;
+- surface/action/state → screen-contract;
+- operation/journey → service-contract / backend-systems-brief;
+- runtime → clickable-demo / prototype-test;
+- feasibility verdict/coverage → feasibility-review;
+- constraint absorption/evidence/approval → design-acceptance and the visual owner;
+- handoff claim → engineering-handoff / decision-dashboard.
+
+## Optional technical planning
+
+`tech-plan` is not a validator stage and does not strengthen Product Blueprint readiness. It starts only on a separate explicit request. Any newly discovered user-visible constraint returns upstream to feasibility consultation and design reapproval.
+
+## 시나리오 (최종) / Scenarios (final)
+
+### Happy Path
+
+| # | User action | Expected result | Implementation guide |
+|---|---|---|---|
+| H1 | Founder reviews the complete demo after all consultations and approves | design acceptance binds current sources, visuals, check IDs, and feasibility hash; handoff reports design-ready only | `skills/design-acceptance/SKILL.md`, `scripts/validate_service_blueprint.py` |
+
+### Exception Path
+
+| # | Situation | Expected behavior | Implementation guide |
+|---|---|---|---|
+| E1 | A behavior is infeasible | fail with `FEASIBILITY_BLOCKER_OPEN`; route to feasibility/design owner | validator feasibility block + `skills/feasibility-review/SKILL.md` |
+| E2 | A conditional constraint lacks relevant regenerated evidence | fail with `FEASIBILITY_CONSTRAINT_UNABSORBED` | subject-to-surface evidence validation |
+| E3 | Founder has not approved the revised result | fail with design/reapproval findings | acceptance status, source hashes, check IDs, canonical feasibility hash |
+
+### Boundary Cases
+
+| # | Condition | Verification point | Implementation guide |
+|---|---|---|---|
+| B1 | Same stable feasibility ID, changed verdict/evidence | old approval hash fails | canonical JSON SHA-256 of `feasibility_checks` |
+| B2 | Handoff stage passes without any tech plan | design handoff fields true; technical/implementation/engineering false | `_report` stage model |
+| B3 | Standard vs Lite initialization | Standard receives pending acceptance; Lite receives only contract artifacts | `scripts/init_prd_project.py` tests |
+
+## Change history from plan
+
+| Plan decision | Design refinement |
+|---|---|
+| approval references current checks | added content hash so same-ID changes also invalidate approval |
+| conditional constraints need evidence | constrained evidence to current visual rows depicting the affected subject |
+| preserve compatibility | added canonical `design-readiness`; old implementation name cannot produce a positive claim |

@@ -1,16 +1,14 @@
 # Design Freeze Readiness — Gap Closure
 
-| Gap | Priority | Deterministic | Closure |
-|---|---|---|---|
-| declared graph can omit original requirement | P0 | yes | product definition + cross-contract mapping |
-| artifact presence can masquerade as visual completion | P0 | yes | hashed surface×viewport×state evidence |
-| self-review can claim design acceptance | P0 | partly | explicit user approval contract + unresolved P0 block |
-| handoff mislabeled engineering-ready | P0 | yes | dimensioned stage readiness |
-| upstream change leaves stale approval | P0 | yes | bound source hashes and cascade |
-| tech plan remains a prose checklist | P0 | yes | technical JSON contract + stage validator |
-| owner approval mistaken for target-user validation | P0 | yes | separate report dimensions |
-| subjective quality itself | P1 | no | iterative review plus explicit user/real-user evidence; no 100% claim |
-| required state shown only at one viewport | P0 | yes | require every required state in each surface×release-viewport evidence row |
-| user rejection exhausted by an autonomous retry cap | P0 | yes | user-requested review rounds remain unlimited until explicit approval or user stops |
+| Gap | Severity | Closure |
+|---|---|---|
+| confirmed requirements could be omitted before the service graph | P0 | product-definition traceability contract |
+| visually polished design could omit screens, viewports, or states | P0 | full P0 visual/state/component evidence |
+| developer feedback could arrive only during implementation | P0 | checkpoint plus final stable-ID feasibility consultation |
+| technical constraints could be documented but not reflected in UX | P0 | conditional verdict requires design resolution and regenerated evidence |
+| old approval could survive changed content under the same feasibility ID | P0 | approval binds every current check ID, canonical feasibility SHA-256, and source hash |
+| product handoff could be mislabeled implementation-ready | P0 | design-only stage model; technical/implementation/engineering fields always false |
+| owner approval could be mislabeled target-user validation | P1 | separate `design_owner_approved` and `user_validated` |
+| initializer could omit new contracts | P1 | scaffold product-definition and design-acceptance templates |
 
-Gap sweep: inline 10-lens pass completed once because side-conversation rules prohibit subagents. New deterministic P0 gaps found after the pass: 0. This is not a claim that subjective product quality can be proven automatically.
+The corrected pipeline ends at an accepted product/design handoff. Optional technical planning is downstream and outside the readiness gate.
