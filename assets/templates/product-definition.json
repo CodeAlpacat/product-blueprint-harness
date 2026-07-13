@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "status": "draft",
+  "confirmation": {
+    "kind": "explicit-user",
+    "decision_ref": "",
+    "confirmed_at": "",
+    "evidence": ""
+  },
+  "personas": [],
+  "requirements": [],
+  "entry_points": [],
+  "exclusions": []
+}

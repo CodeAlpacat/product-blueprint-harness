@@ -5,6 +5,8 @@ description: Defines the contract for each product screen before storyboard or h
 
 # Product Blueprint Screen Contract
 
+Read the user-confirmed `02.1-product-definition.json` first. Every P0 screen contract lists the requirement and persona IDs it serves. If a required entry point has no plausible start surface, return to the product definition or PRD instead of silently omitting it.
+
 Use this before storyboard and before high-fidelity UI. It prevents attractive screens from breaking the product flow.
 
 ## Output Language And Stage Exit

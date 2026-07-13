@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "status": "user-confirmed",
+  "confirmation": {
+    "kind": "explicit-user",
+    "decision_ref": "DEC-1",
+    "confirmed_at": "2026-07-13T00:00:00Z",
+    "evidence": "The user approved the guest inspection flow."
+  },
+  "personas": [
+    {
+      "id": "guest",
+      "label": "Guest",
+      "mental_model": "I can inspect a public item and recover if loading fails.",
+      "jobs": ["Inspect a public item"],
+      "source_refs": ["00-brief.md#guest"]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "inspect-item",
+      "statement": "A guest can choose and inspect a public item.",
+      "kind": "interaction",
+      "priority": "P0",
+      "status": "included",
+      "persona_ids": ["guest"],
+      "source_refs": ["02-prd.md#inspect-item"],
+      "decision_ref": "DEC-1",
+      "acceptance_outcomes": ["The selected item detail is visible."]
+    },
+    {
+      "id": "recover-item-load",
+      "statement": "A guest can understand and recover from an item load failure.",
+      "kind": "system",
+      "priority": "P0",
+      "status": "included",
+      "persona_ids": ["guest"],
+      "source_refs": ["02-prd.md#recover-item-load"],
+      "decision_ref": "DEC-1",
+      "acceptance_outcomes": ["The error preserves context and retry restores detail."]
+    }
+  ],
+  "entry_points": [
+    {
+      "id": "public-home",
+      "label": "Public home",
+      "persona_id": "guest",
+      "trigger": "Open the public service",
+      "context": "No account or prior selection is required",
+      "expected_outcome": "Reach an inspectable item detail",
+      "lifecycle": ["first-use", "returning", "refresh", "back"],
+      "source_refs": ["02-prd.md#guest-flow"]
+    }
+  ],
+  "exclusions": []
+}

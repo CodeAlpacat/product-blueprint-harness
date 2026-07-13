@@ -2,6 +2,8 @@
 
 Use this reference when creating or consuming `02.6-service-manifest.json`. Markdown explains intent; this manifest is the machine-readable identity and wiring source for readiness.
 
+`02.1-product-definition.json` is the confirmed source set. The service manifest does not decide which user requirements or entry points exist; it proves how that set becomes surfaces, actions, operations, states, and journeys.
+
 ## Stable IDs
 
 - IDs match `[a-z][a-z0-9-]*` and survive label, route, and file-number changes.
@@ -17,6 +19,8 @@ Use this reference when creating or consuming `02.6-service-manifest.json`. Mark
 - `operations`: product-level frontend/backend/data responsibility, not endpoint/table design.
 - `ai_assists`: every AI claim's input → result widget → editable unit → save destination → failure UI.
 - `journeys`: persona start, ordered actions, expected end, exception/recovery, refresh/back/cross-device behavior.
+
+Traceability rules: every included P0 requirement reaches a surface and journey; interaction requirements reach an action; system requirements reach an operation; every entry point reaches a journey with the same persona.
 
 The full starter shape lives at `assets/templates/service-manifest.json`.
 

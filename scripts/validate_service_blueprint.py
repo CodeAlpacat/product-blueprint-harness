@@ -24,6 +24,7 @@ STANDARD_ARTIFACTS = (
     "00-decision-log.md",
     "00-review-dashboard.html",
     "02-prd.md",
+    "02.1-product-definition.json",
     "02.5-screen-contracts.md",
     "02.6-service-manifest.json",
     "02.8-undefined-surfaces.md",
@@ -45,6 +46,7 @@ LITE_ARTIFACTS = (
     "00-decision-log.md",
     "00-review-dashboard.html",
     "02-prd.md",
+    "02.1-product-definition.json",
     "02.5-screen-contracts.md",
     "02.6-service-manifest.json",
     "03-storyboard.html",
@@ -55,6 +57,7 @@ CONTRACT_ARTIFACTS = (
     "00-decision-log.md",
     "00-review-dashboard.html",
     "02-prd.md",
+    "02.1-product-definition.json",
     "02.5-screen-contracts.md",
     "02.6-service-manifest.json",
 )
@@ -73,6 +76,18 @@ OPERATION_OWNERS = {"frontend-local", "backend", "external"}
 PERSISTENCE_TYPES = {"none", "session", "account", "cross-device"}
 RISK_DOMAINS = {"adult", "minors", "payments", "ugc", "pii", "ai-generated"}
 STATUS_KEYS = ("defined", "prototyped", "wired", "contracted", "verified")
+REQUIREMENT_KINDS = {"journey", "content", "interaction", "system", "quality"}
+ENTRY_POINT_LIFECYCLES = {
+    "first-use",
+    "returning",
+    "external-result",
+    "edit",
+    "redirect",
+    "refresh",
+    "back",
+    "cross-device",
+    "offline",
+}
 
 
 @dataclass(frozen=True)
@@ -118,7 +133,12 @@ class Validator:
         self.profile_override = profile
         self.stage = stage
         self.manifest_path = self.root / "02.6-service-manifest.json"
+        self.product_definition_path = self.root / "02.1-product-definition.json"
         self.manifest: dict[str, Any] = {}
+        self.product_definition: dict[str, Any] = {}
+        self.personas: dict[str, dict[str, Any]] = {}
+        self.requirements: dict[str, dict[str, Any]] = {}
+        self.entry_points: dict[str, dict[str, Any]] = {}
         self.findings: list[Finding] = []
         self.demo_cache: dict[Path, DemoParser] = {}
 
@@ -127,8 +147,11 @@ class Validator:
 
     def run(self) -> dict[str, Any]:
         self._load_manifest()
+        self._load_product_definition()
         profile = self._profile()
         self._validate_artifacts(profile, self.stage)
+        if self.product_definition:
+            self._validate_product_definition()
         if self.manifest:
             self._validate_shape(profile)
             self._validate_contract(profile, self.stage)
@@ -154,6 +177,25 @@ class Validator:
             self.add("MANIFEST_INVALID_SHAPE", "Manifest root must be an object.", "02.6-service-manifest.json", "service-contract")
             return
         self.manifest = loaded
+
+    def _load_product_definition(self) -> None:
+        if not self.product_definition_path.exists():
+            self.add(
+                "PRODUCT_DEFINITION_MISSING",
+                "Create and explicitly confirm 02.1-product-definition.json before screen contracts.",
+                "02.1-product-definition.json",
+                "product-definition",
+            )
+            return
+        try:
+            loaded = json.loads(self.product_definition_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            self.add("PRODUCT_DEFINITION_INVALID", str(exc), "02.1-product-definition.json", "product-definition")
+            return
+        if not isinstance(loaded, dict):
+            self.add("PRODUCT_DEFINITION_INVALID", "Product definition root must be an object.", "02.1-product-definition.json", "product-definition")
+            return
+        self.product_definition = loaded
 
     def _profile(self) -> str:
         if self.profile_override:
@@ -219,6 +261,101 @@ class Validator:
         if status == "real-user" and not validation.get("evidence"):
             self.add("REAL_USER_EVIDENCE_MISSING", "real-user status requires evidence.", "user_validation.evidence", "prototype-test")
 
+    def _validate_product_definition(self) -> None:
+        definition = self.product_definition
+        if definition.get("schema_version") != "1.0":
+            self.add("UNSUPPORTED_PRODUCT_DEFINITION_VERSION", "schema_version must be 1.0.", "02.1-product-definition.json", "product-definition")
+        if definition.get("status") != "user-confirmed":
+            self.add("PRODUCT_DEFINITION_UNCONFIRMED", "The product definition needs explicit user confirmation before contract pass.", "status", "product-definition")
+        confirmation = definition.get("confirmation")
+        if not isinstance(confirmation, dict):
+            self.add("PRODUCT_DEFINITION_UNCONFIRMED", "confirmation must be an object.", "confirmation", "product-definition")
+        else:
+            if confirmation.get("kind") != "explicit-user":
+                self.add("PRODUCT_DEFINITION_UNCONFIRMED", "confirmation.kind must be explicit-user.", "confirmation.kind", "product-definition")
+            for key in ("decision_ref", "confirmed_at", "evidence"):
+                if not self._meaningful(confirmation.get(key)):
+                    self.add("PRODUCT_DEFINITION_UNCONFIRMED", f"confirmation.{key} is required.", f"confirmation.{key}", "product-definition")
+
+        self.personas = self._definition_index("personas")
+        self.requirements = self._definition_index("requirements")
+        self.entry_points = self._definition_index("entry_points")
+        if not self.personas:
+            self.add("PRODUCT_DEFINITION_EMPTY", "At least one persona is required.", "personas", "product-definition")
+        if not self.requirements:
+            self.add("PRODUCT_DEFINITION_EMPTY", "At least one requirement is required.", "requirements", "product-definition")
+        if not self.entry_points:
+            self.add("PRODUCT_DEFINITION_EMPTY", "At least one entry point is required.", "entry_points", "product-definition")
+
+        for persona_id, persona in self.personas.items():
+            path = f"personas.{persona_id}"
+            for key in ("label", "mental_model"):
+                if not self._meaningful(persona.get(key)):
+                    self.add("PERSONA_INCOMPLETE", f"{key} is required in user language.", f"{path}.{key}", "product-definition")
+            for key in ("jobs", "source_refs"):
+                if not isinstance(persona.get(key), list) or not persona.get(key):
+                    self.add("PERSONA_INCOMPLETE", f"{key} needs at least one item.", f"{path}.{key}", "product-definition")
+
+        for requirement_id, requirement in self.requirements.items():
+            path = f"requirements.{requirement_id}"
+            if requirement.get("kind") not in REQUIREMENT_KINDS:
+                self.add("INVALID_REQUIREMENT_KIND", f"kind must be one of: {', '.join(sorted(REQUIREMENT_KINDS))}.", f"{path}.kind", "product-definition")
+            if requirement.get("priority") not in {"P0", "P1", "P2"}:
+                self.add("INVALID_REQUIREMENT_PRIORITY", "priority must be P0, P1, or P2.", f"{path}.priority", "product-definition")
+            if requirement.get("status") not in {"included", "excluded"}:
+                self.add("INVALID_REQUIREMENT_STATUS", "status must be included or excluded.", f"{path}.status", "product-definition")
+            for key in ("statement", "decision_ref"):
+                if not self._meaningful(requirement.get(key)):
+                    self.add("REQUIREMENT_INCOMPLETE", f"{key} is required.", f"{path}.{key}", "product-definition")
+            for key in ("persona_ids", "source_refs", "acceptance_outcomes"):
+                values = requirement.get(key)
+                if not isinstance(values, list) or not values:
+                    self.add("REQUIREMENT_INCOMPLETE", f"{key} needs at least one item.", f"{path}.{key}", "product-definition")
+            for persona_id in requirement.get("persona_ids", []):
+                if persona_id not in self.personas:
+                    self.add("UNKNOWN_PERSONA_REFERENCE", f"Unknown persona {persona_id!r}.", f"{path}.persona_ids", "product-definition")
+            if requirement.get("status") == "excluded" and not self._meaningful(requirement.get("current_entry_behavior")):
+                self.add("EXCLUDED_REQUIREMENT_UNDEFINED", "Excluded requirements need current_entry_behavior.", f"{path}.current_entry_behavior", "product-definition")
+
+        for entry_id, entry in self.entry_points.items():
+            path = f"entry_points.{entry_id}"
+            if entry.get("persona_id") not in self.personas:
+                self.add("UNKNOWN_PERSONA_REFERENCE", f"Unknown persona {entry.get('persona_id')!r}.", f"{path}.persona_id", "product-definition")
+            for key in ("label", "trigger", "context", "expected_outcome"):
+                if not self._meaningful(entry.get(key)):
+                    self.add("ENTRY_POINT_INCOMPLETE", f"{key} is required.", f"{path}.{key}", "product-definition")
+            lifecycle = entry.get("lifecycle")
+            if not isinstance(lifecycle, list) or not lifecycle or any(item not in ENTRY_POINT_LIFECYCLES for item in lifecycle):
+                self.add("ENTRY_POINT_INCOMPLETE", "lifecycle needs valid entry/lifecycle values.", f"{path}.lifecycle", "product-definition")
+            if not isinstance(entry.get("source_refs"), list) or not entry.get("source_refs"):
+                self.add("ENTRY_POINT_INCOMPLETE", "source_refs needs at least one item.", f"{path}.source_refs", "product-definition")
+
+        roles = self._mapping("release_profile").get("roles", []) if self.manifest else []
+        for role in roles if isinstance(roles, list) else []:
+            if role not in self.personas:
+                self.add("UNKNOWN_PERSONA_REFERENCE", f"Release role {role!r} is not a confirmed persona ID.", "release_profile.roles", "product-definition")
+
+    def _definition_index(self, key: str) -> dict[str, dict[str, Any]]:
+        result: dict[str, dict[str, Any]] = {}
+        values = self.product_definition.get(key, [])
+        if not isinstance(values, list):
+            self.add("PRODUCT_DEFINITION_INVALID", f"{key} must be an array.", key, "product-definition")
+            return result
+        for position, item in enumerate(values):
+            path = f"{key}[{position}]"
+            if not isinstance(item, dict):
+                self.add("PRODUCT_DEFINITION_INVALID", f"{path} must be an object.", path, "product-definition")
+                continue
+            item_id = item.get("id")
+            if not isinstance(item_id, str) or not ID_RE.fullmatch(item_id):
+                self.add("INVALID_CONTRACT_ID", f"{path}.id must match {ID_RE.pattern}.", f"{path}.id", "product-definition")
+                continue
+            if item_id in result:
+                self.add("DUPLICATE_CONTRACT_ID", f"Duplicate id: {item_id}", f"{path}.id", "product-definition")
+                continue
+            result[item_id] = item
+        return result
+
     def _validate_contract(self, profile: str, stage: str) -> None:
         surfaces = self._index("surfaces", "screen-contract")
         actions = self._index("actions", "screen-contract")
@@ -233,10 +370,82 @@ class Validator:
         self._validate_operations(operations, profile)
         self._validate_ai_assists(ai_assists, actions)
         self._validate_journeys(journeys, surfaces, actions, states, profile)
+        self._validate_product_traceability(surfaces, actions, operations, journeys)
         self._validate_reachability(surfaces, actions, journeys)
         if profile != "lite" and stage in {"prototype", "handoff"}:
             self._validate_uncontracted_controls(actions)
             self._validate_runtime_evidence(actions, states)
+
+    def _validate_product_traceability(
+        self,
+        surfaces: dict[str, dict[str, Any]],
+        actions: dict[str, dict[str, Any]],
+        operations: dict[str, dict[str, Any]],
+        journeys: dict[str, dict[str, Any]],
+    ) -> None:
+        if not self.product_definition:
+            return
+        declared_file = self.manifest.get("product_definition_file")
+        if declared_file != "02.1-product-definition.json":
+            self.add("PRODUCT_DEFINITION_LINK_MISSING", "product_definition_file must be 02.1-product-definition.json.", "product_definition_file", "service-contract")
+
+        coverage: dict[str, set[str]] = {requirement_id: set() for requirement_id in self.requirements}
+        entry_coverage: dict[str, set[str]] = {entry_id: set() for entry_id in self.entry_points}
+
+        for collection_name, items in (("surfaces", surfaces), ("actions", actions), ("operations", operations), ("journeys", journeys)):
+            for item_id, item in items.items():
+                path = f"{collection_name}.{item_id}.requirement_ids"
+                refs = item.get("requirement_ids")
+                if not isinstance(refs, list) or not refs:
+                    self.add("REQUIREMENT_TRACE_MISSING", f"{collection_name[:-1]} {item_id!r} needs requirement_ids.", path, "service-contract")
+                    continue
+                for requirement_id in refs:
+                    if requirement_id not in self.requirements:
+                        self.add("UNKNOWN_REQUIREMENT_REFERENCE", f"Unknown requirement {requirement_id!r}.", path, "service-contract")
+                    else:
+                        coverage[requirement_id].add(collection_name[:-1])
+
+        for surface_id, surface in surfaces.items():
+            path = f"surfaces.{surface_id}.persona_ids"
+            refs = surface.get("persona_ids")
+            if surface.get("priority") == "P0" and (not isinstance(refs, list) or not refs):
+                self.add("PERSONA_TRACE_MISSING", "P0 surface needs persona_ids.", path, "screen-contract")
+            for persona_id in refs if isinstance(refs, list) else []:
+                if persona_id not in self.personas:
+                    self.add("UNKNOWN_PERSONA_REFERENCE", f"Unknown persona {persona_id!r}.", path, "screen-contract")
+
+        for journey_id, journey in journeys.items():
+            path = f"journeys.{journey_id}"
+            persona_id = journey.get("persona_id")
+            if persona_id not in self.personas:
+                self.add("UNKNOWN_PERSONA_REFERENCE", f"Unknown journey persona {persona_id!r}.", f"{path}.persona_id", "service-contract")
+            entry_ids = journey.get("entry_point_ids")
+            if not isinstance(entry_ids, list) or not entry_ids:
+                self.add("ENTRY_POINT_TRACE_MISSING", "Journey needs entry_point_ids.", f"{path}.entry_point_ids", "service-contract")
+            else:
+                for entry_id in entry_ids:
+                    if entry_id not in self.entry_points:
+                        self.add("UNKNOWN_ENTRY_POINT_REFERENCE", f"Unknown entry point {entry_id!r}.", f"{path}.entry_point_ids", "service-contract")
+                    else:
+                        entry_coverage[entry_id].add(journey_id)
+                        if persona_id != self.entry_points[entry_id].get("persona_id"):
+                            self.add("ENTRY_POINT_PERSONA_MISMATCH", f"Entry point {entry_id!r} belongs to another persona.", f"{path}.entry_point_ids", "service-contract")
+
+        for requirement_id, requirement in self.requirements.items():
+            if requirement.get("status") != "included" or requirement.get("priority") != "P0":
+                continue
+            required_kinds = {"surface", "journey"}
+            if requirement.get("kind") == "interaction":
+                required_kinds.add("action")
+            if requirement.get("kind") == "system":
+                required_kinds.add("operation")
+            missing = sorted(required_kinds - coverage.get(requirement_id, set()))
+            if missing:
+                self.add("P0_REQUIREMENT_UNCOVERED", f"P0 requirement {requirement_id!r} is missing: {', '.join(missing)}.", f"requirements.{requirement_id}", "service-contract")
+
+        for entry_id, journey_ids in entry_coverage.items():
+            if not journey_ids:
+                self.add("ENTRY_POINT_UNCOVERED", f"Entry point {entry_id!r} has no journey.", f"entry_points.{entry_id}", "service-contract")
 
     def _mapping(self, key: str) -> dict[str, Any]:
         value = self.manifest.get(key, {})

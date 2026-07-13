@@ -72,7 +72,7 @@ Evidence values:
 
 ## Output
 
-Create `02-prd.md`. End with a feature-by-feature checklist and a `Service Manifest Seed` table: story ID | persona/role | entry point | required result | required surfaces | exception/boundary. This drives `02.6-service-manifest.json`.
+Create `02-prd.md`. End with a feature-by-feature checklist and a `Product Definition Seed` table: requirement candidate | kind | persona/mental model | entry point | required result | exception/boundary | decision evidence. Run `product-definition` next to turn this into the user-confirmed `02.1-product-definition.json`; that confirmed source set then drives screen and service contracts.
 
 ## Next Step
 

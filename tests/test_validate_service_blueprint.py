@@ -37,6 +37,12 @@ class ServiceBlueprintValidatorTest(unittest.TestCase):
     def write_manifest(self, manifest: dict) -> None:
         (self.root / "02.6-service-manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
 
+    def product_definition(self) -> dict:
+        return json.loads((self.root / "02.1-product-definition.json").read_text(encoding="utf-8"))
+
+    def write_product_definition(self, definition: dict) -> None:
+        (self.root / "02.1-product-definition.json").write_text(json.dumps(definition, indent=2) + "\n", encoding="utf-8")
+
     @staticmethod
     def codes(report: dict) -> set[str]:
         return {finding["code"] for finding in report["findings"]}
@@ -140,6 +146,46 @@ class ServiceBlueprintValidatorTest(unittest.TestCase):
         self.write_manifest(manifest)
         report = self.validate(stage="contract")
         self.assertIn("CONTRACT_COLLECTION_EMPTY", self.codes(report))
+
+    def test_unconfirmed_product_definition_blocks_contract(self) -> None:
+        definition = self.product_definition()
+        definition["status"] = "draft"
+        self.write_product_definition(definition)
+        report = self.validate(stage="contract")
+        self.assertIn("PRODUCT_DEFINITION_UNCONFIRMED", self.codes(report))
+
+    def test_p0_requirement_without_required_mapping_blocks_contract(self) -> None:
+        definition = self.product_definition()
+        definition["requirements"].append({
+            "id": "save-favorite",
+            "statement": "A guest can save a favorite.",
+            "kind": "interaction",
+            "priority": "P0",
+            "status": "included",
+            "persona_ids": ["guest"],
+            "source_refs": ["02-prd.md#favorite"],
+            "decision_ref": "DEC-2",
+            "acceptance_outcomes": ["The favorite is visible after refresh."],
+        })
+        self.write_product_definition(definition)
+        report = self.validate(stage="contract")
+        self.assertIn("P0_REQUIREMENT_UNCOVERED", self.codes(report))
+
+    def test_entry_point_without_journey_blocks_contract(self) -> None:
+        definition = self.product_definition()
+        definition["entry_points"].append({
+            "id": "shared-link",
+            "label": "Shared link",
+            "persona_id": "guest",
+            "trigger": "Open a shared item URL",
+            "context": "The item may no longer exist",
+            "expected_outcome": "See the item or a recoverable not-found state",
+            "lifecycle": ["external-result", "refresh", "back"],
+            "source_refs": ["02-prd.md#shared-link"],
+        })
+        self.write_product_definition(definition)
+        report = self.validate(stage="contract")
+        self.assertIn("ENTRY_POINT_UNCOVERED", self.codes(report))
 
     def test_transition_dom_must_match_manifest_target(self) -> None:
         demo = self.root / "prototypes" / "fixture-demo.html"
