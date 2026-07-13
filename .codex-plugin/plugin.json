@@ -1,6 +1,6 @@
 {
   "name": "product-blueprint",
-  "version": "0.3.0+codex.20260713064823",
+  "version": "0.3.0+codex.20260713065159",
   "description": "Guided pre-development product blueprint workflow for turning ideas into research-backed PRDs, stable service manifests, fully wired clickable prototypes, product-level frontend/backend operation contracts, deterministic readiness reports, production-grade visual systems, and traceable engineering handoffs.",
   "author": {
     "name": "Local developer"
