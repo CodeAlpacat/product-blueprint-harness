@@ -31,6 +31,7 @@
   "evidence": {
     "contract_file": "02.5-screen-contracts.md",
     "demo_file": "prototypes/product-demo.html",
+    "runtime_report_file": "04.37-runtime-verification.json",
     "prototype_test_file": "04.4-prototype-test.md"
   }
 }

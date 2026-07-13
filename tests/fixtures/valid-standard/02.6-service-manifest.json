@@ -78,6 +78,7 @@
       "kind": "loading",
       "required": true,
       "trigger": "Initial load",
+      "reproduction": "board:#state-home-loading",
       "recovery_action_id": null,
       "prototype": {"file": "prototypes/fixture-demo.html", "element_id": "state-home-loading"}
     },
@@ -87,6 +88,7 @@
       "kind": "error",
       "required": true,
       "trigger": "Item request fails",
+      "reproduction": "board:#state-detail-error",
       "recovery_action_id": "retry-detail",
       "prototype": {"file": "prototypes/fixture-demo.html", "element_id": "state-detail-error"}
     }
@@ -132,6 +134,7 @@
   "evidence": {
     "contract_file": "02.5-screen-contracts.md",
     "demo_file": "prototypes/fixture-demo.html",
+    "runtime_report_file": "04.37-runtime-verification.json",
     "prototype_test_file": "04.4-prototype-test.md"
   }
 }

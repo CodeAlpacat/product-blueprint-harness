@@ -171,4 +171,6 @@ python3 scripts/validate_service_blueprint.py docs/product-planning/<slug> --sta
 
 The final command writes `05-readiness-report.json` and `.md`. Dashboard and handoff readiness must be derived from that report. Lite can pass its compact contract but always keeps `engineering_ready=false`.
 
+Prototype validation also requires `04.37-runtime-verification.json`, produced from a real browser walkthrough. It records every transition/effect/required-state result and the current manifest/demo SHA-256 values. Changing either source makes the report stale and blocks readiness until the browser scenario is rerun.
+
 The architecture follows the useful parts of [Matt Pocock's skills](https://github.com/mattpocock/skills): small composable skills, test seams fixed in the spec, prototypes that answer concrete questions, independently demonstrable vertical slices, and separate standards-vs-spec review. Product Blueprint extends that pattern with a mandatory whole-service prototype contract; a throwaway exploration prototype is not treated as implementation readiness.

@@ -221,6 +221,22 @@ class ServiceBlueprintValidatorTest(unittest.TestCase):
         self.assertEqual(written["manifest_sha256"], report["manifest_sha256"])
         self.assertIn("Status: **pass**", (self.root / "05-readiness-report.md").read_text(encoding="utf-8"))
 
+    def test_runtime_report_must_match_current_manifest_and_demo_hashes(self) -> None:
+        runtime = self.root / "04.37-runtime-verification.json"
+        report = json.loads(runtime.read_text(encoding="utf-8"))
+        report["demo_sha256"] = "stale"
+        runtime.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+        result = self.validate(stage="prototype")
+        self.assertIn("RUNTIME_REPORT_STALE", self.codes(result))
+
+    def test_runtime_report_must_cover_every_effect(self) -> None:
+        runtime = self.root / "04.37-runtime-verification.json"
+        report = json.loads(runtime.read_text(encoding="utf-8"))
+        report["effects"] = []
+        runtime.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+        result = self.validate(stage="prototype")
+        self.assertIn("RUNTIME_EFFECT_UNVERIFIED", self.codes(result))
+
     def test_contract_stage_passes_before_prototype_exists(self) -> None:
         manifest = self.manifest()
         for surface in manifest["surfaces"]:

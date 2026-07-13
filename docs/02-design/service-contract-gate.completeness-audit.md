@@ -105,3 +105,20 @@ Critical 1건(옛 screen-contract만 소비하는 downstream dual-SoT 위험)을
 | P1 | report 두 파일 쓰기 중단 시 부분 갱신 가능 | temp file replace로 각 파일 원자적 교체 |
 
 수정 후 코드 리뷰 판정: P0 0, P1 0. 코드 리뷰는 시나리오 실행을 대신하지 않으므로 별도 E2E evidence를 남긴다.
+
+## 9. E2E Scenario Evidence
+
+사용자 호소 원어: “구현의 최소 요구사항에 해당하는 모든 화면 및 유저플로우 등의 배선이 끊이지 않고 정의되고, 실제 서비스 프로토타입처럼 작동”해야 한다.
+
+| Step | 실행 증거 | 결과 |
+| --- | --- | --- |
+| 신규 scaffold | `init_prd_project.py` → manifest 생성 → 빈 roles/surfaces/actions/journeys로 contract gate 실패 | false ready 차단 |
+| 완전 계약 | valid fixture `--stage contract` | `contract-pass`, finding 0 |
+| 실제 클릭 전이 | agent-browser로 `open-detail` 클릭 | active=`detail`, home hidden, detail visible |
+| 실제 same-surface effect | agent-browser로 `retry-detail` 클릭 | observed effect=`replace-error-with-detail` |
+| 실제 state board | agent-browser로 Board 클릭 | home/detail과 loading/error state 모두 visible |
+| prototype gate | hash-bound runtime report 포함 `--stage prototype` | `prototype-pass`, finding 0 |
+| handoff gate | full fixture `--stage handoff` | `pass`, engineering_ready=true, user_validated=false |
+| 기존 dogfood 기준선 | read-only handoff validation | manifest, UX-writing, clickable-demo note 누락으로 fail |
+
+E2E 중 발견한 P0: DOM ID와 `data-go`만 맞고 JavaScript가 없어도 prototype-pass가 가능했다. 이를 runtime report(브라우저 runner + manifest/demo SHA-256 + action/state별 결과) 필수화로 닫았다. 비결정 영역인 실제 사용자 만족도는 `user_validated=false`로 남는다.

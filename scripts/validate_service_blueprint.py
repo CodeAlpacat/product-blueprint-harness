@@ -236,6 +236,7 @@ class Validator:
         self._validate_reachability(surfaces, actions, journeys)
         if profile != "lite" and stage in {"prototype", "handoff"}:
             self._validate_uncontracted_controls(actions)
+            self._validate_runtime_evidence(actions, states)
 
     def _mapping(self, key: str) -> dict[str, Any]:
         value = self.manifest.get(key, {})
@@ -429,6 +430,8 @@ class Validator:
             if recovery and recovery not in actions:
                 self.add("UNKNOWN_ACTION_REFERENCE", f"Unknown recovery action {recovery!r}.", f"{path}.recovery_action_id", "screen-contract")
             if state.get("required") is True and profile != "lite" and stage in {"prototype", "handoff"}:
+                if not self._meaningful(state.get("reproduction")):
+                    self.add("STATE_REPRODUCTION_MISSING", "Required state needs a stable browser reproduction path.", f"{path}.reproduction", "clickable-demo")
                 self._validate_dom_reference(state.get("prototype"), None, None, "STATE_NOT_REPRODUCIBLE", path, "clickable-demo")
 
     def _validate_operations(self, operations: dict[str, dict[str, Any]], profile: str) -> None:
@@ -566,6 +569,95 @@ class Validator:
                     self.add("UNCONTRACTED_CONTROL", f"Product control {element!r} references unknown action {action_id!r}.", str(path.relative_to(self.root)), "clickable-demo")
                 if tag == "a" and attrs.get("href") == "#" and not action_id:
                     self.add("DEAD_CONTROL", f"Anchor {element!r} has href=# and no contracted action.", str(path.relative_to(self.root)), "clickable-demo")
+
+    def _validate_runtime_evidence(
+        self,
+        actions: dict[str, dict[str, Any]],
+        states: dict[str, dict[str, Any]],
+    ) -> None:
+        evidence = self._mapping("evidence")
+        report_path = self._safe_path(evidence.get("runtime_report_file"))
+        demo_path = self._safe_path(evidence.get("demo_file"))
+        if report_path is None or not report_path.is_file():
+            self.add("RUNTIME_REPORT_MISSING", "Run the demo in a real browser and create the hash-bound runtime report.", "evidence.runtime_report_file", "clickable-demo")
+            return
+        if demo_path is None or not demo_path.is_file():
+            self.add("PROTOTYPE_UNREADABLE", "evidence.demo_file is missing.", "evidence.demo_file", "clickable-demo")
+            return
+        try:
+            report = json.loads(report_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            self.add("RUNTIME_REPORT_INVALID", str(exc), str(report_path.relative_to(self.root)), "clickable-demo")
+            return
+        if not isinstance(report, dict):
+            self.add("RUNTIME_REPORT_INVALID", "Runtime report root must be an object.", str(report_path.relative_to(self.root)), "clickable-demo")
+            return
+        expected_manifest_hash = self._manifest_hash()
+        expected_demo_hash = hashlib.sha256(demo_path.read_bytes()).hexdigest()
+        if report.get("manifest_sha256") != expected_manifest_hash or report.get("demo_sha256") != expected_demo_hash:
+            self.add("RUNTIME_REPORT_STALE", "Runtime report hashes do not match the current manifest and demo.", str(report_path.relative_to(self.root)), "clickable-demo")
+        if report.get("runner") != "browser" or not self._meaningful(report.get("checked_at")):
+            self.add("RUNTIME_REPORT_INVALID", "Runtime report requires runner=browser and checked_at.", str(report_path.relative_to(self.root)), "clickable-demo")
+
+        transitions = self._runtime_rows(report.get("transitions"), "transitions", report_path)
+        effects = self._runtime_rows(report.get("effects"), "effects", report_path)
+        state_rows = self._runtime_rows(report.get("states"), "states", report_path, key="state_id")
+
+        for action_id, action in actions.items():
+            target = action.get("target", {}) if isinstance(action.get("target"), dict) else {}
+            target_surface = target.get("surface_id")
+            target_effect = target.get("effect")
+            if target_surface:
+                row = transitions.get(action_id)
+                if (
+                    not row
+                    or row.get("status") != "pass"
+                    or row.get("from_surface_id") != action.get("source_surface_id")
+                    or row.get("expected_surface_id") != target_surface
+                    or row.get("landed_surface_id") != target_surface
+                ):
+                    self.add("RUNTIME_TRANSITION_UNVERIFIED", f"Browser evidence for transition {action_id!r} is missing or failed.", f"actions.{action_id}", "clickable-demo")
+            elif target_effect:
+                row = effects.get(action_id)
+                if (
+                    not row
+                    or row.get("status") != "pass"
+                    or row.get("source_surface_id") != action.get("source_surface_id")
+                    or row.get("expected_effect") != target_effect
+                    or row.get("observed_effect") != target_effect
+                ):
+                    self.add("RUNTIME_EFFECT_UNVERIFIED", f"Browser evidence for effect {action_id!r} is missing or failed.", f"actions.{action_id}", "clickable-demo")
+
+        for state_id, state in states.items():
+            if state.get("required") is True:
+                row = state_rows.get(state_id)
+                if not row or row.get("status") != "pass" or row.get("reproduction") != state.get("reproduction"):
+                    self.add("RUNTIME_STATE_UNVERIFIED", f"Browser evidence for required state {state_id!r} is missing or failed.", f"states.{state_id}", "clickable-demo")
+
+        demo_relative = str(demo_path.relative_to(self.root))
+        for index, surface in enumerate(self.manifest.get("surfaces", [])):
+            if not isinstance(surface, dict) or surface.get("priority") != "P0" or surface.get("type") == "background":
+                continue
+            if surface.get("prototype", {}).get("file") != demo_relative:
+                self.add("DEMO_FILE_MISMATCH", "Every P0 surface must use the single whole-service demo file.", f"surfaces[{index}].prototype.file", "clickable-demo")
+
+    def _runtime_rows(
+        self,
+        value: Any,
+        name: str,
+        report_path: Path,
+        key: str = "action_id",
+    ) -> dict[str, dict[str, Any]]:
+        if not isinstance(value, list):
+            self.add("RUNTIME_REPORT_INVALID", f"{name} must be an array.", str(report_path.relative_to(self.root)), "clickable-demo")
+            return {}
+        result: dict[str, dict[str, Any]] = {}
+        for item in value:
+            if not isinstance(item, dict) or not self._meaningful(item.get(key)):
+                self.add("RUNTIME_REPORT_INVALID", f"Every {name} row needs {key}.", str(report_path.relative_to(self.root)), "clickable-demo")
+                continue
+            result[item[key]] = item
+        return result
 
     def _validate_dom_reference(
         self,

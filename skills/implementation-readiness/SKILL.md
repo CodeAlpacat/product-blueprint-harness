@@ -10,7 +10,7 @@ Use this gate instead of asking the same agent whether its own work is complete.
 ## Choose the stage
 
 - `contract`: after PRD/screen/service-contract, before storyboard. Checks graph, references, operations, journey lifecycle, exclusions.
-- `prototype`: after clickable demo. Adds DOM surface/action/state evidence, `data-go`/`data-effect`, reachability, responsive evidence, dead/uncontracted controls.
+- `prototype`: after clickable demo and browser walkthrough. Adds DOM surface/action/state evidence, `data-go`/`data-effect`, reachability, responsive evidence, dead/uncontracted controls, and current hash-bound runtime evidence for every transition/effect/state.
 - `handoff`: after a draft `05-engineering-handoff.md`. Checks the full artifact set and writes the authoritative report.
 
 ## Run

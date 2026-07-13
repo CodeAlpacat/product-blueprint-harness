@@ -49,6 +49,8 @@ Each P0 surface carries five booleans. Never replace them with `complete: true`.
 - Review-only jump bars/toggles: `data-demo-control`; never count them as product UI.
 - IDs must be unique in the HTML document.
 
+Static DOM agreement is not runtime proof. Browser-drive every manifest transition/effect and required state, then write `04.37-runtime-verification.json` with `runner: browser`, current manifest/demo SHA-256 values, and one pass/fail row per action/state. The prototype/handoff gates reject missing, incomplete, failed, or stale reports.
+
 ## Operation boundary
 
 Operations define what implementation must preserve without prematurely choosing schema/API:
