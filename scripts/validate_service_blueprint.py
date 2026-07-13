@@ -38,6 +38,7 @@ STANDARD_ARTIFACTS = (
     "04.4-prototype-test.md",
     "04.45-design-critique.md",
     "04.5-feasibility-review.md",
+    "05-design-acceptance.json",
     "05-engineering-handoff.md",
 )
 
@@ -68,6 +69,26 @@ PROTOTYPE_ARTIFACTS = CONTRACT_ARTIFACTS + (
     "04.36-clickable-demo.md",
 )
 
+DESIGN_ARTIFACTS = tuple(item for item in STANDARD_ARTIFACTS if item != "05-engineering-handoff.md")
+DESIGN_SOURCE_FILES = (
+    "02.1-product-definition.json",
+    "02-prd.md",
+    "02.5-screen-contracts.md",
+    "02.6-service-manifest.json",
+    "02.8-undefined-surfaces.md",
+    "03-storyboard.html",
+    "03.7-ux-writing.md",
+    "04.1-visual-quality-gate.md",
+    "04.2-backend-systems-brief.md",
+    "04.3-design-system.md",
+    "04.32-design-system-workbench.md",
+    "04.36-clickable-demo.md",
+    "04.37-runtime-verification.json",
+    "04.4-prototype-test.md",
+    "04.45-design-critique.md",
+    "04.5-feasibility-review.md",
+)
+
 SURFACE_TYPES = {"screen", "overlay", "sheet", "dialog", "panel", "background"}
 ACTION_TYPES = {"navigate", "open-overlay", "close-overlay", "read", "write", "destructive", "external"}
 STATE_TYPES = {"default", "loading", "empty", "error", "success", "locked", "permission", "offline", "conflict", "paid"}
@@ -88,6 +109,8 @@ ENTRY_POINT_LIFECYCLES = {
     "cross-device",
     "offline",
 }
+DESIGN_FINDING_CATEGORIES = {"mental-model", "flow", "surface", "responsive", "visual", "copy", "accessibility"}
+VISUAL_EVIDENCE_SUFFIXES = {".png", ".jpg", ".jpeg", ".webp", ".svg"}
 
 
 @dataclass(frozen=True)
@@ -134,8 +157,10 @@ class Validator:
         self.stage = stage
         self.manifest_path = self.root / "02.6-service-manifest.json"
         self.product_definition_path = self.root / "02.1-product-definition.json"
+        self.design_acceptance_path = self.root / "05-design-acceptance.json"
         self.manifest: dict[str, Any] = {}
         self.product_definition: dict[str, Any] = {}
+        self.design_acceptance: dict[str, Any] = {}
         self.personas: dict[str, dict[str, Any]] = {}
         self.requirements: dict[str, dict[str, Any]] = {}
         self.entry_points: dict[str, dict[str, Any]] = {}
@@ -149,12 +174,16 @@ class Validator:
         self._load_manifest()
         self._load_product_definition()
         profile = self._profile()
+        if self.stage in {"design", "handoff", "technical"} and profile != "lite":
+            self._load_design_acceptance()
         self._validate_artifacts(profile, self.stage)
         if self.product_definition:
             self._validate_product_definition()
         if self.manifest:
             self._validate_shape(profile)
             self._validate_contract(profile, self.stage)
+            if self.stage in {"design", "handoff", "technical"} and profile != "lite":
+                self._validate_design_acceptance()
             if self.stage == "handoff":
                 self._validate_readiness_claims()
         return self._report(profile)
@@ -197,6 +226,25 @@ class Validator:
             return
         self.product_definition = loaded
 
+    def _load_design_acceptance(self) -> None:
+        if not self.design_acceptance_path.exists():
+            self.add(
+                "DESIGN_ACCEPTANCE_MISSING",
+                "Create 05-design-acceptance.json after complete visual review and explicit user approval.",
+                "05-design-acceptance.json",
+                "design-acceptance",
+            )
+            return
+        try:
+            loaded = json.loads(self.design_acceptance_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            self.add("DESIGN_ACCEPTANCE_INVALID", str(exc), "05-design-acceptance.json", "design-acceptance")
+            return
+        if not isinstance(loaded, dict):
+            self.add("DESIGN_ACCEPTANCE_INVALID", "Design acceptance root must be an object.", "05-design-acceptance.json", "design-acceptance")
+            return
+        self.design_acceptance = loaded
+
     def _profile(self) -> str:
         if self.profile_override:
             return self.profile_override
@@ -209,6 +257,8 @@ class Validator:
             required = CONTRACT_ARTIFACTS
         elif stage == "prototype":
             required = PROTOTYPE_ARTIFACTS
+        elif stage == "design":
+            required = DESIGN_ARTIFACTS
         else:
             required = LITE_ARTIFACTS if profile == "lite" else STANDARD_ARTIFACTS
         for relative in required:
@@ -243,7 +293,7 @@ class Validator:
         risk_domains = release.get("risk_domains", [])
         if not isinstance(risk_domains, list) or any(item not in RISK_DOMAINS for item in risk_domains):
             self.add("INVALID_RISK_DOMAINS", f"risk_domains must contain only: {', '.join(sorted(RISK_DOMAINS))}.", "release_profile.risk_domains", "risk-register")
-        elif self.stage == "handoff" and risk_domains and not (self.root / "04.55-risk-register.md").is_file():
+        elif self.stage in {"design", "handoff", "technical"} and risk_domains and not (self.root / "04.55-risk-register.md").is_file():
             self.add("RISK_REGISTER_MISSING", "A risk register is mandatory for the declared risk domains.", "04.55-risk-register.md", "risk-register")
 
         for key in ("surfaces", "actions", "states", "operations", "ai_assists", "journeys"):
@@ -372,7 +422,7 @@ class Validator:
         self._validate_journeys(journeys, surfaces, actions, states, profile)
         self._validate_product_traceability(surfaces, actions, operations, journeys)
         self._validate_reachability(surfaces, actions, journeys)
-        if profile != "lite" and stage in {"prototype", "handoff"}:
+        if profile != "lite" and stage in {"prototype", "design", "handoff", "technical"}:
             self._validate_uncontracted_controls(actions)
             self._validate_runtime_evidence(actions, states)
 
@@ -534,10 +584,10 @@ class Validator:
                 required_status = ("defined",)
                 if stage == "prototype":
                     required_status = STATUS_KEYS[:-1]
-                elif stage == "handoff":
+                elif stage in {"design", "handoff", "technical"}:
                     required_status = STATUS_KEYS
                 self._validate_status(surface.get("status"), path, required_status)
-                if stage in {"prototype", "handoff"}:
+                if stage in {"prototype", "design", "handoff", "technical"}:
                     self._validate_dom_reference(surface.get("prototype"), surface_id, "data-surface", "SURFACE_NOT_PROTOTYPED", path, "clickable-demo")
 
             if responsive_web and surface.get("priority") == "P0" and surface.get("type") == "screen" and profile != "lite":
@@ -549,7 +599,7 @@ class Validator:
                     has_rule = self._meaningful(responsive.get("derivation_rule"))
                     if not (has_desktop or has_rule):
                         self.add("RESPONSIVE_EVIDENCE_MISSING", "Provide desktop evidence or an explicit derivation rule.", f"{path}.responsive", "clickable-demo")
-                    if has_desktop and stage in {"prototype", "handoff"}:
+                    if has_desktop and stage in {"prototype", "design", "handoff", "technical"}:
                         prototype = surface.get("prototype", {})
                         reference = {"file": prototype.get("file"), "element_id": responsive.get("desktop_element_id")}
                         self._validate_dom_reference(reference, None, None, "RESPONSIVE_EVIDENCE_MISSING", f"{path}.responsive", "clickable-demo")
@@ -616,7 +666,7 @@ class Validator:
                     if not self._meaningful(values.get(key)):
                         self.add("INCOMPLETE_ACTION_CONTRACT", f"{group}.{key} is required; use n/a:<reason> only when inapplicable.", f"{path}.{group}.{key}", "screen-contract")
 
-            if profile != "lite" and stage in {"prototype", "handoff"}:
+            if profile != "lite" and stage in {"prototype", "design", "handoff", "technical"}:
                 self._validate_action_dom(action_id, action)
 
     def _validate_states(
@@ -638,7 +688,7 @@ class Validator:
             recovery = state.get("recovery_action_id")
             if recovery and recovery not in actions:
                 self.add("UNKNOWN_ACTION_REFERENCE", f"Unknown recovery action {recovery!r}.", f"{path}.recovery_action_id", "screen-contract")
-            if state.get("required") is True and profile != "lite" and stage in {"prototype", "handoff"}:
+            if state.get("required") is True and profile != "lite" and stage in {"prototype", "design", "handoff", "technical"}:
                 if not self._meaningful(state.get("reproduction")):
                     self.add("STATE_REPRODUCTION_MISSING", "Required state needs a stable browser reproduction path.", f"{path}.reproduction", "clickable-demo")
                 self._validate_dom_reference(state.get("prototype"), None, None, "STATE_NOT_REPRODUCIBLE", path, "clickable-demo")
@@ -938,6 +988,219 @@ class Validator:
                 self.add("DUPLICATE_DOM_ID", f"Prototype contains duplicate id {element_id!r}.", str(path.relative_to(self.root)), "clickable-demo")
         return self.demo_cache[path]
 
+    def _validate_design_acceptance(self) -> None:
+        acceptance = self.design_acceptance
+        if not acceptance:
+            return
+        if acceptance.get("schema_version") != "1.0":
+            self.add("UNSUPPORTED_DESIGN_ACCEPTANCE_VERSION", "schema_version must be 1.0.", "05-design-acceptance.json", "design-acceptance")
+        if acceptance.get("status") != "user-approved":
+            self.add("DESIGN_NOT_APPROVED", "Design remains blocked until the user explicitly approves the current all-P0 evidence.", "status", "design-acceptance")
+        approval = acceptance.get("approval")
+        if not isinstance(approval, dict):
+            self.add("DESIGN_NOT_APPROVED", "approval must be an object.", "approval", "design-acceptance")
+        else:
+            if approval.get("kind") != "explicit-user" or approval.get("scope") != "all-p0":
+                self.add("DESIGN_NOT_APPROVED", "Approval must be explicit-user and cover all-p0.", "approval", "design-acceptance")
+            for key in ("decision_ref", "approved_at", "evidence"):
+                if not self._meaningful(approval.get(key)):
+                    self.add("DESIGN_NOT_APPROVED", f"approval.{key} is required.", f"approval.{key}", "design-acceptance")
+
+        source_hashes = acceptance.get("source_hashes")
+        if not isinstance(source_hashes, dict):
+            self.add("DESIGN_BASELINE_STALE", "source_hashes must be an object.", "source_hashes", "design-acceptance")
+            source_hashes = {}
+        required_sources = list(DESIGN_SOURCE_FILES)
+        if self._mapping("release_profile").get("risk_domains"):
+            required_sources.append("04.55-risk-register.md")
+        for relative in required_sources:
+            path = self.root / relative
+            expected = source_hashes.get(relative)
+            if not path.is_file() or not self._meaningful(expected):
+                self.add("DESIGN_BASELINE_STALE", f"Missing bound source hash for {relative}.", f"source_hashes.{relative}", "design-acceptance")
+                continue
+            actual = hashlib.sha256(path.read_bytes()).hexdigest()
+            if expected != actual:
+                self.add("DESIGN_BASELINE_STALE", f"Bound source changed after design approval: {relative}.", f"source_hashes.{relative}", "design-acceptance")
+
+        component_contracts = self._acceptance_index("component_contracts")
+        for component_id, component in component_contracts.items():
+            path = f"component_contracts.{component_id}"
+            for key in ("purpose", "accessibility"):
+                if not self._meaningful(component.get(key)):
+                    self.add("COMPONENT_CONTRACT_INCOMPLETE", f"{key} is required.", f"{path}.{key}", "design-acceptance")
+            for key in ("variants", "states", "token_refs"):
+                if not isinstance(component.get(key), list) or not component.get(key):
+                    self.add("COMPONENT_CONTRACT_INCOMPLETE", f"{key} needs at least one item.", f"{path}.{key}", "design-acceptance")
+            self._validate_hashed_visual(component.get("evidence"), f"{path}.evidence", "COMPONENT_EVIDENCE_STALE")
+
+        visual_rows = self._acceptance_index("visual_evidence")
+        review_rounds = self._acceptance_index("review_rounds")
+        surfaces = self._index("surfaces", "screen-contract")
+        states = self._index("states", "screen-contract")
+        viewports = self._mapping("release_profile").get("viewports", [])
+        if not isinstance(viewports, list) or not viewports:
+            viewports = []
+        coverage: set[tuple[str, str]] = set()
+
+        for evidence_id, row in visual_rows.items():
+            path = f"visual_evidence.{evidence_id}"
+            surface_id = row.get("surface_id")
+            viewport = row.get("viewport")
+            if surface_id not in surfaces:
+                self.add("UNKNOWN_SURFACE_REFERENCE", f"Unknown visual surface {surface_id!r}.", f"{path}.surface_id", "design-acceptance")
+                continue
+            if viewport not in viewports:
+                self.add("UNKNOWN_VIEWPORT_REFERENCE", f"Viewport {viewport!r} is not in the release profile.", f"{path}.viewport", "design-acceptance")
+            else:
+                coverage.add((surface_id, viewport))
+            if row.get("visual_gate") != "pass":
+                self.add("VISUAL_GATE_NOT_PASSED", "Every P0 visual evidence row must pass the visual gate.", f"{path}.visual_gate", "visual-quality-gate")
+            if row.get("review_round_id") not in review_rounds:
+                self.add("DESIGN_REVIEW_EVIDENCE_MISSING", "Visual evidence must belong to a recorded review round.", f"{path}.review_round_id", "design-acceptance")
+            component_ids = row.get("component_ids")
+            if not isinstance(component_ids, list) or not component_ids:
+                self.add("COMPONENT_TRACE_MISSING", "Visual evidence needs component_ids.", f"{path}.component_ids", "design-acceptance")
+            else:
+                for component_id in component_ids:
+                    if component_id not in component_contracts:
+                        self.add("UNKNOWN_COMPONENT_REFERENCE", f"Unknown component {component_id!r}.", f"{path}.component_ids", "design-acceptance")
+            state_ids = row.get("state_ids")
+            if not isinstance(state_ids, list):
+                self.add("VISUAL_STATE_COVERAGE_MISSING", "state_ids must be an array.", f"{path}.state_ids", "design-acceptance")
+                state_ids = []
+            expected_states = {
+                state_id
+                for state_id in surfaces[surface_id].get("required_state_ids", [])
+                if state_id in states and states[state_id].get("required") is True
+            }
+            missing_states = sorted(expected_states - set(state_ids))
+            if missing_states:
+                self.add("VISUAL_STATE_COVERAGE_MISSING", f"Evidence is missing required states: {', '.join(missing_states)}.", f"{path}.state_ids", "design-acceptance")
+            for state_id in state_ids:
+                if state_id not in states or states[state_id].get("surface_id") != surface_id:
+                    self.add("UNKNOWN_STATE_REFERENCE", f"State {state_id!r} does not belong to {surface_id!r}.", f"{path}.state_ids", "design-acceptance")
+            self._validate_hashed_visual({"file": row.get("file"), "sha256": row.get("sha256")}, path, "VISUAL_EVIDENCE_STALE")
+
+        for surface_id, surface in surfaces.items():
+            if surface.get("priority") != "P0" or surface.get("type") == "background":
+                continue
+            for viewport in viewports:
+                if (surface_id, viewport) not in coverage:
+                    self.add("VISUAL_VIEWPORT_COVERAGE_MISSING", f"P0 surface {surface_id!r} has no current {viewport!r} visual evidence.", f"surfaces.{surface_id}", "design-acceptance")
+
+        completed_rounds = [row for row in review_rounds.values() if row.get("status") == "completed"]
+        all_evidence_ids = set(visual_rows)
+        if not completed_rounds or not any(set(row.get("reviewed_evidence_ids", [])) >= all_evidence_ids for row in completed_rounds):
+            self.add("DESIGN_REVIEW_INCOMPLETE", "A completed review round must cover every current visual evidence row.", "review_rounds", "design-acceptance")
+        for round_id, row in review_rounds.items():
+            if row.get("status") not in {"revised", "completed", "rejected"} or not self._meaningful(row.get("summary")):
+                self.add("DESIGN_REVIEW_INCOMPLETE", "Review round needs a valid status and summary.", f"review_rounds.{round_id}", "design-acceptance")
+
+        findings = acceptance.get("findings")
+        if not isinstance(findings, list):
+            self.add("DESIGN_FINDINGS_INVALID", "findings must be an array.", "findings", "design-acceptance")
+            findings = []
+        for index, finding in enumerate(findings):
+            path = f"findings[{index}]"
+            if not isinstance(finding, dict):
+                self.add("DESIGN_FINDINGS_INVALID", "Finding must be an object.", path, "design-acceptance")
+                continue
+            if finding.get("category") not in DESIGN_FINDING_CATEGORIES:
+                self.add("DESIGN_FINDINGS_INVALID", "Finding category is invalid.", f"{path}.category", "design-acceptance")
+            if finding.get("severity") not in {"P0", "P1", "P2"}:
+                self.add("DESIGN_FINDINGS_INVALID", "Finding severity must be P0, P1, or P2.", f"{path}.severity", "design-acceptance")
+            if finding.get("severity") == "P0" and finding.get("status") != "resolved":
+                self.add("UNRESOLVED_P0_DESIGN_FINDING", "P0 design findings cannot be deferred or accepted away.", path, "design-acceptance")
+            if finding.get("status") not in {"resolved", "deferred"}:
+                self.add("DESIGN_FINDINGS_INVALID", "Finding status must be resolved or deferred.", f"{path}.status", "design-acceptance")
+            for key in ("id", "evidence", "resolution", "decision_ref"):
+                if not self._meaningful(finding.get(key)):
+                    self.add("DESIGN_FINDINGS_INVALID", f"{key} is required.", f"{path}.{key}", "design-acceptance")
+
+        checks = acceptance.get("mental_model_checks")
+        if not isinstance(checks, list):
+            self.add("MENTAL_MODEL_REVIEW_INCOMPLETE", "mental_model_checks must be an array.", "mental_model_checks", "design-acceptance")
+            checks = []
+        checked_personas: set[str] = set()
+        checked_requirements: set[str] = set()
+        journeys = self._index("journeys", "service-contract")
+        for index, check in enumerate(checks):
+            path = f"mental_model_checks[{index}]"
+            if not isinstance(check, dict):
+                self.add("MENTAL_MODEL_REVIEW_INCOMPLETE", "Mental-model check must be an object.", path, "design-acceptance")
+                continue
+            persona_id = check.get("persona_id")
+            if persona_id not in self.personas:
+                self.add("UNKNOWN_PERSONA_REFERENCE", f"Unknown persona {persona_id!r}.", f"{path}.persona_id", "design-acceptance")
+            else:
+                checked_personas.add(persona_id)
+            if check.get("verdict") != "pass" or not self._meaningful(check.get("evidence")):
+                self.add("MENTAL_MODEL_REVIEW_INCOMPLETE", "Mental-model checks need pass verdict and evidence.", path, "design-acceptance")
+            for requirement_id in check.get("requirement_ids", []):
+                if requirement_id not in self.requirements:
+                    self.add("UNKNOWN_REQUIREMENT_REFERENCE", f"Unknown requirement {requirement_id!r}.", f"{path}.requirement_ids", "design-acceptance")
+                else:
+                    checked_requirements.add(requirement_id)
+            journey_ids = check.get("journey_ids")
+            if not isinstance(journey_ids, list) or not journey_ids:
+                self.add("MENTAL_MODEL_REVIEW_INCOMPLETE", "journey_ids needs at least one journey.", f"{path}.journey_ids", "design-acceptance")
+            else:
+                for journey_id in journey_ids:
+                    if journey_id not in journeys:
+                        self.add("UNKNOWN_JOURNEY_REFERENCE", f"Unknown journey {journey_id!r}.", f"{path}.journey_ids", "design-acceptance")
+        required_personas = set(self.personas)
+        required_requirements = {
+            requirement_id
+            for requirement_id, requirement in self.requirements.items()
+            if requirement.get("status") == "included" and requirement.get("priority") == "P0"
+        }
+        if required_personas - checked_personas or required_requirements - checked_requirements:
+            self.add("MENTAL_MODEL_REVIEW_INCOMPLETE", "Every persona and included P0 requirement needs a mental-model journey review.", "mental_model_checks", "design-acceptance")
+
+        target_validation = acceptance.get("target_user_validation")
+        manifest_validation = self._mapping("user_validation")
+        if not isinstance(target_validation, dict) or target_validation.get("status") not in {"not-run", "heuristic", "real-user"}:
+            self.add("TARGET_USER_VALIDATION_INVALID", "Use not-run, heuristic, or real-user.", "target_user_validation", "prototype-test")
+        elif target_validation.get("status") != manifest_validation.get("status"):
+            self.add("TARGET_USER_VALIDATION_MISMATCH", "Design acceptance and service manifest must report the same target-user validation status.", "target_user_validation.status", "prototype-test")
+        elif target_validation.get("status") == "real-user" and not target_validation.get("evidence"):
+            self.add("REAL_USER_EVIDENCE_MISSING", "real-user status requires evidence.", "target_user_validation.evidence", "prototype-test")
+
+    def _acceptance_index(self, key: str) -> dict[str, dict[str, Any]]:
+        result: dict[str, dict[str, Any]] = {}
+        values = self.design_acceptance.get(key, [])
+        if not isinstance(values, list):
+            self.add("DESIGN_ACCEPTANCE_INVALID", f"{key} must be an array.", key, "design-acceptance")
+            return result
+        for position, item in enumerate(values):
+            path = f"{key}[{position}]"
+            if not isinstance(item, dict):
+                self.add("DESIGN_ACCEPTANCE_INVALID", f"{path} must be an object.", path, "design-acceptance")
+                continue
+            item_id = item.get("id")
+            if not isinstance(item_id, str) or not ID_RE.fullmatch(item_id):
+                self.add("INVALID_CONTRACT_ID", f"{path}.id must match {ID_RE.pattern}.", f"{path}.id", "design-acceptance")
+                continue
+            if item_id in result:
+                self.add("DUPLICATE_CONTRACT_ID", f"Duplicate id: {item_id}", f"{path}.id", "design-acceptance")
+                continue
+            result[item_id] = item
+        return result
+
+    def _validate_hashed_visual(self, evidence: Any, path: str, code: str) -> None:
+        if not isinstance(evidence, dict):
+            self.add(code, "Visual evidence needs file and sha256.", path, "design-acceptance")
+            return
+        visual_path = self._safe_path(evidence.get("file"))
+        expected = evidence.get("sha256")
+        if visual_path is None or not visual_path.is_file() or visual_path.suffix.lower() not in VISUAL_EVIDENCE_SUFFIXES:
+            self.add(code, "Visual evidence must be a local png, jpg, jpeg, webp, or svg file.", path, "design-acceptance")
+            return
+        actual = hashlib.sha256(visual_path.read_bytes()).hexdigest()
+        if expected != actual:
+            self.add(code, "Visual evidence hash is missing or stale.", path, "design-acceptance")
+
     def _validate_readiness_claims(self) -> None:
         dashboard = self.root / "00-review-dashboard.html"
         handoff = self.root / "05-engineering-handoff.md"
@@ -961,33 +1224,60 @@ class Validator:
             return None
         return hashlib.sha256(self.manifest_path.read_bytes()).hexdigest()
 
+    def _file_hash(self, path: Path) -> str | None:
+        if not path.is_file():
+            return None
+        return hashlib.sha256(path.read_bytes()).hexdigest()
+
     def _report(self, profile: str) -> dict[str, Any]:
         errors = [finding for finding in self.findings if finding.severity == "error"]
         validation = self.manifest.get("user_validation", {}) if self.manifest else {}
         user_validated = isinstance(validation, dict) and validation.get("status") == "real-user" and bool(validation.get("evidence"))
+        stage_rank = {"contract": 0, "prototype": 1, "design": 2, "handoff": 3, "technical": 4}.get(self.stage, -1)
+        error_owners = {finding.owner for finding in errors}
+        contract_owners = {"product-definition", "prd", "screen-contract", "service-contract", "backend-systems-brief"}
+        prototype_owners = contract_owners | {"clickable-demo", "prototype-test", "implementation-readiness"}
+        design_owners = prototype_owners | {
+            "design-acceptance",
+            "visual-quality-gate",
+            "design-system",
+            "design-critique",
+            "feasibility-review",
+            "ux-writing",
+            "risk-register",
+        }
+        handoff_owners = design_owners | {"engineering-handoff", "decision-dashboard", "orchestrate"}
+        product_contract_ready = profile != "lite" and stage_rank >= 0 and not (error_owners & contract_owners)
+        prototype_ready = product_contract_ready and stage_rank >= 1 and not (error_owners & prototype_owners)
+        design_owner_approved = self.design_acceptance.get("status") == "user-approved" if self.design_acceptance else False
+        design_accepted = prototype_ready and stage_rank >= 2 and design_owner_approved and not (error_owners & design_owners)
+        product_handoff_ready = design_accepted and stage_rank >= 3 and not (error_owners & handoff_owners)
+        technical_design_ready = False
+        implementation_ready = False
+        engineering_ready = implementation_ready
         if errors:
             status = "fail"
-            engineering_ready = False
-        elif self.stage == "contract":
-            status = "contract-pass"
-            engineering_ready = False
-        elif self.stage == "prototype":
-            status = "prototype-pass"
-            engineering_ready = False
         elif profile == "lite":
             status = "lite-pass"
-            engineering_ready = False
         else:
-            status = "pass"
-            engineering_ready = True
+            status = f"{self.stage}-pass"
         return {
             "schema_version": "1.0",
             "status": status,
             "stage": self.stage,
             "profile": profile,
             "engineering_ready": engineering_ready,
+            "product_contract_ready": product_contract_ready,
+            "prototype_ready": prototype_ready,
+            "design_owner_approved": design_owner_approved,
+            "design_accepted": design_accepted,
+            "product_handoff_ready": product_handoff_ready,
+            "technical_design_ready": technical_design_ready,
+            "implementation_ready": implementation_ready,
             "user_validated": user_validated,
             "manifest_sha256": self._manifest_hash(),
+            "product_definition_sha256": self._file_hash(self.product_definition_path),
+            "design_acceptance_sha256": self._file_hash(self.design_acceptance_path),
             "checked_at": datetime.now(timezone.utc).isoformat(),
             "findings": [asdict(finding) for finding in self.findings],
             "accepted_limitations": self._mapping("release_profile").get("accepted_limitations", []) if self.manifest else [],
@@ -1004,6 +1294,13 @@ def write_report(root: Path, report: dict[str, Any]) -> None:
         "",
         f"- Status: **{report['status']}**",
         f"- Engineering ready: **{str(report['engineering_ready']).lower()}**",
+        f"- Product contract ready: **{str(report['product_contract_ready']).lower()}**",
+        f"- Prototype ready: **{str(report['prototype_ready']).lower()}**",
+        f"- Design owner approved: **{str(report['design_owner_approved']).lower()}**",
+        f"- Design accepted: **{str(report['design_accepted']).lower()}**",
+        f"- Product handoff ready: **{str(report['product_handoff_ready']).lower()}**",
+        f"- Technical design ready: **{str(report['technical_design_ready']).lower()}**",
+        f"- Implementation ready: **{str(report['implementation_ready']).lower()}**",
         f"- User validated: **{str(report['user_validated']).lower()}**",
         f"- Manifest SHA-256: `{report['manifest_sha256'] or 'missing'}`",
         f"- Checked at: `{report['checked_at']}`",
@@ -1034,7 +1331,7 @@ def parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("planning_dir", type=Path)
     parser.add_argument("--profile", choices=("lite", "standard", "deep"))
-    parser.add_argument("--stage", choices=("contract", "prototype", "handoff"), default="handoff")
+    parser.add_argument("--stage", choices=("contract", "prototype", "design", "handoff", "technical"), default="handoff")
     parser.add_argument("--no-write", action="store_true", help="Print findings without writing readiness reports")
     parser.add_argument("--json", action="store_true", help="Print the full JSON report")
     return parser.parse_args(argv)

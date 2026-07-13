@@ -104,6 +104,7 @@ File: `05-design-acceptance.json`
 - storyboard, UX writing
 - visual quality gate, design system, workbench
 - clickable demo, browser runtime report, prototype test, design critique
+- undefined-surface audit, backend systems brief, and feasibility review
 
 Any mismatch yields `DESIGN_BASELINE_STALE` for design/handoff/technical stages. The owning skill reruns only the affected downstream chain, then requests approval again.
 

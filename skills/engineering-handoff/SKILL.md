@@ -21,6 +21,7 @@ Use this as the final default phase of Product Blueprint. It is not the technica
 - Feasibility review
 - `02.6-service-manifest.json`
 - Latest prototype-stage validator result and prototype-test evidence
+- Current `05-design-acceptance.json` with a passing design-stage report
 
 ## Handoff Contents
 
@@ -51,13 +52,13 @@ Use this as the final default phase of Product Blueprint. It is not the technica
 - Do include backend/system risks that would break user trust if mishandled.
 - Preserve user experience requirements even when they are difficult.
 - Mark each unresolved question as `must decide before build`, `can decide during technical design`, or `experiment required`.
-- If no React design-system workbench exists and visual quality was a user concern, mark technical design readiness as conditional.
+- Do not draft a ready handoff before `design-pass`. Missing/stale approval is a blocker, not a conditional visual note.
 - Do not write `planning-readiness: pass`, “ready for engineering,” or equivalent from prose review. Create the handoff draft, then call `product-blueprint:implementation-readiness` at handoff stage.
 - Use exact service-manifest IDs in journeys, state machines, invariants, and vertical slices. A handoff row without IDs cannot be traced back to the prototype.
 
 ## Output
 
-Create `05-engineering-handoff.md` as a draft with `planning-readiness: pending`, then run `product-blueprint:implementation-readiness`. The generated `05-readiness-report.{json,md}` is the readiness verdict. Use `product-blueprint:tech-plan` only if the user explicitly asks to proceed from this handoff into technical architecture.
+Create `05-engineering-handoff.md` as a draft with `planning-readiness: pending`, then run `product-blueprint:implementation-readiness` at handoff stage. A pass means `product_handoff_ready=true`; it does not mean technical or implementation readiness. Build-ready runs continue to `tech-plan`.
 
 ## Next Step
 

@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "status": "pending",
+  "approval": {
+    "kind": "explicit-user",
+    "decision_ref": "",
+    "approved_at": "",
+    "scope": "all-p0",
+    "evidence": ""
+  },
+  "source_hashes": {},
+  "component_contracts": [],
+  "visual_evidence": [],
+  "review_rounds": [],
+  "findings": [],
+  "mental_model_checks": [],
+  "target_user_validation": {
+    "status": "not-run",
+    "evidence": []
+  }
+}

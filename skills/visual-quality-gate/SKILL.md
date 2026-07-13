@@ -21,6 +21,7 @@ The gate is worthless if the model that produced the screen also grades it again
 
 - **Ceiling scan** (one screen, deep): full pass list below on the single decisive screen — run during the craft loop.
 - **All-P0 board scan** (breadth): after the workbench/clickable-demo exists, screenshot the board/all-screens view and check EVERY P0 surface/state from `02.6-service-manifest.json` against the rendered coverage matrix. A P0 surface with no rendered artifact = fail; "propagated from the ceiling" without a render is not coverage. Also scan cross-screen coherence: same tokens, same imagery treatment, one storyline.
+- **Acceptance scan** (fidelity): before design approval, review each P0 surface at every release viewport with every required state. A board scan cannot substitute for readable per-surface evidence. Feed stable evidence IDs and findings into `design-acceptance`.
 
 ## Output Language And Stage Exit
 

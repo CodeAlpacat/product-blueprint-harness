@@ -51,6 +51,7 @@ Create `04.45-design-critique.md` with:
 - Optional improvements
 - Pass/fail decision (+ACCEPT-FLAG rows)
 - Handoff readiness note
+- Stable finding IDs with category, P0/P1/P2 severity, evidence, and owning artifact. `design-acceptance` imports these findings; unresolved P0 rows block approval.
 - Separate visual/UX and service-contract fidelity verdicts, with exact manifest IDs for every fidelity finding
 
 ## Next Step
