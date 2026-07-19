@@ -462,11 +462,11 @@ Not legal advice — real counsel reviews before launch.
 
 ## Purpose
 
-Render the product's visual system as a React/Tailwind workbench before technical design.
+Render the product's visual system as dependency-light React sources before technical design.
 
 ## Required Workbench Artifact
 
-- prototypes/<product>-design-system-workbench.html
+- visual-workbench/ with tokens, components, fixtures, ComponentBoard, DepthBoard, and FlowPreview
 
 ## Foundation Tokens
 
@@ -474,7 +474,7 @@ Render the product's visual system as a React/Tailwind workbench before technica
 
 ## State Lab
 
-## Production Screen Set
+## Depth And P0 Screen Set
 
 ## Flow Wiring Notes
 

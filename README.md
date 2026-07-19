@@ -19,7 +19,7 @@ Cross-agent plugin for pre-development product planning and production-grade vis
    | **Deep** | Standard + richer evidence, risk register, stronger boundary/role coverage | multi-day |
 
 4. Want it hands-off? Say **"쭉 진행해"** — the orchestrator chains phases and only stops at the decisions that are genuinely yours (direction, brand, MVP scope, design acceptance, handoff). Every response ends with a `다음 단계` block: the recommended next skill, what you must decide, and where you are in the pipeline.
-5. Review visually, not by reading markdown: open `00-review-dashboard.html` (always current), the storyboard, and the clickable demo. The `.md` files are the detail source of truth.
+5. Review visually, not by reading markdown: open `00-review-dashboard.html`, then the rendered React ComponentBoard, DepthBoard, and FlowPreview. The storyboard/HTML demo explain flow; `.md` files are detail SoT.
 
 Notes: artifact scaffolding uses `python3` if available (falls back to direct file creation if not). Interrupted sessions resume from `00-decision-log.md` — say "이어서 진행해" in the same folder; say "아트디렉션만 다시" to redo one phase and its downstream only.
 
@@ -40,7 +40,7 @@ The planning/IA discipline was always strong; the weak point was visual output c
 
 - `anti-slop-doctrine.md` — why slop happens (mode collapse to the training average), a named S1–S14 slop-signature taxonomy with fixes, the shadcn/component-library sameness defense, and the two survival tests.
 - `measured-design-spec.md` — art direction must resolve to numbers (type ramp, OKLCH color roles + contrast, grid, spacing), never adjectives.
-- `token-substrate.md` — build on shadcn/ui + Radix with the default skin stripped and product OKLCH tokens applied; never raw divs, never default shadcn.
+- `token-substrate.md` — dependency-light React + CSS tokens for greenfield, actual substrate reuse for existing products, and one component source shared by boards and screens.
 - `craft-loop.md` — layered craft passes, ceiling-on-one-screen-first, full-viewport rendering + screenshots.
 - `adversarial-visual-gate.md` — a fresh-context critic runs measurable checks and loops until clean; conditional is not pass.
 
@@ -57,10 +57,11 @@ Product Blueprint guides an idea or reference product through:
 - a machine-readable service contract connecting stories, surfaces, actions, states, frontend feedback, backend/data ownership, and journeys
 - feasibility checkpoint BEFORE visual design (so mockups never promise the impossible)
 - storyboard visualization
+- Figma-informed page/section organization, component variants/properties, token modes, named flows, and AI-assisted direction exploration
 - art direction and adversarial visual quality gates (with an all-P0 coverage matrix)
 - UX writing / microcopy sheets
-- design-system planning, tokens, portable DESIGN.md, and workbench generation
-- high-fidelity screen specimens and a single-file clickable demo (phone-frame flow + Figma-like board mode + rendered non-happy states)
+- design-system planning, tokens, portable DESIGN.md, dependency-light React ComponentBoard/DepthBoard/FlowPreview, and browser evidence
+- reusable React component/state boards, Depth-level screens, fixture-data FlowPreview, optional high-fidelity ceiling screen, and a secondary HTML behavior audit
 - prototype testing (heuristic + real-user protocol) and design critique
 - backend systems briefing and risk register
 - feasibility review
@@ -122,9 +123,9 @@ product-blueprint:orchestrate
 | Visual | `art-direction-brief` | `03.5-art-direction-brief.md` (measured spec, not adjectives) |
 | Visual | `visual-quality-gate` | `04.1-visual-quality-gate.md` (adversarial anti-slop gate) |
 | Visual | `ux-writing` | `03.7-ux-writing.md` (microcopy used verbatim downstream) |
-| Visual | `design-system` → `design-system-workbench` | `04.3-*` + workbench HTML (tokens, component states, all-P0 mockups) |
+| Visual | `design-system` → `design-system-workbench` | `04.3-*` + reusable React tokens/components + ComponentBoard/DepthBoard/FlowPreview |
 | Visual | `high-fidelity-screen` | single ceiling-screen pixel pass |
-| Visual | `clickable-demo` | `prototypes/<product>-demo.html` (primary founder review artifact) |
+| Visual | `clickable-demo` | optional `prototypes/<product>-demo.html` (portable flow/state audit; never visual SoT) |
 | Assets | `art-production` (optional) | character/scene asset pipeline (prompt recipes, batch, curation board) |
 | Validation | `prototype-test`, `design-critique` | `04.4-*`, `04.45-*` |
 | Validation | `risk-register` | `04.55-risk-register.md` (mandatory for adult/minors/payments/UGC/PII/AI content) |

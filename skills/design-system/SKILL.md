@@ -7,7 +7,7 @@ description: Turns an approved PRD, storyboard, and visual quality gate into a p
 
 Use this after storyboard approval and `product-blueprint:visual-quality-gate`. The design system should serve the product thesis, not decorate the board. This is a production design brief, not frontend implementation.
 
-HTML storyboards are acceptable inputs here because they are flow/IA contracts. Do not treat them as final visual UI. If the user wants production-grade design quality or future frontend portability, the next visual artifact should be a React design-system workbench through `product-blueprint:design-system-workbench`, not a single isolated screen.
+HTML storyboards are acceptable inputs here because they are flow/IA contracts. Do not treat them as final visual UI. Production-grade output continues into reusable React components, boards, and previews through `product-blueprint:design-system-workbench`.
 
 ## Output Language And Stage Exit
 
@@ -66,7 +66,7 @@ Beyond the analysis brief, emit a single **portable `DESIGN.md`** at the plannin
 - **Governance** — where the SoT lives, how tokens/components are added, off-token values forbidden.
 - **Anti-slop rules** — the S1–S14 scan items to refuse.
 
-Keep the three layers in sync: `tokens/<product>.*` (machine), `DESIGN.md` (portable AI/human spec), and the rendered visual page from `design-system-workbench` (`prototypes/<product>-design-system.html` — swatches, type specimens, live components, states). `DESIGN.md` is the source a coding agent reads; the rendered page is how a human reviews it; the tokens are what code imports.
+Keep the three layers in sync: `tokens/<product>.*` (machine), `DESIGN.md` (portable AI/human spec), and the rendered React ComponentBoard/DepthBoard/FlowPreview from `design-system-workbench`. `DESIGN.md` explains the rules; React source proves reuse; browser evidence is how a human approves it.
 
 ## Output
 

@@ -13,7 +13,7 @@ Markdown remains the source of truth. The dashboard is the user's decision cockp
 
 - `00-decision-log.md`
 - Current phase artifact
-- Storyboard or workbench HTML when available
+- Storyboard plus rendered React ComponentBoard, DepthBoard, and FlowPreview when available
 - Screenshots when available
 - Open questions and gate status
 - `05-readiness-report.json` when design readiness has run

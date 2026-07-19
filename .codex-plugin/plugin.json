@@ -1,15 +1,15 @@
 {
   "name": "product-blueprint",
-  "version": "0.4.0+codex.20260713073806",
-  "description": "Guided product/design freeze workflow for confirmed mental models, continuous user flows, complete visual/state evidence, developer-lens feasibility consultation, explicit user approval, and honest design handoff before technical architecture.",
+  "version": "0.4.0+codex.20260719060303",
+  "description": "Guided product/design workflow from research and PRD to branded Depth screens, reusable React components, fixture-data flows, explicit visual approval, and handoff before technical architecture.",
   "author": {
     "name": "Local developer"
   },
   "skills": "./skills/",
   "interface": {
     "displayName": "Product Blueprint",
-    "shortDescription": "Guided product planning before technical design: asks for decisions, records assumptions, and moves through research, PRD, screen flows, design gates, and handoff.",
-    "longDescription": "Product Blueprint provides independent pre-development product-planning skills for founders and agents: guided intake, decision logging, visual decision dashboards, reference research, ideation, reference deconstruction, parallel concepting, PRD writing, screen contracts, product-experience mechanism design, storyboard visualization, art direction, anti-slop visual quality review, backend systems briefing, production design-system briefing, React design-system workbench creation, high-fidelity screen specimen creation, prototype testing, structured design critique, feasibility review, and engineering handoff. Technical architecture is an optional follow-up, not the default workflow.",
+    "shortDescription": "Plan and visually approve a branded product through reusable React components and complete user flows before technical design.",
+    "longDescription": "Product Blueprint guides reference research, direction and brand lock, PRD, Depth-based screen contracts, feasibility, Figma-informed component/variant/mode design, dependency-light React component and state boards, complete fixture-data flows, browser evidence, critique, explicit design acceptance, and handoff. Existing products extend their real components; greenfield output stays portable. Technical architecture and API/DB wiring remain a later opt-in phase.",
     "developerName": "Local developer",
     "category": "Productivity",
     "capabilities": [
@@ -37,7 +37,7 @@
       "engineering-handoff"
     ],
     "defaultPrompt": [
-      "Guide me from idea to an explicitly approved product/design baseline: confirm the user's mental model, wire every P0 flow and state, build a clickable whole-service prototype, consult developer feasibility without designing implementation, absorb constraints into the UX, regenerate evidence, and stop at design handoff."
+      "Guide me from idea to an explicitly approved, branded product experience: confirm the mental model, map Depth and flows, create reusable React components and state boards, render every P0 fixture-data journey, absorb feasibility constraints, and stop before technical architecture and API/DB wiring."
     ]
   }
 }

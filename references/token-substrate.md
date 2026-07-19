@@ -1,77 +1,74 @@
-# Token Substrate — shadcn/Radix + OKLCH
+# Token substrate — dependency-light React + CSS
 
-The workbench and hi-fi screens must be built on a real component substrate, not raw hand-rolled `<div>`s. Building from scratch collapses to the training average (generic cards, generic spacing). This reference defines the substrate and — critically — **how to avoid the shadcn-default sameness** (see anti-slop-doctrine §3).
+The portable visual baseline uses reusable React components and CSS tokens without requiring a UI library, CSS framework, or Storybook. Existing products reuse their actual substrate; greenfield output must remain easy to transplant.
 
-## Why a substrate
+## Structure before skin
 
-- Radix primitives give correct behavior for free: focus management, keyboard nav, ARIA roles, portal/overlay/dismiss logic, controlled/uncontrolled state. Hand-rolled components get this wrong and read as amateur.
-- shadcn gives component *structure* (composition, slots, variants API via `cva`) that is clean and inspectable.
-- Starting from tasteful, correct primitives removes ~half of slop before any styling.
+- Use semantic HTML inside named React components. Do not represent every control as a styled `<div>`.
+- Keep behavior and skin separate: component props and interaction states define behavior; CSS variables and component classes define appearance.
+- Centralize focus, keyboard, dialog, overlay, and dismissal behavior in reusable primitives. Native `<button>`, `<input>`, `<dialog>`, landmark elements, and ARIA are the default dependency-free substrate.
+- If an existing product already uses Radix, shadcn, or another primitive library, reuse it. Do not add one only for the Blueprint artifact.
+- The component/state board and Depth screens import the same source files. Copied markup is a failed handoff.
 
-## The non-negotiable: strip the defaults
+## Token layers
 
-shadcn ships a recognizable skin (New York / zinc / neutral, Geist, `rounded-md`, muted-foreground). Shipping it untouched is slop v2. The substrate is skeleton only; the skin comes from the measured spec.
-
-Do all of the following before the substrate is "yours":
-
-1. **Replace the token layer.** Overwrite the CSS variables (`--background`, `--foreground`, `--primary`, `--muted`, `--border`, `--radius`, …) with the OKLCH values from the measured design spec. The default gray ramp and default `--radius` are banned starting values.
-2. **Replace the font.** Never leave Geist/Inter default. Set the display/body/data families from the type spec, with the right feature settings (`font-variant-numeric: tabular-nums` for data, KR line-height for Korean body).
-3. **Re-derive radius, border, elevation, density** from the spec — a radius *scale* by role, hairline borders preferred over shadows, real spacing scale. Do not accept `rounded-md` on everything.
-4. **Add the signature element** as a real component/utility so it recurs across surfaces.
-5. **Override component variants.** The default `Button`, `Card`, `Badge` looks must be re-skinned to the art direction. If `Badge` is still a gray stadium pill, you have S4.
-
-Self-test: open the rendered screen next to a vanilla shadcn starter. If a designer can't tell which is which within the neutral chrome, the skin was not replaced.
-
-## OKLCH token model
-
-Use OKLCH for the palette — perceptually uniform lightness makes contrast and hover/pressed states predictable and consistent across hues.
-
-Layer the tokens (primitive → semantic → component), the same discipline the measured spec requires:
+Use primitive → semantic → component CSS variables:
 
 ```css
 :root {
-  /* primitive — raw ramps, not used directly in components */
-  --paper-50:  oklch(0.98 0.008 60);
-  --paper-100: oklch(0.96 0.010 60);
-  --ink-900:   oklch(0.22 0.012 60);
-  --ink-600:   oklch(0.46 0.012 60);
-  --accent-500: oklch(0.55 0.14 20);   /* product-derived, not tech-blue */
+  --paper-50: oklch(0.98 0.008 60);
+  --ink-900: oklch(0.22 0.012 60);
+  --ink-600: oklch(0.46 0.012 60);
+  --accent-500: oklch(0.55 0.14 20);
 
-  /* semantic — what components reference */
   --surface: var(--paper-50);
-  --surface-raised: #fff;
   --ink: var(--ink-900);
   --ink-muted: var(--ink-600);
   --accent: var(--accent-500);
   --accent-ink: oklch(0.98 0.01 20);
-  --border-hairline: oklch(0.22 0.012 60 / 0.10);
-  --radius-md: 8px;
+  --border-hairline: oklch(0.22 0.012 60 / 0.1);
 
-  /* component — optional, for one-off precise mappings */
-  --card-radius: var(--radius-md);
-  --card-border: 1px solid var(--border-hairline);
+  --control-radius: 8px;
+  --control-height: 40px;
+  --motion-fast: 120ms;
 }
 ```
 
-Then map shadcn's expected variables (`--background`, `--foreground`, `--primary`, `--border`, `--ring`, `--radius`, …) onto the semantic layer so every shadcn component inherits the product skin automatically.
+Components reference semantic/component tokens only. Screens must not introduce off-token color, spacing, radius, typography, or motion values.
 
 Export stable values to:
-- `tokens/<product>.tokens.json` — design-tokens JSON (primitive/semantic/component).
-- `tokens/<product>.variables.css` — the `:root` block above.
-- `tokens/<product>.theme.css` — the shadcn-variable mapping + dark mode if in scope.
 
-## Contrast obligation
+- `tokens/<product>.tokens.json`
+- `tokens/<product>.variables.css`
+- `tokens/<product>.theme.css` when the target app needs a mapping layer
 
-Because OKLCH lightness is explicit, verify text pairs numerically: `ink on surface ≥ 7:1`, `ink-muted on surface ≥ 4.5:1`, `accent-ink on accent ≥ 4.5:1`, semantic-on-surface per the spec. Record each pair as `X on Y = N:1` in the workbench so the gate can check it. Do not guess contrast from OKLCH lightness alone — compute the WCAG ratio.
+## Portable React artifact
 
-## Planning-artifact form
+The greenfield artifact contains source, not a compiled single HTML file:
 
-This is a **planning specimen**, not the production app. Acceptable forms:
-- A single self-contained HTML file that inlines the tokens as CSS variables and hand-writes the (already-skinned) component markup with Tailwind utilities — fast to render and screenshot, no build. Good for hero-screen craft and the workbench.
-- A standalone React/Vite artifact using real shadcn components when the coupling to a real stack is wanted.
+```text
+visual-workbench/
+  tokens/
+  components/
+  fixtures/
+  boards/ComponentBoard.tsx
+  boards/DepthBoard.tsx
+  FlowPreview.tsx
+  index.ts
+```
 
-Either way: keep it under `docs/product-planning/<project>/prototypes/`, mark it non-production, render it in a browser, and screenshot desktop + mobile at real viewport sizes (see craft-loop.md).
+Keep imports limited to React, local source, and assets that can be checked into the target project. Do not require Storybook or a specific build tool. When a host app exists, render these entries through its normal preview route or Storybook without forking them.
 
-## What NOT to decide here
+## Accessibility and contrast obligation
 
-Tokens and components are visual planning. Do not decide app routing, data fetching, query/cache state, API, or DB. Component and token *names* should be good enough to become real design-system candidates later, but implementation is a post-handoff step.
+Dependency-free does not mean behavior-free. Render and verify focus order, visible focus, keyboard activation, dialog focus return, labels/descriptions, pending announcements, escape/dismiss behavior, and disabled versus locked semantics.
+
+Compute and record contrast: body text ≥ 4.5:1, large text ≥ 3:1, focus and meaningful non-text UI ≥ 3:1. Do not infer contrast from OKLCH lightness alone.
+
+## Anti-template test
+
+Compare the rendered neutral chrome with common SaaS/shadcn starters. If content could be swapped and the product identity disappears, fail the visual gate. The answer is stronger art direction and token/component decisions, not another dependency.
+
+## Boundary
+
+This React package is the executable visual design baseline, not the production app. It uses fixtures and does not decide routing, requests, cache state, API, DB, auth, or deployment.

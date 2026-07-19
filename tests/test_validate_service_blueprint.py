@@ -322,6 +322,26 @@ class ServiceBlueprintValidatorTest(unittest.TestCase):
         self.assertIn("DESIGN_NOT_APPROVED", self.codes(report))
         self.assertFalse(report["design_accepted"])
 
+    def test_design_stage_requires_implementation_fidelity_react_sources(self) -> None:
+        acceptance = self.design_acceptance()
+        acceptance.pop("visual_implementation")
+        self.write_design_acceptance(acceptance)
+        report = self.validate(stage="design")
+        self.assertIn("IMPLEMENTATION_FIDELITY_MISSING", self.codes(report))
+
+    def test_design_stage_rejects_stale_react_source(self) -> None:
+        source = self.root / "visual-workbench" / "boards" / "DepthBoard.tsx"
+        source.write_text(source.read_text(encoding="utf-8") + "\n", encoding="utf-8")
+        report = self.validate(stage="design")
+        self.assertIn("IMPLEMENTATION_SOURCE_STALE", self.codes(report))
+
+    def test_design_stage_requires_visual_evidence_source_trace(self) -> None:
+        acceptance = self.design_acceptance()
+        acceptance["visual_evidence"][0].pop("render_source_ref")
+        self.write_design_acceptance(acceptance)
+        report = self.validate(stage="design")
+        self.assertIn("VISUAL_SOURCE_TRACE_MISSING", self.codes(report))
+
     def test_design_stage_rejects_stale_bound_source(self) -> None:
         prd = self.root / "02-prd.md"
         prd.write_text(prd.read_text(encoding="utf-8") + "\nchanged\n", encoding="utf-8")

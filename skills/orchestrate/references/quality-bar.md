@@ -17,6 +17,7 @@ Use this to judge whether the plugin output is industry-usable.
 - It claims production design while still looking like a generic AI mockup.
 - It has design tokens that are not visible in components, state examples, or production screen mockups.
 - It uses a convenience HTML storyboard as if it were production-grade UI.
+- It approves a React-looking screen whose component board and product screens use different source implementations.
 - It produces one polished screen while the service's design system, state lab, and P0 surfaces remain abstract.
 - It leaves the user to ask for obvious missing surfaces, components, or states one by one.
 - It converts an unstable planning board into React before the screen contracts and P0 surface list are coherent.
@@ -41,7 +42,7 @@ Use this to judge whether the plugin output is industry-usable.
 - Art direction defines a product-specific visual thesis before high-fidelity UI.
 - Visual quality gate checks reference fidelity, AI-slop signals, state coverage, and mechanism visibility before production design is accepted.
 - Design system follows approved product behavior and has a named art direction tied to the audience and product loop.
-- A React design-system workbench renders tokens, component catalog, state lab, and P0 production screen mockups when visual quality or frontend portability is a known risk.
+- A dependency-light React workbench renders ComponentBoard, DepthBoard, FlowPreview, token modes, state lab, and every P0 surface from shared sources.
 - One high-risk screen may receive an additional React high-fidelity specimen after the workbench, but it is not a substitute for the workbench.
 - Backend systems brief states product-level responsibilities, data categories, lifecycle, permissions, and high-risk invariants without deciding schema or API.
 - Prototype testing uses concrete tasks and screenshots to verify comprehension and flow gates.

@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.1",
+  "schema_version": "1.2",
   "status": "user-approved",
   "approval": {
     "kind": "explicit-user",
@@ -38,6 +38,32 @@
     "04.45-design-critique.md": "8d7d1f2681a9bc892b7b95851179462b96cdd38fe7a26bd2d3f6ae2ff49de019",
     "04.5-feasibility-review.md": "53c09e0d97d8431564b061df1e935614b5f98a60382c9636780b7af4ca081622"
   },
+  "visual_implementation": {
+    "mode": "portable-react",
+    "source_scope": "planning",
+    "data_mode": "fixture-only",
+    "shares_components_with_target": true,
+    "component_board": "visual-workbench/boards/ComponentBoard.tsx",
+    "depth_board": "visual-workbench/boards/DepthBoard.tsx",
+    "flow_preview": "visual-workbench/FlowPreview.tsx",
+    "token_source_refs": [
+      "visual-workbench/tokens.css"
+    ],
+    "component_source_refs": [
+      "visual-workbench/components/PrimaryButton.tsx"
+    ],
+    "screen_source_refs": [
+      "visual-workbench/boards/DepthBoard.tsx",
+      "visual-workbench/FlowPreview.tsx"
+    ],
+    "source_hashes": {
+      "visual-workbench/tokens.css": "86dcd303ca9fdb3f9414a9912b7e6b9a9d83355b8ef96bb1e553efaa9b644101",
+      "visual-workbench/components/PrimaryButton.tsx": "0ede649c4c874b51cfcf6e2c824c101d73f3103f1b7bce4208fb9ea47c52c40e",
+      "visual-workbench/boards/ComponentBoard.tsx": "d2d24c40696cc3953b46ea93aecf45a976e9603552fc688ae28a3ef6175bb2ae",
+      "visual-workbench/boards/DepthBoard.tsx": "c04ebd771914cd636ed04e3f9af4e44da61bbcf5d5686922a16d3498e3621c5c",
+      "visual-workbench/FlowPreview.tsx": "c15c041fe4aefd69b071e2d2d9fab636310e157ccf053f847f25c66cd6160c23"
+    }
+  },
   "component_contracts": [
     {
       "id": "primary-button",
@@ -46,6 +72,7 @@
       "states": ["default", "focus", "pending", "disabled"],
       "token_refs": ["color.action.primary", "space.control.inline", "radius.control"],
       "accessibility": "Keyboard activation, visible focus, and pending announcement.",
+      "source_ref": "visual-workbench/components/PrimaryButton.tsx",
       "evidence": {
         "file": "screenshots/component-button.svg",
         "sha256": "9c1ee95ae51f84ca2d333d403007bf6d2406f7df03b7e9b4378fc9e944f1ce71"
@@ -62,7 +89,8 @@
       "state_ids": ["home-loading"],
       "component_ids": ["primary-button"],
       "visual_gate": "pass",
-      "review_round_id": "round-2"
+      "review_round_id": "round-2",
+      "render_source_ref": "visual-workbench/boards/DepthBoard.tsx"
     },
     {
       "id": "home-desktop",
@@ -73,7 +101,8 @@
       "state_ids": ["home-loading"],
       "component_ids": ["primary-button"],
       "visual_gate": "pass",
-      "review_round_id": "round-2"
+      "review_round_id": "round-2",
+      "render_source_ref": "visual-workbench/boards/DepthBoard.tsx"
     },
     {
       "id": "detail-mobile",
@@ -84,7 +113,8 @@
       "state_ids": ["detail-error"],
       "component_ids": ["primary-button"],
       "visual_gate": "pass",
-      "review_round_id": "round-2"
+      "review_round_id": "round-2",
+      "render_source_ref": "visual-workbench/boards/DepthBoard.tsx"
     },
     {
       "id": "detail-desktop",
@@ -95,7 +125,8 @@
       "state_ids": ["detail-error"],
       "component_ids": ["primary-button"],
       "visual_gate": "pass",
-      "review_round_id": "round-2"
+      "review_round_id": "round-2",
+      "render_source_ref": "visual-workbench/boards/DepthBoard.tsx"
     }
   ],
   "review_rounds": [

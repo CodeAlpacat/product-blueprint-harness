@@ -994,8 +994,8 @@ class Validator:
         acceptance = self.design_acceptance
         if not acceptance:
             return
-        if acceptance.get("schema_version") != "1.1":
-            self.add("UNSUPPORTED_DESIGN_ACCEPTANCE_VERSION", "schema_version must be 1.1.", "05-design-acceptance.json", "design-acceptance")
+        if acceptance.get("schema_version") != "1.2":
+            self.add("UNSUPPORTED_DESIGN_ACCEPTANCE_VERSION", "schema_version must be 1.2.", "05-design-acceptance.json", "design-acceptance")
         if acceptance.get("status") != "user-approved":
             self.add("DESIGN_NOT_APPROVED", "Design remains blocked until the user explicitly approves the current all-P0 evidence.", "status", "design-acceptance")
         approval = acceptance.get("approval")
@@ -1025,6 +1025,69 @@ class Validator:
             if expected != actual:
                 self.add("DESIGN_BASELINE_STALE", f"Bound source changed after design approval: {relative}.", f"source_hashes.{relative}", "design-acceptance")
 
+        visual_implementation = acceptance.get("visual_implementation")
+        visual_source_hashes: dict[str, Any] = {}
+        visual_source_refs: set[str] = set()
+        component_source_refs: set[str] = set()
+        screen_source_refs: set[str] = set()
+        if not isinstance(visual_implementation, dict):
+            self.add("IMPLEMENTATION_FIDELITY_MISSING", "visual_implementation must describe the React design baseline.", "visual_implementation", "design-acceptance")
+        else:
+            mode = visual_implementation.get("mode")
+            source_scope = visual_implementation.get("source_scope")
+            if mode not in {"existing-app", "portable-react"}:
+                self.add("IMPLEMENTATION_FIDELITY_INVALID", "mode must be existing-app or portable-react.", "visual_implementation.mode", "design-acceptance")
+            if source_scope not in {"planning", "repository"}:
+                self.add("IMPLEMENTATION_FIDELITY_INVALID", "source_scope must be planning or repository.", "visual_implementation.source_scope", "design-acceptance")
+            if mode == "portable-react" and source_scope != "planning":
+                self.add("IMPLEMENTATION_FIDELITY_INVALID", "portable-react sources must live inside the planning folder.", "visual_implementation.source_scope", "design-acceptance")
+            if visual_implementation.get("data_mode") != "fixture-only":
+                self.add("IMPLEMENTATION_FIDELITY_INVALID", "Visual approval must use fixture-only data before API/DB wiring.", "visual_implementation.data_mode", "design-acceptance")
+            if visual_implementation.get("shares_components_with_target") is not True:
+                self.add("IMPLEMENTATION_FIDELITY_INVALID", "Boards and target screens must share the same React component sources.", "visual_implementation.shares_components_with_target", "design-acceptance")
+
+            visual_source_hashes_value = visual_implementation.get("source_hashes")
+            if not isinstance(visual_source_hashes_value, dict) or not visual_source_hashes_value:
+                self.add("IMPLEMENTATION_SOURCE_STALE", "visual_implementation.source_hashes must bind React/CSS sources.", "visual_implementation.source_hashes", "design-acceptance")
+            else:
+                visual_source_hashes = visual_source_hashes_value
+
+            for key in ("component_board", "depth_board", "flow_preview"):
+                ref = visual_implementation.get(key)
+                if not self._meaningful(ref):
+                    self.add("IMPLEMENTATION_FIDELITY_MISSING", f"{key} is required.", f"visual_implementation.{key}", "design-acceptance")
+                else:
+                    visual_source_refs.add(ref)
+
+            token_source_refs: set[str] = set()
+            for key, target in (("token_source_refs", token_source_refs), ("component_source_refs", component_source_refs), ("screen_source_refs", screen_source_refs)):
+                refs = visual_implementation.get(key)
+                if not isinstance(refs, list) or not refs or not all(self._meaningful(ref) for ref in refs):
+                    self.add("IMPLEMENTATION_FIDELITY_MISSING", f"{key} needs at least one source ref.", f"visual_implementation.{key}", "design-acceptance")
+                else:
+                    target.update(refs)
+                    visual_source_refs.update(refs)
+
+            source_root = self.root
+            if source_scope == "repository":
+                source_root = next((candidate for candidate in (self.root, *self.root.parents) if (candidate / ".git").exists()), self.root)
+                if source_root == self.root and not (self.root / ".git").exists():
+                    self.add("IMPLEMENTATION_SOURCE_STALE", "Could not locate a repository root for repository-scoped React sources.", "visual_implementation.source_scope", "design-acceptance")
+            for ref in sorted(visual_source_refs):
+                candidate = (source_root / ref).resolve()
+                try:
+                    candidate.relative_to(source_root)
+                except ValueError:
+                    self.add("IMPLEMENTATION_SOURCE_OUTSIDE_SCOPE", f"React source escapes {source_scope} scope: {ref}", f"visual_implementation.source_hashes.{ref}", "design-acceptance")
+                    continue
+                expected = visual_source_hashes.get(ref)
+                if not candidate.is_file() or not self._meaningful(expected):
+                    self.add("IMPLEMENTATION_SOURCE_STALE", f"Missing bound React source: {ref}", f"visual_implementation.source_hashes.{ref}", "design-acceptance")
+                    continue
+                actual = hashlib.sha256(candidate.read_bytes()).hexdigest()
+                if expected != actual:
+                    self.add("IMPLEMENTATION_SOURCE_STALE", f"React source changed after visual approval: {ref}", f"visual_implementation.source_hashes.{ref}", "design-acceptance")
+
         component_contracts = self._acceptance_index("component_contracts")
         for component_id, component in component_contracts.items():
             path = f"component_contracts.{component_id}"
@@ -1034,6 +1097,8 @@ class Validator:
             for key in ("variants", "states", "token_refs"):
                 if not isinstance(component.get(key), list) or not component.get(key):
                     self.add("COMPONENT_CONTRACT_INCOMPLETE", f"{key} needs at least one item.", f"{path}.{key}", "design-acceptance")
+            if component.get("source_ref") not in component_source_refs:
+                self.add("COMPONENT_SOURCE_TRACE_MISSING", "Component contract must reference a bound React component source.", f"{path}.source_ref", "design-acceptance")
             self._validate_hashed_visual(component.get("evidence"), f"{path}.evidence", "COMPONENT_EVIDENCE_STALE")
 
         visual_rows = self._acceptance_index("visual_evidence")
@@ -1060,6 +1125,8 @@ class Validator:
                 self.add("VISUAL_GATE_NOT_PASSED", "Every P0 visual evidence row must pass the visual gate.", f"{path}.visual_gate", "visual-quality-gate")
             if row.get("review_round_id") not in review_rounds:
                 self.add("DESIGN_REVIEW_EVIDENCE_MISSING", "Visual evidence must belong to a recorded review round.", f"{path}.review_round_id", "design-acceptance")
+            if row.get("render_source_ref") not in screen_source_refs and row.get("render_source_ref") not in visual_source_refs:
+                self.add("VISUAL_SOURCE_TRACE_MISSING", "Visual evidence must reference a bound React screen/board source.", f"{path}.render_source_ref", "design-acceptance")
             component_ids = row.get("component_ids")
             if not isinstance(component_ids, list) or not component_ids:
                 self.add("COMPONENT_TRACE_MISSING", "Visual evidence needs component_ids.", f"{path}.component_ids", "design-acceptance")

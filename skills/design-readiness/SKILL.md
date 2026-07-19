@@ -13,7 +13,7 @@ Use the validator instead of asking the producing agent whether its own work is 
 |---|---|---|
 | `contract` | confirmed personas, requirements, entry points, and service-graph coverage | `product_contract_ready` |
 | `prototype` | contract plus DOM wiring and current browser transition/effect/state proof | `prototype_ready` |
-| `design` | prototype plus complete P0 surface×viewport×state evidence, component contracts, mental-model review, developer-lens feasibility coverage, absorbed constraints, and explicit current user approval | `design_accepted` |
+| `design` | prototype plus hashed implementation-fidelity React sources, shared component/depth/flow boards, complete P0 surface×viewport×state evidence, component contracts, mental-model review, feasibility coverage, and explicit approval | `design_accepted` |
 | `handoff` | accepted design plus a product/design handoff that preserves behavior, state, constraints, and open limitations without choosing implementation architecture | `design_handoff_ready`, `ready_for_technical_design` |
 
 Lite never sets these dimensions true.

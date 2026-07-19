@@ -1,7 +1,7 @@
 {
   "name": "product-blueprint",
   "version": "0.4.0",
-  "description": "Guided product/design definition workflow for Claude Code: turns ideas into confirmed mental models, fully wired screen/action/state contracts, clickable whole-service prototypes, production visual evidence, developer-lens feasibility consultation, explicit user design approval, and honest design handoff without claiming implementation readiness.",
+  "description": "Guided product/design workflow for Claude Code: turns ideas into branded Depth-based screens, reusable React component/state boards, complete fixture-data flows, feasibility-checked visual evidence, explicit approval, and honest handoff before technical architecture.",
   "author": {
     "name": "CodeAlpacat",
     "url": "https://github.com/CodeAlpacat"

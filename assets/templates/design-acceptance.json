@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.1",
+  "schema_version": "1.2",
   "status": "pending",
   "approval": {
     "kind": "explicit-user",
@@ -11,6 +11,19 @@
     "feasibility_sha256": ""
   },
   "source_hashes": {},
+  "visual_implementation": {
+    "mode": "",
+    "source_scope": "",
+    "data_mode": "fixture-only",
+    "shares_components_with_target": false,
+    "component_board": "",
+    "depth_board": "",
+    "flow_preview": "",
+    "token_source_refs": [],
+    "component_source_refs": [],
+    "screen_source_refs": [],
+    "source_hashes": {}
+  },
   "component_contracts": [],
   "visual_evidence": [],
   "review_rounds": [],

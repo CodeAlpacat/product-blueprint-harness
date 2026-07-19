@@ -22,7 +22,7 @@ A senior cross-functional team (PM, researcher, brand strategist, product design
 | Feasibility checkpoint | The engineer in the room saying "that costs three sprints" BEFORE mockups promise it |
 | Storyboard | Flow review on a wall — the whole journey visible at once |
 | Art direction (measured) | Art director handing a spec, not adjectives |
-| Design system + workbench + demo | Design-systems team: tokens, components, states, all P0 screens — not one hero shot |
+| Design system + React boards + flow preview | Design-systems team: branded tokens, reusable components, states, Depth screens, and all P0 flows from one source — not one hero shot |
 | Adversarial visual gate | The critique where a fresh pair of eyes fails your favorite screen |
 | Risk register | Legal/policy reviewer who reads it before launch, not after the incident |
 | Engineering handoff | The handoff meeting where developers can start architecting, not start asking |
@@ -31,6 +31,7 @@ A senior cross-functional team (PM, researcher, brand strategist, product design
 
 - **The waterfall skip**: jumping to high-fidelity screens with no contracts under them. Screens look done, so nobody re-opens scope; the product ossifies around the first pretty mockup.
 - **The single-voice collapse**: one generator grading its own homework. Every gate in this harness that matters is either measurable (numbers) or fresh-context (a critic who didn't build it). Self-graded adjectives are treated as no gate at all.
+- **The prototype rewrite**: approving standalone HTML, then rebuilding components and layouts in the app. The React component/state board and Depth screens must use the same sources, so later work attaches behavior and data instead of redesigning the UI.
 
 ## When to compress
 

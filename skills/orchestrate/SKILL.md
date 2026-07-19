@@ -1,6 +1,6 @@
 ---
 name: orchestrate
-description: End-to-end pre-development product planning orchestration from vague idea and optional reference services to research, reference deconstruction, parallel concepts, positioning and brand naming, mechanism contracts, PRD, screen contracts, feasibility checkpoint, storyboard, art direction, visual quality gate, UX writing, backend systems brief, design system, workbench, high-fidelity screen, clickable demo, prototype test, design critique, risk register, feasibility review, and engineering handoff. Supports Lite/Standard/Deep modes and run-through pacing, and always ends each response with the recommended next step. Use when the user wants to plan a new product, structure an app idea, analyze references, run staged planning with expert agents, or create a product planning workflow before technical design and implementation.
+description: End-to-end pre-development product planning and design orchestration from research and PRD through brand, Depth-based screens, reusable React design components, fixture-data prototype flows, feasibility, explicit design acceptance, and handoff. Use when the user wants a product blueprint whose final UX can be implemented without redesign drift, including existing-product expansion.
 ---
 
 # Product Blueprint Orchestrate
@@ -38,7 +38,8 @@ Product logic in this workflow is strong; the historical failure was visual craf
 
 - `${CLAUDE_PLUGIN_ROOT}/references/anti-slop-doctrine.md` — why slop happens, the S1–S14 signature taxonomy + fixes, the shadcn-sameness defense, the two survival tests.
 - `${CLAUDE_PLUGIN_ROOT}/references/measured-design-spec.md` — art direction must output numbers (type ramp, OKLCH roles, grid, spacing), not adjectives.
-- `${CLAUDE_PLUGIN_ROOT}/references/token-substrate.md` — build on shadcn/Radix with the default skin stripped and product OKLCH tokens applied; never raw divs, never default shadcn.
+- `${CLAUDE_PLUGIN_ROOT}/references/token-substrate.md` — dependency-light React components + CSS tokens for greenfield; actual substrate reuse for existing products; one source shared by boards and screens.
+- `${CLAUDE_PLUGIN_ROOT}/references/figma-design-process.md` — Figma-informed pages/sections, component variants/properties, modes, named prototype flows, and AI-assisted exploration mapped to React.
 - `${CLAUDE_PLUGIN_ROOT}/references/craft-loop.md` — layered passes (structure→layout→type→color→imagery→polish→distinctiveness), ceiling-on-one-screen-first, full-viewport rendering.
 - `${CLAUDE_PLUGIN_ROOT}/references/adversarial-visual-gate.md` — fresh-critic + measurable checks + loop-until-clean.
 
@@ -51,7 +52,7 @@ Product logic in this workflow is strong; the historical failure was visual craf
 A solo founder reviews **visually**, not by opening every `.md`. Producing a wall of markdown with no visual review surface is a failure mode, even if the markdown is excellent. Enforce:
 
 - **After every phase, update `00-review-dashboard.html`** via `product-blueprint:decision-dashboard`. This is not optional and not "when asked" — it is part of finishing a phase. Never leave the dashboard as the init stub while shipping 10+ markdown files. If you produced artifacts and did not update the dashboard, the phase is not done.
-- **The dashboard is THE review surface.** It answers, in <30s: where are we, what are the 2–4 things to look at now (with ★), what decisions are pending, and what each artifact is for. Markdown is the detail SoT; the founder should never be told "read these 20 files."
+- **The dashboard is the review index.** It answers, in <30s: where are we, what are the 2–4 things to inspect now, and what decisions are pending. Final visual review happens in the rendered React ComponentBoard, DepthBoard, and FlowPreview; markdown remains detail SoT.
 - **Visuals are first-class deliverables, not decoration.** The review layer is the dashboard + the storyboard flow board + screen mockups. When the user says "there are too many documents / I don't know what to look at / I don't read them one by one," that is a signal the visual review layer is missing — build/repair it, do not answer with more prose.
 - **Visualize decisions and expected outcomes**, not just status: a decision→implication map and a flow board let the founder *see* what the plan produces without reading contracts. Prefer a legible flow/IA diagram over tiny pixel mockups (tiny tiled frames destroy fidelity — that is the storyboard's flow-contract role, distinct from the workbench's full-fidelity role).
 
@@ -79,6 +80,8 @@ Start with a short intake if the request is vague. Ask at most 5 questions at on
 
 Proceed without asking only when the missing information is non-blocking and reversible. In that case, write an `Assumptions` section and mark what should be confirmed later.
 
+**Visual-reference gate**: before high-fidelity design, use supplied URLs/screenshots. If none were supplied, ask for one. If the user has none, run a short taste interview (audience, task, desired/undesired feel, must-avoid patterns, release viewports), show 2–3 distinct directions, and lock one. Do not silently generate a single preferred style.
+
 ## Artifact Maturity Bar
 
 `orchestrate` must not behave like a rough outline generator when the user asks for a standard or deep planning package. The first complete pass should be reviewable by a founder, product designer, and engineer even if it is not final.
@@ -87,7 +90,7 @@ Default depth (see the mode table in "How To Run"):
 
 - If the user says "쭉 진행", "orchestrate부터", "전체 기획", "프로덕션급", or gives a reference service for benchmarking, treat the request as `standard` unless they explicitly ask for a quick sketch. "쭉 진행" additionally enables run-through pacing.
 - `lite` stops at brief, PRD, light screen contracts, and storyboard — but never skips the decision log, user decision gates, or assumption labels.
-- `standard` must produce the full product-flow package, positioning/brand, a readable storyboard, design-system + workbench, and the clickable demo before engineering handoff.
+- `standard` must produce the full product-flow package, positioning/brand, a readable storyboard, reusable React design workbench, and complete FlowPreview before handoff. A portable HTML behavior demo may accompany it but is not the visual baseline.
 - `deep` must additionally include richer reference evidence, more alternative concepts, stronger state coverage, visual critiques, the full risk register, feasibility options, and handoff risks.
 
 Minimum standard/deep completeness:
@@ -95,7 +98,7 @@ Minimum standard/deep completeness:
 - Include all obvious core surfaces for the product category. For discovery-heavy products, search is a default surface unless explicitly scoped out.
 - Wire each major screen to previous and next screens with storyboard annotations outside the mocked product UI. A frame without entry/exit is incomplete; a frame that puts planning labels inside the app screen is also incomplete.
 - Storyboard frames must be visually legible as screen frames, not blurred wireframes. Use reference screenshots, existing product imagery, or generated bitmap assets for character/product/place visuals when the product domain depends on visual appeal. Storyboards can be HTML because they are flow/IA contracts, not final UI.
-- For production-grade design expectations, do not stop at `04.3-design-system.md` or one polished screen. Create a React design-system workbench with token swatches, component catalog, state lab, and P0 production screen mockups.
+- For production-grade design expectations, do not stop at `04.3-design-system.md`, HTML, or one polished screen. Create reusable React tokens/components plus ComponentBoard, DepthBoard, FlowPreview, and all-P0 browser evidence.
 - A high-fidelity screen specimen is a pixel-level pass for one screen, not a replacement for the workbench.
 - Separate first-time, returning, empty, locked/safety, paid, and error states when relevant.
 - Include a `Known Missing / Not Yet Explored` section instead of hiding gaps.
@@ -211,7 +214,7 @@ At the end of every phase, include:
 Lite mode runs phases 1, 2, 7, 8, 8.5, 10 only (with the dashboard). Standard/Deep run all.
 
 1. **Brief**: Define target user, job, core loop, reference services, constraints, and unknowns.
-2. **Research Or Ideation**: If reference products exist, use `product-blueprint:research`. If not, use `product-blueprint:ideation` with assumptions clearly labeled.
+2. **Research Or Ideation**: If reference products exist, use `product-blueprint:research`. If none are supplied, request URL/image; if the user has none, use `product-blueprint:ideation` plus the visual-reference interview and direction comparison.
 3. **Reference Deconstruction**: Use `product-blueprint:reference-deconstruction` when references exist. Turn screenshots into product principles, gates, and anti-copy rules.
 4. **Parallel Concepts**: Use `product-blueprint:parallel-concepts`. Explore multiple product/screen directions before committing to one. Concepts must differ at screen/mechanic level with a representative visual each — a non-reader must be able to choose.
 5. **Positioning & Brand**: Use `product-blueprint:positioning-brand`. Positioning statement, name (taste-first rounds → availability signals), voice one-pager, mascot/wordmark direction. Runs BEFORE art direction because the name, voice, and mascot constrain the visual world.
@@ -220,17 +223,17 @@ Lite mode runs phases 1, 2, 7, 8, 8.5, 10 only (with the dashboard). Standard/De
 8. **Screen Contracts**: Use `product-blueprint:screen-contract`. Define each priority screen's purpose, allowed actions, forbidden shortcuts, states, entry paths, and exit paths with stable IDs.
 8.5. **Service Contract Gate**: Use `product-blueprint:service-contract`. Bind stories, surfaces, actions, required states, product-level frontend/backend operation ownership, AI-assist review loops, and journeys in `02.6-service-manifest.json`. Run `design-readiness` at `contract` stage; no storyboard on findings.
 9. **Feasibility Checkpoint (lightweight, BEFORE any visual design)**: Use `product-blueprint:feasibility-review` in checkpoint mode. Every mechanism a P0 screen depends on gets a verdict — feasible / conditional (state the condition) / infeasible — so mockups never promise the impossible. Output `02.7-feasibility-checkpoint.md`. An `infeasible` verdict goes back to the user BEFORE the storyboard renders that screen. This is the "engineer in the room" moment; do not defer it to the full feasibility review (phase 22).
-10. **Storyboard Board**: Use `product-blueprint:storyboard`. Visualize flows screen-by-screen with evidence, state, transition wiring, and mechanism surfaces as a Figma-like board. This is the default visual planning artifact; do not replace it with a rough clickable demo.
+10. **Storyboard / Depth Board**: Use `product-blueprint:storyboard`. Organize global shell, Depth 1, Depth 2, overlays, named flow starts, states, and evidence as a Figma-informed board. This locks IA and flow, not final pixels.
 11. **Art Direction Brief**: Use `product-blueprint:art-direction-brief`. Define product world, design thesis, imagery, typography, color roles, signature element, and anti-aesthetic — consuming the brand lock (wordmark face, mascot palette rule, voice).
 12. **Visual Quality Gate**: Use `product-blueprint:visual-quality-gate` before accepting any visual direction. Fail generic AI-slop, flow-inaccurate, unreadable, or state-poor design artifacts.
 13. **UX Writing**: Use `product-blueprint:ux-writing`. Microcopy sheet (labels, empties, errors, loading, confirmations, CTA verbs) for every P0 screen. Downstream mockups use these strings verbatim.
 14. **Backend Systems Brief**: Use `product-blueprint:backend-systems-brief` for memory, judging, ranking, billing, permissions, safety, creator publishing, and other backend/system concerns before technical architecture.
 15. **Design System / Visual Direction**: Use `product-blueprint:design-system` only after storyboard, art direction, and visual quality gate are stable. This creates a production design brief, not frontend implementation or frontend architecture.
-16. **Design System Workbench**: Use `product-blueprint:design-system-workbench` to render tokens, component catalog, state lab, and P0 production screen mockups. **All-P0 coverage matrix is the exit gate**: every P0 screen from the contracts → a workbench/demo mockup → visual-gate pass. A missing row fails the phase; "propagated from the ceiling" without a rendered artifact is not coverage.
+16. **Implementation-fidelity React Workbench**: Use `product-blueprint:design-system-workbench`. Existing products extend their actual token/component sources; greenfield creates dependency-light React sources. Render ComponentBoard, DepthBoard, FlowPreview, modes, and all P0 screens from the same components. **All-P0 coverage matrix is the exit gate**; HTML evidence cannot satisfy it.
 17. **High-Fidelity Screen Specimen**: Use `product-blueprint:high-fidelity-screen` only when one screen from the workbench needs an additional pixel-level pass. This is the ceiling screen, not a substitute for all-P0 coverage.
-18. **Clickable Demo**: Use `product-blueprint:clickable-demo`. Single-file HTML: every P0 screen, real transitions matching the contract map (script-verified), board mode for Figma-like review, rendered non-happy-states sample. This is the founder's primary review artifact.
+18. **Portable Behavior Demo**: Use `product-blueprint:clickable-demo` when a file-only walkthrough or deterministic DOM transition audit adds value. It validates flow/state/copy only and is never the visual or component-reuse baseline. The React FlowPreview is the primary product experience review.
 18.5. **Prototype Contract Gate**: Use `product-blueprint:design-readiness` at `prototype` stage. DOM surface/action/state IDs, transitions/effects, reachability, responsive evidence, and dead controls must pass before task testing.
-19. **Prototype Test**: Use `product-blueprint:prototype-test` for the manifest journeys against the demo/workbench. Distinguish heuristic self-walkthrough (always) from a real-user protocol (recommend when stakes justify it); the loop stays labeled "실사용자 미검증" until real users run it. Update manifest evidence and rerun prototype stage.
+19. **Prototype Test**: Use `product-blueprint:prototype-test` for manifest journeys against the React FlowPreview; cross-check the portable HTML only when it exists. Distinguish heuristic walkthrough from real-user evidence.
 20. **Design Critique**: Use `product-blueprint:design-critique` to review product intent, UX flow, visual quality, states, system trust, component reuse, and handoff readiness.
 21. **Risk Register**: Use `product-blueprint:risk-register` when the product touches adult content, minors, payments, UGC, PII, or AI-generated content (mandatory then; recommended otherwise). P0 risks need mitigations before handoff.
 22. **Feasibility Consultation (full)**: Use `product-blueprint:feasibility-review` as the final developer lens on every P0 surface/action/operation/journey. Reconcile phase-9 verdicts. `infeasible` blocks; every conditional product-visible constraint routes back into design and invalidates downstream evidence.
@@ -270,9 +273,10 @@ Run these lenses inline by default. Use subagents only when the environment has 
 - No single concept lock-in before at least two alternatives have been considered, unless the user explicitly asks for speed.
 - No storyboard for AI/system-judged behavior before an experience mechanism contract exists.
 - No high-fidelity design before PRD, screen contracts, storyboard, art direction, and visual-quality gate are coherent.
-- No design-system claim before tokens are shown on components and P0 screen mockups. For production-grade visual direction, create a React design-system workbench instead of treating the HTML storyboard or markdown token table as the visual ceiling.
+- No design-system claim before tokens are shown on reusable React components, state boards, Depth screens, and P0 flows.
 - No production design claim without screenshot verification and critique against AI-slop signals.
-- No React conversion of the entire planning board by default. Convert design-system foundations, reusable components, state lab, and P0 production screen mockups into a React workbench after the design system exists.
+- No separate mockup component tree. ComponentBoard, DepthBoard, FlowPreview, and later implementation must share React sources.
+- No visual acceptance from standalone HTML, static images without source refs, or a board that cannot prove component reuse.
 - No engineering handoff readiness if visual quality was a user concern and the workbench is missing, unrendered, or screenshot-untested.
 - No backend architecture during default Product Blueprint workflow. Create a backend systems brief first.
 - No API/DB design during the default Product Blueprint workflow. Stop at engineering handoff unless the user explicitly asks for technical planning.
@@ -312,10 +316,10 @@ Create or update a folder such as `docs/product-planning/<slug>/` with:
 - `04.2-backend-systems-brief.md`
 - `04.3-design-system.md` or `.html`
 - `04.32-design-system-workbench.md`
-- `prototypes/<product>-design-system-workbench.html` or equivalent isolated workbench
+- `visual-workbench/` dependency-light React source package, or existing-app repo-relative component/preview refs
 - `tokens/` files when token export is useful and values are stable enough
 - `04.35-high-fidelity-screen.md` plus optional single-screen specimen only when one screen needs an extra pixel pass
-- `04.36-clickable-demo.md` + `prototypes/<product>-demo.html`
+- optional `04.36-clickable-demo.md` + `prototypes/<product>-demo.html` for portable behavior audit
 - `04.4-prototype-test.md`
 - `04.45-design-critique.md`
 - `04.55-risk-register.md` when the domain makes it mandatory

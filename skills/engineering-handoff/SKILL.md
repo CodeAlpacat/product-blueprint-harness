@@ -39,7 +39,7 @@ Use this as the final default phase of Product Blueprint. The filename remains `
    A handoff without this section loses the behavior the user approved. Prose questions belong in section 9, not here.
 9. Open questions for engineering, product, design, legal/safety, and data/AI.
 10. Evidence links: screenshots, storyboard frames, and mechanism examples.
-11. High-fidelity visual evidence: design-system workbench screenshots, clickable-demo link, token/component/state coverage, and optional single-screen pixel pass when the product requires production-grade UI confidence before technical design.
+11. High-fidelity visual evidence: reusable React source manifest, ComponentBoard/DepthBoard/FlowPreview refs, token/component/state coverage, release-viewport screenshots, optional HTML behavior-demo link, and optional ceiling-screen pass.
 12. Risk register status: P0 risks and their mitigations (from `04.55-risk-register.md` when it exists); handoff is not ready with unmitigated P0 risks.
 13. Design-handoff completeness checklist.
 14. **Journey continuity matrix**: journey-by-journey table with journey IDs, entry points, surfaces, actions, states, operations, recovery, and accepted feasibility constraints. This proves that the approved flow does not break between screens; it is not an implementation sequence.

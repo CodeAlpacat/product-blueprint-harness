@@ -5,6 +5,7 @@
 ## Required proof
 
 - current hashes for every implementation-bearing product/design source;
+- an implementation-fidelity React manifest: existing-app or portable-react mode, repository/planning scope, fixture-only data, shared target components, component/depth/flow board entries, token/component/screen source refs, and current hashes;
 - every non-background P0 surface at every release viewport;
 - every required state visible in each surface/viewport evidence row;
 - stable component IDs with variants, states, tokens, accessibility behavior, and current visual evidence;
@@ -25,3 +26,5 @@
 ## Change cascade
 
 Any source, feasibility verdict, or evidence mismatch makes the baseline stale. Fix the owning artifact, regenerate browser/visual evidence, repeat review, and request approval again. Never update a stale hash merely to restore green status.
+
+Standalone HTML does not qualify as implementation-bearing visual evidence. Every component contract and visual evidence row references the React source that produced it.
