@@ -1,180 +1,106 @@
-# Product Blueprint Harness
+# Product Blueprint
 
-Cross-agent plugin for pre-development product planning and production-grade visual design. Runs in **both Codex and Claude Code**.
+아이디어를 **검토 가능한 제품 기획 패키지**로 만드는 Codex / Claude Code 플러그인입니다.
 
-## Quickstart (60 seconds)
+제품 컨셉, 브랜드 방향, PRD, 화면 역할과 흐름을 함께 정리하고 여러 관점에서 빠진 내용을 점검합니다. 기본 과정은 디자이너가 탐색을 시작할 수 있는 전달 문서에서 끝납니다. 완성 화면과 프로토타입은 자동으로 만들지 않습니다.
 
-1. Install (see Install below).
-2. In a new or empty project folder, just **describe your idea and name the plugin** — there is no slash command; skills auto-trigger:
+![기획과 디자인 제작을 분리한 Product Blueprint 흐름](assets/product-blueprint-workflow-ko.png)
 
-   > "product-blueprint로 내 아이디어 기획해줘: 러닝 기록·공유 모바일 웹앱을 만들고 싶어. 레퍼런스는 Strava."
+## 무엇을 해주나요?
 
-   or explicitly: "`product-blueprint:orchestrate`부터 시작해줘".
-3. Answer the short intake (max 5 questions). Pick a **mode**:
+- 아이디어와 레퍼런스를 바탕으로 서로 다른 제품 방향을 비교합니다.
+- 포지셔닝, 이름의 방향, 말투와 브랜드 원칙을 제품 경험에 연결합니다.
+- 첫 버전의 핵심 기능, 제외 범위, 사용자 흐름과 예외 상태를 PRD로 만듭니다.
+- 제품전략·사용자근거·브랜드·PRD·실현성·리스크 관점에서 교차점검합니다.
+- 주요 화면의 목적, 진입 경로, 행동, 상태와 복구 방식을 정리합니다.
+- 디자이너가 바로 시각 탐색을 시작할 수 있는 `03-design-brief.md`를 만듭니다.
 
-   | Mode | You get | Rough effort |
-   |---|---|---|
-   | **Lite** | brief → research/ideation → PRD → screen contracts + compact service manifest → storyboard + dashboard | one short session |
-   | **Standard** (default) | full pipeline: research → mechanisms/screens → service contract → design system → all-P0 clickable prototype → deterministic readiness → handoff | several sessions |
-   | **Deep** | Standard + richer evidence, risk register, stronger boundary/role coverage | multi-day |
+## 기본 진행 방식
 
-4. Want it hands-off? Say **"쭉 진행해"** — the orchestrator chains phases and only stops at the decisions that are genuinely yours (direction, brand, MVP scope, design acceptance, handoff). Every response ends with a `다음 단계` block: the recommended next skill, what you must decide, and where you are in the pipeline.
-5. Review visually, not by reading markdown: open `00-review-dashboard.html`, then the rendered React ComponentBoard, DepthBoard, and FlowPreview. The storyboard/HTML demo explain flow; `.md` files are detail SoT.
+1. 아이디어와 사용자를 짧게 정리합니다.
+2. 제품 컨셉과 브랜드 방향을 비교하고 사용자가 선택합니다.
+3. PRD를 작성한 뒤 여섯 관점으로 빠진 내용을 점검합니다.
+4. 사용자가 첫 버전 범위와 제품 정의를 확정합니다.
+5. 화면·흐름·상태를 정리하고 디자인 전달 문서를 만듭니다.
 
-Notes: artifact scaffolding uses `python3` if available (falls back to direct file creation if not). Interrupted sessions resume from `00-decision-log.md` — say "이어서 진행해" in the same folder; say "아트디렉션만 다시" to redo one phase and its downstream only.
+사용자가 직접 결정해야 하는 지점에서는 멈춥니다. 에이전트가 제품 방향이나 첫 버전 범위를 대신 승인하지 않습니다.
 
-This repository contains only the reusable plugin:
+## 빠르게 시작하기
 
-- `.claude-plugin/plugin.json` + `.claude-plugin/marketplace.json` (Claude Code)
-- `.codex-plugin/plugin.json` (Codex)
-- `skills/*/SKILL.md` (shared — same SKILL.md format on both hosts)
-- `references/*.md` (anti-slop craft doctrine — the visual quality spine)
-- `scripts/init_prd_project.py` + `scripts/validate_service_blueprint.py`
-- `assets/templates/storyboard-section.html`
+새 프로젝트에서 이렇게 요청하세요.
 
-It intentionally does not include any project-specific planning outputs, benchmark captures, or screenshots from dogfood runs.
+> product-blueprint로 러닝 기록·공유 모바일 웹앱을 기획해줘. 레퍼런스는 Strava야.
 
-## Anti-Slop Visual Craft Spine
+또는 스킬 이름을 직접 말할 수 있습니다.
 
-The planning/IA discipline was always strong; the weak point was visual output collapsing to AI slop that a self-graded gate passed. The `references/` doctrine fixes this structurally:
+> `product-blueprint:orchestrate`로 시작해줘.
 
-- `anti-slop-doctrine.md` — why slop happens (mode collapse to the training average), a named S1–S14 slop-signature taxonomy with fixes, the shadcn/component-library sameness defense, and the two survival tests.
-- `measured-design-spec.md` — art direction must resolve to numbers (type ramp, OKLCH color roles + contrast, grid, spacing), never adjectives.
-- `token-substrate.md` — dependency-light React + CSS tokens for greenfield, actual substrate reuse for existing products, and one component source shared by boards and screens.
-- `craft-loop.md` — layered craft passes, ceiling-on-one-screen-first, full-viewport rendering + screenshots.
-- `adversarial-visual-gate.md` — a fresh-context critic runs measurable checks and loops until clean; conditional is not pass.
+작업 중에는 `00-review-dashboard.html`을 먼저 보면 됩니다. 지금 확인할 내용과 필요한 결정을 한곳에 모아 보여줍니다. 중단했다면 같은 폴더에서 “이어서 진행해”라고 요청하세요.
 
-On Claude Code, the visual phases can additionally delegate pixel craft to an **external design-skill suite if you have it installed** — `impeccable` (Apache 2.0, based on Anthropic's `frontend-design` skill) and its companion skills (`craft`, `layout`, `typeset`, `colorize`, `distill`, `polish`, `bolder`, `critique`). **These are third-party skills, not authored by or bundled with this plugin** — install them separately if you want them. When they are absent, the `references/` doctrine above is self-sufficient: apply the craft passes by hand. Either way, this plugin owns product logic, IA, states, the measured spec, and the adversarial gate; the craft layer only owns pixels.
+## 기획 깊이
 
-## Purpose
+| 모드 | 적합한 상황 | 결과 |
+| --- | --- | --- |
+| Lite | 빠르게 방향을 확인할 때 | 핵심 컨셉·브랜드·PRD·주요 흐름·디자인 전달 문서 |
+| Standard | 실제 제품 기획의 기본값 | 근거와 교차점검을 포함한 전체 기획 패키지 |
+| Deep | 규제·비용·운영 위험이 크거나 새로운 제품 | 더 넓은 근거, 예외 상황, 실현성과 리스크 검토 |
 
-Product Blueprint guides an idea or reference product through:
+## 결과물
 
-- research and reference deconstruction
-- ideation and parallel concepts
-- positioning, naming (taste-first rounds + availability signals), brand voice, mascot direction
-- PRD, experience mechanisms, and screen contracts
-- a machine-readable service contract connecting stories, surfaces, actions, states, frontend feedback, backend/data ownership, and journeys
-- feasibility checkpoint BEFORE visual design (so mockups never promise the impossible)
-- storyboard visualization
-- Figma-informed page/section organization, component variants/properties, token modes, named flows, and AI-assisted direction exploration
-- art direction and adversarial visual quality gates (with an all-P0 coverage matrix)
-- UX writing / microcopy sheets
-- design-system planning, tokens, portable DESIGN.md, dependency-light React ComponentBoard/DepthBoard/FlowPreview, and browser evidence
-- reusable React component/state boards, Depth-level screens, fixture-data FlowPreview, optional high-fidelity ceiling screen, and a secondary HTML behavior audit
-- prototype testing (heuristic + real-user protocol) and design critique
-- backend systems briefing and risk register
-- feasibility review
-- engineering handoff with an Entity & State Contract developers can architect from
-- deterministic contract/prototype/handoff gates and a manifest-hash-bound readiness report, so documents cannot self-declare completion
+- 제품과 사용자를 설명하는 브리프
+- 비교된 제품 컨셉과 선택된 브랜드 방향
+- 첫 버전 범위와 제외 범위가 분명한 PRD
+- 여섯 관점의 교차점검 결과
+- 확정된 사용자·진입점·주요 여정
+- 화면, 행동, 상태와 서비스 책임 정리
+- 낮은 해상도의 흐름 보드
+- 시각 디자인을 위한 전달 문서
 
-The plugin is for planning before implementation. Frontend/backend technical architecture is a later handoff step, not the default starting point.
+이 결과는 좋은 제품 판단을 돕는 기획 기준선입니다. 시장성, 실제 사용자 수요, 상표 사용 가능성, 구현 성공을 보증하지는 않습니다.
 
-## Install
+## 디자인 제작은 선택 사항입니다
+
+화면 디자인과 프로토타입은 기획과 분리되어 있습니다. 사용자가 명시적으로 원할 때만 다음처럼 시작합니다.
+
+> `product-blueprint:design-production`으로 시각 디자인을 계속해줘.
+
+이 과정은 곧바로 모든 화면을 만들지 않습니다. 먼저 2~3개의 시각 방향을 비교하고, 대표 화면 하나를 다듬어 사용자의 피드백을 받은 뒤 나머지 화면과 프로토타입으로 확장합니다.
+
+전용 디자인 역량이나 충분한 레퍼런스가 없으면 그 한계를 밝힙니다. 생성된 화면을 곧바로 “완성된 디자인”으로 부르지 않습니다.
+
+## 설치
 
 ### Claude Code
-
-Add the repo as a plugin marketplace, then install the plugin:
 
 ```text
 /plugin marketplace add CodeAlpacat/product-blueprint-harness
 /plugin install product-blueprint@product-blueprint-harness
 ```
 
-Skills are auto-discovered from `skills/` and invoked as `product-blueprint:orchestrate`, `product-blueprint:art-direction-brief`, etc.
-
 ### Codex
-
-Clone and link it using your Codex plugin workflow:
 
 ```bash
 git clone https://github.com/CodeAlpacat/product-blueprint-harness.git
 ```
 
-## How the skills fit together
+저장소를 Codex 플러그인으로 연결하면 `skills/` 아래 스킬이 발견됩니다.
 
-`orchestrate` is the **router, not a gatekeeper**: it sequences phases, enforces gates, and writes the decision log — but every skill below is standalone-callable. You do not need a full orchestrate run to use one piece.
+## 더 자세한 문서
 
-Start a full run with:
+- [전체 기획 흐름](docs/workflow.md)
+- [검증 방식과 명령](docs/validation.md)
+- [선택형 디자인 제작 과정](docs/design-production.md)
+
+## 저장소 구조
 
 ```text
-product-blueprint:orchestrate
+assets/                          이미지와 템플릿
+docs/                            사용자·운영 문서
+references/                      품질과 계약 기준
+scripts/init_prd_project.py      기획 폴더 만들기
+scripts/validate_service_blueprint.py
+skills/*/SKILL.md                단계별 작성·검토 스킬
+tests/                           회귀 테스트
 ```
 
-### Skill map (pipeline order)
-
-| Stage | Skill | Owns (artifact) |
-|---|---|---|
-| Control | `orchestrate` | phase routing, gates, `00-decision-log.md` |
-| Control | `decision-dashboard` | `00-review-dashboard.html` (the visual review surface — refresh after every phase) |
-| Research | `research` / `ideation` | `01-reference-research.md` / `01-ideation.md` |
-| Research | `reference-deconstruction` | `01.5-reference-deconstruction.md` |
-| Concept | `parallel-concepts` | `01.6-parallel-concepts.md` (direction lock input) |
-| Brand | `positioning-brand` | `01.8-positioning-brand.md` (name, voice, mascot direction) |
-| Definition | `experience-mechanisms` | `02-mechanisms.md` (invisible behavior: memory, scoring, safety, paid) |
-| Definition | `prd` | `02-prd.md` (MVP lock input) |
-| Definition | `product-definition` | `02.1-product-definition.json` (confirmed personas, mental models, P0 requirements, entry points) |
-| Definition | `screen-contract` | `02.5-screen-contracts.md` (per-screen actions/states/wiring) |
-| Definition | `service-contract` | `02.6-service-manifest.json` (stable IDs, operations, journeys, evidence maturity) |
-| Gate | `design-readiness` | contract/prototype/design/handoff validation + `05-readiness-report.*` |
-| Definition | `feasibility-review` (checkpoint mode) | `02.7-feasibility-checkpoint.md` — BEFORE any visual design |
-| Existing assets | `feature-adoption` (optional) | adoption map when you already own a mature codebase |
-| Visual | `storyboard` | `03-storyboard.html` (flow board) |
-| Visual | `art-direction-brief` | `03.5-art-direction-brief.md` (measured spec, not adjectives) |
-| Visual | `visual-quality-gate` | `04.1-visual-quality-gate.md` (adversarial anti-slop gate) |
-| Visual | `ux-writing` | `03.7-ux-writing.md` (microcopy used verbatim downstream) |
-| Visual | `design-system` → `design-system-workbench` | `04.3-*` + reusable React tokens/components + ComponentBoard/DepthBoard/FlowPreview |
-| Visual | `high-fidelity-screen` | single ceiling-screen pixel pass |
-| Visual | `clickable-demo` | optional `prototypes/<product>-demo.html` (portable flow/state audit; never visual SoT) |
-| Assets | `art-production` (optional) | character/scene asset pipeline (prompt recipes, batch, curation board) |
-| Validation | `prototype-test`, `design-critique` | `04.4-*`, `04.45-*` |
-| Validation | `risk-register` | `04.55-risk-register.md` (mandatory for adult/minors/payments/UGC/PII/AI content) |
-| Validation | `feasibility-review` (full) | `04.5-feasibility-review.md` |
-| Acceptance | `design-acceptance` | `05-design-acceptance.json` (absorbed constraints + explicit current user approval) |
-| Handoff | `backend-systems-brief` | `04.2-backend-systems-brief.md` |
-| Handoff | `engineering-handoff` | compatibility-named `05-engineering-handoff.md` (accepted product/design contract, not implementation readiness) |
-| Post-handoff | `tech-plan` (opt-in only) | technical architecture — only when explicitly requested |
-
-### Improving one part mid-stream (partial use)
-
-Skills communicate through the numbered artifacts, with `00-decision-log.md` as shared state — so partial reruns are a first-class flow, not a hack:
-
-1. **Call the one skill you need** (in the planning folder). It reads its upstream artifacts and rewrites only its own.
-2. **Cascade downstream only**: after the rerun, update the artifacts that consume the changed one, farthest-upstream first, and leave the rest untouched. Saying "아트디렉션만 다시" to `orchestrate` does exactly this (its Phase 0 redo mode).
-3. **Refresh the dashboard** (`decision-dashboard`) so the review surface matches.
-
-Common partial asks:
-
-| You want to… | Call | Then cascades to |
-|---|---|---|
-| Rename / rebrand | `positioning-brand` | art-direction → design-system → workbench → demo |
-| Add or change one screen | `screen-contract` | storyboard → workbench (if new components) → demo |
-| Add or change a flow/state/data responsibility | `service-contract` | storyboard → demo → prototype test → readiness report |
-| Rebuild just the demo | `clickable-demo` | — (reads existing contracts) |
-| Strengthen form/component states | `design-system-workbench` | demo (if shared components changed) |
-| Redo the visual direction | `art-direction-brief` | visual-quality-gate → design-system → workbench → demo |
-| Generate/curate art assets | `art-production` | demo (asset wiring) |
-| Audit what's still undefined | run the coverage self-audit (`references/coverage-self-audit.md`) | `02.8-undefined-surfaces.md` + dashboard |
-| Check risk/compliance only | `risk-register` | handoff |
-| Mine an existing codebase | `feature-adoption` | screen-contract deltas → demo → feasibility consultation |
-
-If you're unsure which skill owns what you want to change, ask `orchestrate` to route it ("X만 다시") — it will identify the owning skill and the downstream update list instead of restarting the pipeline.
-
-## Service contract and readiness gates
-
-Standard/Deep runs use `02.6-service-manifest.json` as the stable identity and wiring source. Markdown explains decisions; the manifest makes them checkable. A P0 surface is not simply “complete”: it moves through `defined → prototyped → wired → contracted → verified` with concrete evidence.
-
-Run the same validator at four product/design boundaries:
-
-```bash
-python3 scripts/validate_service_blueprint.py docs/product-planning/<slug> --stage contract --no-write
-python3 scripts/validate_service_blueprint.py docs/product-planning/<slug> --stage prototype --no-write
-python3 scripts/validate_service_blueprint.py docs/product-planning/<slug> --stage design --no-write
-python3 scripts/validate_service_blueprint.py docs/product-planning/<slug> --stage handoff
-```
-
-The final command writes `05-readiness-report.json` and `.md`. Dashboard and handoff readiness must be derived from that report. A pass means the accepted product/design contract is ready to begin a separate technical-design process; it never means implementation-ready. Lite keeps all accepted-design dimensions false.
-
-Prototype validation also requires `04.37-runtime-verification.json`, produced from a real browser walkthrough. It records every transition/effect/required-state result and the current manifest/demo SHA-256 values. Changing either source makes the report stale and blocks readiness until the browser scenario is rerun.
-
-The architecture follows the useful parts of [Matt Pocock's skills](https://github.com/mattpocock/skills): small composable skills, test seams fixed in the spec, prototypes that answer concrete questions, and separate standards-vs-spec review. Product Blueprint extends that pattern with a mandatory whole-service prototype contract and a developer-lens consultation that feeds constraints back into design; neither is treated as implementation readiness.
+기본 흐름은 제품 기획과 디자인 전달 문서에서 멈춥니다. 기술 아키텍처와 구현 계획은 별도의 요청이 있을 때만 다룹니다.

@@ -1,349 +1,167 @@
 ---
 name: orchestrate
-description: End-to-end pre-development product planning and design orchestration from research and PRD through brand, Depth-based screens, reusable React design components, fixture-data prototype flows, feasibility, explicit design acceptance, and handoff. Use when the user wants a product blueprint whose final UX can be implemented without redesign drift, including existing-product expansion.
+description: End-to-end product planning orchestration from an early idea through research, concept and brand direction, PRD, cross-functional review, product definition, screen and service contracts, flows, and a design handoff brief. Stops before visual UI production unless the user explicitly starts design-production.
 ---
 
-# Product Blueprint Orchestrate
+# Product Blueprint Orchestrator
 
-Use this as the master pre-development workflow. Do not start from screens, API, DB, architecture, or implementation. Turn a vague product idea into staged artifacts that a founder, designer, and engineer can review before technical design starts.
+Turn an early product idea into a reviewed planning package that a designer and an engineer can understand. This is the default entry point.
 
-Read `references/pro-design-process.md` when the user asks why the workflow is staged this way or wants senior designer process guidance.
+The default finish line is **planning complete**, not “the product is designed.” High-fidelity UI, component styling, rendered screens, and clickable prototypes belong to the separate `product-blueprint:design-production` workflow and begin only after the user explicitly asks to continue.
 
-## How To Run — modes and effort (tell the user this up front)
+## Choose the depth
 
-When a run starts, state the chosen mode and its rough effort in one line, and confirm it. Three depths, plus a pacing switch:
+| Mode | Use when | Planning finish line |
+| --- | --- | --- |
+| Lite | The user wants a fast direction check | Compact concept, working brand direction, PRD, critical flows, design brief |
+| Standard | Default for a real product | Evidence-backed concept, reviewed PRD, complete P0 contracts and design brief |
+| Deep | The product is novel, regulated, expensive, or high-risk | Broader evidence, failure and policy coverage, deeper feasibility and risk review |
 
-| Mode | Phases | Output files | Rough effort | For |
-|---|---|---|---|---|
-| **Lite** | Brief → Research/Ideation → PRD → Screen contracts + compact service manifest → Storyboard → Dashboard | ~9 | one short session | small products, validating an idea, "간단히" |
-| **Standard** (default) | Full phase order below, single pixel ceiling + workbench | ~20 | several sessions | real product heading to build |
-| **Deep** | Standard + richer evidence, more alternatives, stronger state coverage, full risk register | ~25 | multi-day | production launch, regulated/sensitive domains |
+If the user does not choose, use Standard. Record the mode in the decision log and service manifest.
 
-Pacing switch — **run-through mode ("쭉 진행")**: when the user says "쭉 진행해", "알아서 진행", "한번에 해줘", or approves run-through at intake, chain phases WITHOUT stopping for review between them — pause ONLY at the User Decision Gates listed below (direction lock, MVP lock, brand lock, surface lock, hi-fi entry, design acceptance, handoff). Everything else proceeds, with assumptions labeled and logged. In run-through mode the phase-exit block still appears after every phase so the user can scan what happened.
+## What this workflow owns
 
-**Every response in an orchestrate run — regardless of mode — ends with a `다음 단계` block**: (1) 추천 다음 스킬 1개 + 이유 1줄, (2) 사용자가 결정할 것 (없으면 "없음 — 그대로 진행 가능"), (3) 진행 중 위치 (단계 N/총단계). A response that ends without this block is an unfinished response. This is how the user always knows what to do next without reading the pipeline docs.
+- product problem, target users, core loop, differentiation, and scope
+- positioning, working name, brand voice, and brand principles
+- product mechanisms and trust behavior
+- PRD, non-goals, success signals, and open questions
+- screen purposes, entry points, flows, states, and recovery behavior
+- product-level service responsibilities and feasibility constraints
+- a concise brief that lets visual design start without reopening every planning document
 
-## Phase 0 — Workspace detection (resume / redo / fresh)
+It does not claim to produce final visual quality, a production design system, or an implementation-ready application.
 
-Before initializing anything, check whether the planning folder already exists (`docs/product-planning/<slug>/` or the folder the user names):
+## User decisions that cannot be self-approved
 
-- **No folder** → fresh run: initialize (see Required Outputs), then start at Brief.
-- **Folder exists, user continues the same product** → resume: read `00-decision-log.md` (decisions + gate status) and the dashboard FIRST, report "지금 어디까지 왔고, 다음은 X" — never restart phases that passed.
-- **User asks to redo one part** ("아트디렉션만 다시", "이름 다시 짓자") → rerun ONLY that skill, then cascade: list which downstream artifacts consume it (e.g., art direction → design system → workbench → demo) and update only those, farthest-upstream first. Do not touch unaffected artifacts.
-- **User pivots the product** → archive: move the old folder to `<slug>-archive-<date>/`, start fresh, and carry over only what the user explicitly keeps.
+Ask for explicit user confirmation at these four boundaries:
 
-## Visual Craft Spine (Anti-Slop) — the part that decides production quality
+1. **Product direction** — the selected concept and why it wins.
+2. **Brand direction** — positioning, voice, naming direction, and what to avoid.
+3. **First-version scope** — the included loop, excluded work, and accepted limitations.
+4. **Product definition** — personas, mental models, entry points, journeys, and required outcomes.
 
-Product logic in this workflow is strong; the historical failure was visual craft producing AI slop that the gate self-passed. The visual phases (art direction → token substrate → hi-fi screen → workbench → gate) run on a shared anti-slop spine. Before any visual phase, read:
+Record each decision in `00-decision-log.md`. Do not hide these decisions behind internal terms such as “lock” in user-facing summaries.
 
-- `${CLAUDE_PLUGIN_ROOT}/references/anti-slop-doctrine.md` — why slop happens, the S1–S14 signature taxonomy + fixes, the shadcn-sameness defense, the two survival tests.
-- `${CLAUDE_PLUGIN_ROOT}/references/measured-design-spec.md` — art direction must output numbers (type ramp, OKLCH roles, grid, spacing), not adjectives.
-- `${CLAUDE_PLUGIN_ROOT}/references/token-substrate.md` — dependency-light React components + CSS tokens for greenfield; actual substrate reuse for existing products; one source shared by boards and screens.
-- `${CLAUDE_PLUGIN_ROOT}/references/figma-design-process.md` — Figma-informed pages/sections, component variants/properties, modes, named prototype flows, and AI-assisted exploration mapped to React.
-- `${CLAUDE_PLUGIN_ROOT}/references/craft-loop.md` — layered passes (structure→layout→type→color→imagery→polish→distinctiveness), ceiling-on-one-screen-first, full-viewport rendering.
-- `${CLAUDE_PLUGIN_ROOT}/references/adversarial-visual-gate.md` — fresh-critic + measurable checks + loop-until-clean.
+## Planning sequence
 
-**Delegate pixel craft to Claude Code's design skills when the environment provides them** (they are engineered against these signatures): `impeccable`/`craft` (shape→build), `layout`, `typeset`, `colorize`, `distill`, `polish`, `bolder` (distinctiveness), `critique`/`audit` (adversarial review). If the environment provides none, the `references/` doctrine is self-sufficient — apply the craft passes by hand. Either way this plugin owns product logic, IA, screen contracts, states, the measured spec, and the gate; the craft owns the pixels. Never let craft change product IA (e.g. promoting an internal mechanism to primary navigation) for visual convenience — the screen contract wins.
+### 0. Create or resume the workspace
 
-**Ceiling-first ordering.** Do not render all P0 screens at average quality at once. Craft the single most decisive screen to the bar, pass the adversarial gate, then propagate the passing token/component system to the rest. One screen at the ceiling beats eight at the average.
-
-## Visual-First Review (mandatory) — the founder does not read 20 markdown files
-
-A solo founder reviews **visually**, not by opening every `.md`. Producing a wall of markdown with no visual review surface is a failure mode, even if the markdown is excellent. Enforce:
-
-- **After every phase, update `00-review-dashboard.html`** via `product-blueprint:decision-dashboard`. This is not optional and not "when asked" — it is part of finishing a phase. Never leave the dashboard as the init stub while shipping 10+ markdown files. If you produced artifacts and did not update the dashboard, the phase is not done.
-- **The dashboard is the review index.** It answers, in <30s: where are we, what are the 2–4 things to inspect now, and what decisions are pending. Final visual review happens in the rendered React ComponentBoard, DepthBoard, and FlowPreview; markdown remains detail SoT.
-- **Visuals are first-class deliverables, not decoration.** The review layer is the dashboard + the storyboard flow board + screen mockups. When the user says "there are too many documents / I don't know what to look at / I don't read them one by one," that is a signal the visual review layer is missing — build/repair it, do not answer with more prose.
-- **Visualize decisions and expected outcomes**, not just status: a decision→implication map and a flow board let the founder *see* what the plan produces without reading contracts. Prefer a legible flow/IA diagram over tiny pixel mockups (tiny tiled frames destroy fidelity — that is the storyboard's flow-contract role, distinct from the workbench's full-fidelity role).
-
-## Output Language And Stage Exit
-
-- Default to the user's conversation language for planning artifacts, review prompts, decision logs, PRD summaries, storyboards, critique notes, and final guidance.
-- If the user is Korean, write planning artifacts in Korean. Keep product names, UI labels under evaluation, API-like identifiers, and skill names in English only when useful.
-- Do not leave the user guessing what to review. At the end of every phase, include:
-  1. `지금 확인할 산출물`
-  2. `사용자가 결정할 것`
-  3. `수정이 필요하면 어디를 바꿀지`
-  4. `다음 추천 스킬`
-
-## Conversation Contract
-
-Product Blueprint is guided planning, not autopilot. Ask the user when a decision would change the product direction, research scope, design direction, safety boundary, monetization model, or engineering handoff.
-
-Start with a short intake if the request is vague. Ask at most 5 questions at once:
-
-1. What product idea or user problem are we planning?
-2. Are there reference services, screenshots, or competitors to inspect?
-3. Who is the primary user and what should the product feel like?
-4. What must be included or avoided in the first version?
-5. What output depth is wanted: quick concept, standard PRD/storyboard, or deep full handoff?
-
-Proceed without asking only when the missing information is non-blocking and reversible. In that case, write an `Assumptions` section and mark what should be confirmed later.
-
-**Visual-reference gate**: before high-fidelity design, use supplied URLs/screenshots. If none were supplied, ask for one. If the user has none, run a short taste interview (audience, task, desired/undesired feel, must-avoid patterns, release viewports), show 2–3 distinct directions, and lock one. Do not silently generate a single preferred style.
-
-## Artifact Maturity Bar
-
-`orchestrate` must not behave like a rough outline generator when the user asks for a standard or deep planning package. The first complete pass should be reviewable by a founder, product designer, and engineer even if it is not final.
-
-Default depth (see the mode table in "How To Run"):
-
-- If the user says "쭉 진행", "orchestrate부터", "전체 기획", "프로덕션급", or gives a reference service for benchmarking, treat the request as `standard` unless they explicitly ask for a quick sketch. "쭉 진행" additionally enables run-through pacing.
-- `lite` stops at brief, PRD, light screen contracts, and storyboard — but never skips the decision log, user decision gates, or assumption labels.
-- `standard` must produce the full product-flow package, positioning/brand, a readable storyboard, reusable React design workbench, and complete FlowPreview before handoff. A portable HTML behavior demo may accompany it but is not the visual baseline.
-- `deep` must additionally include richer reference evidence, more alternative concepts, stronger state coverage, visual critiques, the full risk register, feasibility options, and handoff risks.
-
-Minimum standard/deep completeness:
-
-- Include all obvious core surfaces for the product category. For discovery-heavy products, search is a default surface unless explicitly scoped out.
-- Wire each major screen to previous and next screens with storyboard annotations outside the mocked product UI. A frame without entry/exit is incomplete; a frame that puts planning labels inside the app screen is also incomplete.
-- Storyboard frames must be visually legible as screen frames, not blurred wireframes. Use reference screenshots, existing product imagery, or generated bitmap assets for character/product/place visuals when the product domain depends on visual appeal. Storyboards can be HTML because they are flow/IA contracts, not final UI.
-- For production-grade design expectations, do not stop at `04.3-design-system.md`, HTML, or one polished screen. Create reusable React tokens/components plus ComponentBoard, DepthBoard, FlowPreview, and all-P0 browser evidence.
-- A high-fidelity screen specimen is a pixel-level pass for one screen, not a replacement for the workbench.
-- Separate first-time, returning, empty, locked/safety, paid, and error states when relevant.
-- Include a `Known Missing / Not Yet Explored` section instead of hiding gaps.
-- Include a `Next Decision` after each artifact. If the user cannot decide what to review next, the phase is incomplete.
-- Do not mark any phase as pass when reference fidelity, P0 scope, or screen wiring is materially incomplete.
-- Do not mark design as complete while the user still has to request obvious missing screens, components, or states one by one.
-- Do not infer completeness from artifact count. `02.6-service-manifest.json` is the stable surface/action/state/operation/journey set, and the stage validator is the wiring evidence.
-- Do not force the user to read every markdown file to understand the state. Maintain `00-review-dashboard.html` as the fast visual review surface; markdown files are the detailed source of truth.
-
-## Evidence And Assumption Discipline
-
-Never mix observed reference behavior, user-confirmed requirements, and agent-proposed ideas in the same bullet without labels.
-
-Use these labels throughout artifacts:
-
-- `관찰`: Seen in screenshots, DOM, live exploration, user-provided screenshots, or quoted source.
-- `사용자 확정`: The user explicitly confirmed this direction or constraint.
-- `제안`: Product idea proposed by the agent or expert lens.
-- `가정`: Needed to proceed but not yet verified.
-- `미확인`: Known research gap.
-
-Rules:
-
-- Every reference-derived claim must point to a screenshot, URL, DOM snapshot, or explicit inference.
-- If a referenced page has scrollable lower content, inspect and capture the lower content before claiming the page structure is understood.
-- If login/session access is unavailable, say so and mark the affected flows as unverified.
-- Never use a polished storyboard to cover missing research.
-
-## Feature Intent Clarification
-
-Before turning a named feature into screens or requirements, restate the user's intended behavior in concrete terms.
-
-Ask or label as unconfirmed when a term can mean multiple products:
-
-- `checkpoint` may mean manual save, branch point, undo state, version history, or "copy this chat room from turn N into a new chat room."
-- `memory` may mean hidden system recall, user-visible notes, editable long-term memory, summary, or per-chat state.
-- `persona` may mean user identity, role, relationship premise, account-level profile, or per-character setup.
-- `mission` may mean quest, achievement, paid challenge, creator-authored task, or conversation scoring.
-
-If the user clarifies the meaning, update the decision log and remove the incorrect interpretation from PRD, screen contracts, storyboard, backend brief, and handoff.
-
-Do not promote a feature into P0 just because it sounds powerful. Classify each feature as:
-
-- `Core P0`: Required for the main product loop.
-- `P0 support`: Required only to make the loop usable, safe, searchable, or recoverable.
-- `P1 differentiator`: Strong feature, but not needed for the first usable loop.
-- `P2 expansion`: Needs core loop validation first.
-- `Out of scope`: Not part of the product direction.
-
-## Concept-To-Surface Discipline
-
-Do not turn internal planning concepts into tabs, screens, or primary UI without checking the product logic and the user's language.
-
-> Domain neutrality: the character-chat examples in this section and throughout this skill (persona-as-entry-gate, memory, checkpoint) are illustrations of *one* domain. This harness is product-agnostic — substitute your product's real concepts and IA. Apply the neutral rules; treat the chat-specific defaults as examples, not universal law.
-
-For every major concept or mechanism, separate these levels:
-
-1. **Internal concept**: the planning term used by the team.
-2. **User-facing feature**: the label and promise users should understand.
-3. **Moment of use**: when the feature affects the journey.
-4. **Default visibility**: background, inline hint, bottom sheet, side panel, settings, modal, dedicated screen, or primary navigation.
-5. **User control**: what the user can inspect, edit, correct, hide, retry, or undo.
-6. **Surface decision**: whether this deserves a persistent UI surface or only appears during setup, review, correction, or recovery.
-
-Rules:
-
-- Never assume a mechanism deserves a main tab because it is product-critical.
-- Never promote a system behavior into a visible screen before defining the moment when users need to see or control it.
-- Treat persona/setup as a chat-entry gate by default: it belongs after character detail and before the chat room. Do not place persona on the home screen, bottom navigation, primary navigation, or discovery surface unless the user explicitly changes the product model.
-- Preserve user terminology when the user has clarified it. If the user says a concept is just persona, memory, setup, or a background change, do not split it into a separate product object unless they approve.
-- If a planning term could change the IA or screen map, ask the user before locking it.
-- Mark surface assumptions explicitly in the decision log.
-- When reference evidence and user intent conflict, user intent wins and the reference is treated as benchmark evidence, not a requirement.
-
-Example distinction:
-
-- Persona/setup may include relationship premise, role, tone, pace, and boundaries. Its default flow is `character detail -> persona/setup -> chat room`. Do not create a separate "relationship contract" tab, home module, or navigation item unless the user wants that surface.
-- Long-term memory may be generated by changes during chat. Do not place it on the main screen by default. Define whether it is background behavior, a side-panel review surface, an inline suggestion, or a correction/recovery tool.
-
-## Recommended-Default Doctrine (decision quality for passive users)
-
-Every user-decision gate ships as: 권장안 먼저 + 근거 1–2줄 + "반대안이 이기는 조건" 1줄 — never a flat option menu. A user who only accepts the defaults must still land on a coherent, tasteful product; if the harness cannot form a recommendation, that is a research gap to close before asking. Judge recommendations by "works well" (root-cause, maintainable, deterministic), not "fastest".
-
-## Direction Challenge Passes (mandatory at lock points)
-
-The founder should not have to be the devil's advocate. At each lock point — concept lock (4), screen-contract lock (8), before desktop rendering (16/18), scope/deferral lock, tech-plan (when run) — run the applicable challenge classes from `references/direction-challenges.md` (C1 surface-level, C2 responsive grammar, C3 data-mirror IA, C4 reuse strategy, C5 monetization trust, C6 deferral honesty, C7 over-engineering, C8 identity coherence). Record each as a `[CHALLENGE]` decision-log entry (question → honest answer → keep/change) and self-correct BEFORE presenting. A lock without a recorded challenge pass is not a lock. Use a fresh-context subagent for large artifacts; inline for small locks.
-
-## User Decision Gates
-
-Ask for user input before crossing these gates:
-
-- **Research access**: login, paid, adult-gated, destructive, publishing, account, or privacy-sensitive exploration.
-- **Direction lock**: choosing the winning concept from `parallel-concepts`.
-- **Brand lock**: confirming positioning, product name, and mascot direction from `positioning-brand`.
-- **MVP lock**: finalizing PRD scope and non-goals.
-- **Surface lock**: deciding that a mechanism becomes a visible tab, main-screen component, persistent panel, or primary navigation item.
-- **Screen contract lock**: accepting allowed actions and forbidden shortcuts.
-- **High-fidelity design**: moving from storyboard/art direction into realistic visual mockups.
-- **Design acceptance**: treating visual quality gate, design-system, or prototype test as pass.
-- **Engineering handoff**: approving the package after a handoff-stage readiness report passes; the user does not override hidden validator failures.
-
-At the end of every phase, include:
-
-- `Status`: pass, fail, or ACCEPT-FLAG (recorded limitation — see `references/quality-bar.md`; "conditional pass" is not a status)
-- `What changed`
-- `User decisions needed`
-- `Assumptions carried forward`
-- `Next recommended skill`
-- `Why this next`
-
-## Phase Order
-
-Lite mode runs phases 1, 2, 7, 8, 8.5, 10 only (with the dashboard). Standard/Deep run all.
-
-1. **Brief**: Define target user, job, core loop, reference services, constraints, and unknowns.
-2. **Research Or Ideation**: If reference products exist, use `product-blueprint:research`. If none are supplied, request URL/image; if the user has none, use `product-blueprint:ideation` plus the visual-reference interview and direction comparison.
-3. **Reference Deconstruction**: Use `product-blueprint:reference-deconstruction` when references exist. Turn screenshots into product principles, gates, and anti-copy rules.
-4. **Parallel Concepts**: Use `product-blueprint:parallel-concepts`. Explore multiple product/screen directions before committing to one. Concepts must differ at screen/mechanic level with a representative visual each — a non-reader must be able to choose.
-5. **Positioning & Brand**: Use `product-blueprint:positioning-brand`. Positioning statement, name (taste-first rounds → availability signals), voice one-pager, mascot/wordmark direction. Runs BEFORE art direction because the name, voice, and mascot constrain the visual world.
-6. **Experience Mechanisms**: Use `product-blueprint:experience-mechanisms` for invisible product behavior such as memory, judging, ranking, scoring, recommendations, personalization, safety gates, and paid actions.
-7. **User Stories And PRD**: Use `product-blueprint:prd`. Define MVP loops, requirements, non-goals, states, risks, and mechanism-dependent requirements. **Red-team this phase**: when multi-agent support exists, spawn a fresh-context critic to attack the PRD (missing loop steps, unowned states, scope lies) before MVP lock; inline adversarial pass otherwise. Record what it found.
-8. **Screen Contracts**: Use `product-blueprint:screen-contract`. Define each priority screen's purpose, allowed actions, forbidden shortcuts, states, entry paths, and exit paths with stable IDs.
-8.5. **Service Contract Gate**: Use `product-blueprint:service-contract`. Bind stories, surfaces, actions, required states, product-level frontend/backend operation ownership, AI-assist review loops, and journeys in `02.6-service-manifest.json`. Run `design-readiness` at `contract` stage; no storyboard on findings.
-9. **Feasibility Checkpoint (lightweight, BEFORE any visual design)**: Use `product-blueprint:feasibility-review` in checkpoint mode. Every mechanism a P0 screen depends on gets a verdict — feasible / conditional (state the condition) / infeasible — so mockups never promise the impossible. Output `02.7-feasibility-checkpoint.md`. An `infeasible` verdict goes back to the user BEFORE the storyboard renders that screen. This is the "engineer in the room" moment; do not defer it to the full feasibility review (phase 22).
-10. **Storyboard / Depth Board**: Use `product-blueprint:storyboard`. Organize global shell, Depth 1, Depth 2, overlays, named flow starts, states, and evidence as a Figma-informed board. This locks IA and flow, not final pixels.
-11. **Art Direction Brief**: Use `product-blueprint:art-direction-brief`. Define product world, design thesis, imagery, typography, color roles, signature element, and anti-aesthetic — consuming the brand lock (wordmark face, mascot palette rule, voice).
-12. **Visual Quality Gate**: Use `product-blueprint:visual-quality-gate` before accepting any visual direction. Fail generic AI-slop, flow-inaccurate, unreadable, or state-poor design artifacts.
-13. **UX Writing**: Use `product-blueprint:ux-writing`. Microcopy sheet (labels, empties, errors, loading, confirmations, CTA verbs) for every P0 screen. Downstream mockups use these strings verbatim.
-14. **Backend Systems Brief**: Use `product-blueprint:backend-systems-brief` for memory, judging, ranking, billing, permissions, safety, creator publishing, and other backend/system concerns before technical architecture.
-15. **Design System / Visual Direction**: Use `product-blueprint:design-system` only after storyboard, art direction, and visual quality gate are stable. This creates a production design brief, not frontend implementation or frontend architecture.
-16. **Implementation-fidelity React Workbench**: Use `product-blueprint:design-system-workbench`. Existing products extend their actual token/component sources; greenfield creates dependency-light React sources. Render ComponentBoard, DepthBoard, FlowPreview, modes, and all P0 screens from the same components. **All-P0 coverage matrix is the exit gate**; HTML evidence cannot satisfy it.
-17. **High-Fidelity Screen Specimen**: Use `product-blueprint:high-fidelity-screen` only when one screen from the workbench needs an additional pixel-level pass. This is the ceiling screen, not a substitute for all-P0 coverage.
-18. **Portable Behavior Demo**: Use `product-blueprint:clickable-demo` when a file-only walkthrough or deterministic DOM transition audit adds value. It validates flow/state/copy only and is never the visual or component-reuse baseline. The React FlowPreview is the primary product experience review.
-18.5. **Prototype Contract Gate**: Use `product-blueprint:design-readiness` at `prototype` stage. DOM surface/action/state IDs, transitions/effects, reachability, responsive evidence, and dead controls must pass before task testing.
-19. **Prototype Test**: Use `product-blueprint:prototype-test` for manifest journeys against the React FlowPreview; cross-check the portable HTML only when it exists. Distinguish heuristic walkthrough from real-user evidence.
-20. **Design Critique**: Use `product-blueprint:design-critique` to review product intent, UX flow, visual quality, states, system trust, component reuse, and handoff readiness.
-21. **Risk Register**: Use `product-blueprint:risk-register` when the product touches adult content, minors, payments, UGC, PII, or AI-generated content (mandatory then; recommended otherwise). P0 risks need mitigations before handoff.
-22. **Feasibility Consultation (full)**: Use `product-blueprint:feasibility-review` as the final developer lens on every P0 surface/action/operation/journey. Reconcile phase-9 verdicts. `infeasible` blocks; every conditional product-visible constraint routes back into design and invalidates downstream evidence.
-22.5. **Coverage Self-Audit (mandatory — do not wait for the founder to ask)**: run the six-point developer-lens scan in `references/coverage-self-audit.md` (responsive grammar / Storybook-style state enumeration / wiring matrix / global fallbacks + cross-cutting sheets / form policy / undefined-surface registry). Output `02.8-undefined-surfaces.md` — every referenced-but-undrawn surface classified as 정의됨 / 규칙 파생 / 지금 계약(3-line mini-contract) / P1 명시 이연 — and surface it in the dashboard "남은 갭" section. Dogfood evidence: three founder questions each hit a real P0 gap this scan would have caught first.
-22.75. **Design Acceptance Loop**: Use `product-blueprint:design-acceptance`. Absorb feasibility constraints, regenerate the affected prototype/visual evidence, and repeat user review until the user explicitly approves the current whole-service baseline. No autonomous retry cap may manufacture approval.
-23. **Product/Design Handoff Draft**: Use `product-blueprint:engineering-handoff` for the compatibility-named handoff file. Preserve accepted behaviors, states, constraints, evidence, and journey continuity without selecting implementation architecture. Keep `planning-readiness: pending`.
-24. **Design Readiness Close**: Use `product-blueprint:design-readiness` at `handoff` stage. It generates `05-readiness-report.{json,md}`. Only a real pass may set `design_handoff_ready` and `ready_for_technical_design`; it never sets implementation readiness. Failure routes upstream by finding owner.
-
-After each phase, explicitly recommend one next phase and explain why (the `다음 단계` block — mandatory on every response). If required inputs for the next phase are missing, stop and ask the user for those inputs instead of proceeding with invented assumptions.
-
-After each phase that produces or changes multiple artifacts, update `product-blueprint:decision-dashboard`. The dashboard is the user's review entry point; do not make the user inspect long markdown files first.
-
-Use `product-blueprint:tech-plan` only when the user explicitly asks to continue into technical architecture after the handoff.
-
-## Expert Lenses
-
-Run these lenses inline by default. Use subagents only when the environment has safe multi-agent support and the user approves the cost.
-
-- Product owner: scope, MVP loop, sequencing
-- UX researcher: reference evidence, user intent, confusion
-- Service designer: cross-screen journey and lifecycle
-- Product designer: screen hierarchy, storyboard clarity
-- UX writer: labels, promises, empty/error states
-- Art director: product world, visual thesis, image rules, signature motif
-- Visual design director: reference fidelity, art direction, anti-slop quality, state completeness
-- Frontend lead: interaction feasibility and design-system constraints only; implementation planning happens in the actual app workflow later
-- Backend lead: product invariants, system responsibilities, permissions, lifecycle, audit, cost and operational concerns
-- AI/Systems behavior lead: memory, judging, recommendations, scoring, uncertainty
-- Growth/monetization: activation, retention, paid moments
-- Risk reviewer: policy, age, safety, abuse, legal ambiguity
-
-## Gates
-
-- No storyboard before research or ideation mental model.
-- No storyboard before the service manifest contract-stage validator passes.
-- No high-fidelity screen before a screen contract exists.
-- No single concept lock-in before at least two alternatives have been considered, unless the user explicitly asks for speed.
-- No storyboard for AI/system-judged behavior before an experience mechanism contract exists.
-- No high-fidelity design before PRD, screen contracts, storyboard, art direction, and visual-quality gate are coherent.
-- No design-system claim before tokens are shown on reusable React components, state boards, Depth screens, and P0 flows.
-- No production design claim without screenshot verification and critique against AI-slop signals.
-- No separate mockup component tree. ComponentBoard, DepthBoard, FlowPreview, and later implementation must share React sources.
-- No visual acceptance from standalone HTML, static images without source refs, or a board that cannot prove component reuse.
-- No engineering handoff readiness if visual quality was a user concern and the workbench is missing, unrendered, or screenshot-untested.
-- No backend architecture during default Product Blueprint workflow. Create a backend systems brief first.
-- No API/DB design during the default Product Blueprint workflow. Stop at engineering handoff unless the user explicitly asks for technical planning.
-- Mark unverified flows explicitly. Never invent reference behavior.
-- Paid, destructive, age-gated, or account-affecting actions require user approval before live exploration.
-- Do not erase a product requirement because it sounds technically hard. Mark it for feasibility review with staged options — but get the feasibility checkpoint verdict BEFORE the screen is visually designed.
-- No visual design (storyboard onward) for a P0 screen whose mechanisms lack a feasibility-checkpoint verdict.
-- No handoff readiness while the all-P0 coverage matrix has missing rows or the risk register has unmitigated P0 rows (when the register is mandatory).
-- **Retry cap + ACCEPT-FLAG**: any gate loops at most 3 fix cycles per artifact. Still failing → do not loop forever, do not silently pass: record ACCEPT-FLAG in the decision log (what failed, why accepted, later fix) and surface it in the dashboard and handoff. See `references/quality-bar.md`.
-- No lock (concept, screen contracts, scope, tech-plan) without a recorded direction-challenge pass (`references/direction-challenges.md`).
-- No handoff readiness before the coverage self-audit has run and `02.8-undefined-surfaces.md` has zero unclassified rows (`references/coverage-self-audit.md`).
-- No handoff/dashboard design-ready claim without a current handoff-stage report whose manifest hash matches and `design_handoff_ready=true`.
-- Non-visual red-team: PRD/mechanism lock gets a fresh-context adversarial pass (subagent when available, inline otherwise) — the visual gate must not be the only place a critic exists.
-
-## Required Outputs
-
-Create or update a folder such as `docs/product-planning/<slug>/` with:
-
-> File numbers are folder-sort order for review, not execution order — the Phase Order above governs sequencing (e.g. the visual gate runs before `03.7-ux-writing.md`; the risk register runs before `04.5-feasibility-review.md`).
-
-- `00-brief.md`
-- `00-decision-log.md`
-- `00-review-dashboard.html`
-- `01-reference-research.md` or `01-ideation.md`
-- `01.5-reference-deconstruction.md` when references exist
-- `01.6-parallel-concepts.md`
-- `01.8-positioning-brand.md`
-- `02-mechanisms.md`
-- `02-prd.md`
-- `02.5-screen-contracts.md`
-- `02.6-service-manifest.json`
-- `02.7-feasibility-checkpoint.md`
-- `03-storyboard.html`
-- `03.5-art-direction-brief.md`
-- `03.7-ux-writing.md`
-- `04.1-visual-quality-gate.md`
-- `04.2-backend-systems-brief.md`
-- `04.3-design-system.md` or `.html`
-- `04.32-design-system-workbench.md`
-- `visual-workbench/` dependency-light React source package, or existing-app repo-relative component/preview refs
-- `tokens/` files when token export is useful and values are stable enough
-- `04.35-high-fidelity-screen.md` plus optional single-screen specimen only when one screen needs an extra pixel pass
-- optional `04.36-clickable-demo.md` + `prototypes/<product>-demo.html` for portable behavior audit
-- `04.4-prototype-test.md`
-- `04.45-design-critique.md`
-- `04.55-risk-register.md` when the domain makes it mandatory
-- `02.8-undefined-surfaces.md` (coverage self-audit registry — mandatory before handoff)
-- `04.5-feasibility-review.md`
-- `05-engineering-handoff.md`
-- `05-readiness-report.json` + `05-readiness-report.md` (generated at the final gate)
-- `screenshots/` when references are researched
-
-Lite mode creates only: `00-brief.md`, `00-decision-log.md`, `00-review-dashboard.html`, `01-*(research|ideation).md`, `02-prd.md`, `02.5-screen-contracts.md`, `02.6-service-manifest.json`, `03-storyboard.html` (init with `--lite`). Lite contract validation may pass, but it never claims accepted-design or implementation readiness.
-
-To initialize the artifact structure, run:
+Run:
 
 ```bash
-python3 <plugin-root>/scripts/init_prd_project.py "<product name>" --root docs/product-planning   # add --lite for Lite mode
+python3 scripts/init_prd_project.py "<product name>" --root <planning-root>
 ```
 
-If `python3` is unavailable, do not stall: create the folder and the stub files directly with your file tools (same names as above; the script is a convenience, not a dependency).
+Use `--lite` or `--deep` only when the chosen mode differs from Standard. Resume existing artifacts without overwriting them. Keep `00-review-dashboard.html` as the user’s review entry point and update it after each decision boundary.
 
-## Completion
+### 1. Clarify the brief
 
-Use `references/quality-bar.md` for human/visual quality and `design-readiness` for deterministic product/design continuity. Report which gates are complete, which flows are unverified, which constraints still need design absorption, and quote the generated readiness status instead of self-declaring.
+Fill `00-brief.md` with the idea, intended user, core job, constraints, references, known facts, assumptions, and unanswered questions. Label evidence as observed, user-confirmed, proposed, assumed, or unverified.
 
-## Next Step
+### 2. Build product evidence
 
-- If starting a new planning project, initialize the folder with `scripts/init_prd_project.py`, then run `product-blueprint:research` or `product-blueprint:ideation`.
-- If all required artifacts are complete, stop at `product-blueprint:engineering-handoff` unless the user explicitly asks for `product-blueprint:tech-plan`.
+- With named references, use `product-blueprint:research` and `product-blueprint:reference-deconstruction`.
+- Without useful references, use `product-blueprint:ideation`.
+- Never present inferred target-user needs as research findings.
+
+### 3. Compare product directions
+
+Use `product-blueprint:parallel-concepts` to compare meaningfully different product concepts, not cosmetic variants. Show the recommendation and tradeoffs in the dashboard. Continue only after the user confirms a product direction.
+
+### 4. Establish the brand direction
+
+Use `product-blueprint:positioning-brand`. Define positioning, voice, naming direction, and brand principles. Availability checks are signals, not trademark clearance. Continue only after the user confirms the direction; a working name is acceptable.
+
+### 5. Define product mechanisms and draft the PRD
+
+Use `product-blueprint:experience-mechanisms` for memory, ranking, generation, missions, rewards, moderation, or other behavior that cannot be explained as a simple screen. Then use `product-blueprint:prd`.
+
+The PRD must include the first-version loop, user stories, feature and surface scope, explicit non-goals, states and entry points, success signals, and unresolved questions.
+
+### 6. Run the planning review
+
+Use `product-blueprint:planning-quality-gate`. It reviews the plan through six independent lenses: product strategy, user evidence, brand, PRD quality, service feasibility, and growth/risk.
+
+Resolve all critical and major findings. Present the recommended first-version scope in plain language, then continue only after explicit user confirmation.
+
+### 7. Confirm the product definition
+
+Use `product-blueprint:product-definition`. Confirm personas, mental models, entry points, journeys, required outcomes, exceptions, and priorities. This is the canonical product contract from which screens are derived.
+
+### 8. Define screens, service behavior, and feasibility
+
+Run, in order:
+
+1. `product-blueprint:screen-contract`
+2. `product-blueprint:service-contract`
+3. `product-blueprint:feasibility-review` as an early product feasibility checkpoint
+4. coverage self-audit into `02.8-undefined-surfaces.md`
+
+Validate the contract:
+
+```bash
+python3 scripts/validate_service_blueprint.py <planning-dir> --stage contract
+```
+
+Fix errors before proceeding. The validator checks consistency; it does not replace user judgment.
+
+### 9. Map the experience without designing pixels
+
+Use `product-blueprint:storyboard` to show P0 journeys, navigation, overlays, states, and recovery paths. Treat it as a low-fidelity behavior board. Do not use this phase to claim a visual direction or final UI quality.
+
+In Standard and Deep, use `product-blueprint:backend-systems-brief` to record product-visible system responsibilities. Keep it compact and mark inapplicable concerns with reasons for simple products; expand it for persistence, permissions, ranking, generation, payment, or moderation behavior. Lite may omit it when those concerns are genuinely absent.
+
+### 10. Create the design handoff brief
+
+Use `product-blueprint:design-brief` to create `03-design-brief.md`. It must summarize what visual design may explore and what product behavior must not change silently.
+
+Validate the planning package:
+
+```bash
+python3 scripts/validate_service_blueprint.py <planning-dir> --stage planning
+```
+
+Update the dashboard with:
+
+- what was decided
+- what remains uncertain
+- the most important flows and states
+- current constraints and accepted limitations
+- the design brief
+- the optional next step
+
+Then stop. Report **planning complete** only when the planning validator passes and required user decisions are recorded.
+
+## Optional continuation: visual design and prototype
+
+If the user explicitly asks for UI design, screens, or a prototype, start `product-blueprint:design-production`. Do not silently continue into it.
+
+That workflow first compares two or three visual directions, applies the chosen direction to one representative screen, asks for user feedback, and only then expands to the full screen set and prototype.
+
+## Quality rules
+
+- Prefer a useful decision over a large volume of prose.
+- Keep user-facing language plain; put schemas, hashes, severity codes, and validator mechanics in technical documentation.
+- A complete file is not the same as a confirmed decision.
+- A storyboard is not visual design.
+- A generated screen is not an accepted design.
+- If visual exploration reveals a product change, return to the affected planning artifact and reconfirm it.
+- Do not claim target-user validation without real target-user evidence.
+- Do not claim trademark clearance from search signals.
+- Do not claim technical or implementation readiness; those require a later project-specific workflow.
+
+## Planning outputs
+
+The default workflow produces:
+
+- a product and audience brief
+- concept and brand direction
+- PRD and cross-functional review
+- confirmed product definition
+- screen, service, state, and flow contracts
+- feasibility and unresolved-surface notes
+- a low-fidelity storyboard
+- `03-design-brief.md`
+- a review dashboard and decision log
+
+Visual tokens, polished screens, React workbenches, screenshots, prototypes, design acceptance, and engineering handoff are optional design-production outputs, not default planning outputs.

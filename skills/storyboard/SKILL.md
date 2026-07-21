@@ -1,13 +1,13 @@
 ---
 name: storyboard
-description: Creates Figma-like HTML storyboards and screen-flow boards from PRDs, mechanism contracts, and research evidence, wiring user flows, states, transitions, and engineering-review notes. Use when the user wants visualized planning artifacts, screen-by-screen flows, product storyboards, or designer-style handoff before high-fidelity design or technical design.
+description: Creates low-fidelity HTML storyboards and screen-flow boards from PRDs, mechanism contracts, and research evidence, wiring user flows, states, transitions, and review notes. Use near the end of planning before creating the design brief; it does not establish final visual design.
 ---
 
 # Product Blueprint Storyboard
 
 Create a planning board, not a fake finished app and not the default clickable demo.
 
-The default storyboard artifact is a Figma-like HTML board that lays out screens side by side. Use it to inspect information architecture, screen coverage, transitions, and product assumptions at a glance. Create a clickable demo only later through `product-blueprint:prototype-test` or a separate prototype artifact when the flow is stable enough to validate by interaction. Create React only later through `product-blueprint:design-system-workbench` when tokens, components, states, and production screen mockups need to be visualized.
+The default storyboard artifact is a low-fidelity HTML board that lays out screens side by side. Use it to inspect information architecture, screen coverage, transitions, and product assumptions at a glance. Do not turn it into a visual styling exercise. Clickable demos and React screen production belong to the separate `product-blueprint:design-production` workflow.
 
 ## Output Language And Stage Exit
 
@@ -58,17 +58,16 @@ If any P0 surface from the service manifest has no frame or approved background-
 
 ## Visual Rules
 
-- Use screenshots as evidence and never crop critical content. Prefer `object-fit: contain`.
-- Use meaningful visual assets inside product frames. For character, media, marketplace, venue, or object-focused products, do not leave hero/card areas as abstract gradients when a reference image or generated bitmap asset would make the flow understandable.
-- Do not leave card thumbnails, avatars, hero slots, or media wells visually empty. If only one safe placeholder image exists, reuse it with varied crops or subtle treatments instead of falling back to blank gradients.
-- If no safe product asset exists, generate a small set of non-branded placeholder images with `imagegen`, copy them into the project, and reference them from the storyboard.
+- Use neutral wireframes and clear annotations. Do not imply that layout, color, typography, imagery, component styling, or density is approved.
+- Use screenshots only in a separate evidence strip and never crop critical content. Do not blend reference screenshots into proposed product frames.
+- Represent media slots with labeled neutral placeholders. Do not generate decorative product imagery during the default planning workflow.
 - Separate `Observed`, `Assumption`, and `Improvement`.
 - For reference-based flows, include screenshots for lower-scroll/detail-tab/side-panel evidence, not only first viewport screenshots.
 - Include baseline category surfaces such as search for discovery products unless the PRD explicitly scoped them out.
 - Use user-facing words inside product frames. Do not put internal planning terms such as "relationship grammar" into search placeholders, buttons, tabs, or card copy; use concrete labels and examples users recognize.
 - For discovery-first products, keep home focused on discovery unless the screen contract approved a returning-user module. Show ongoing conversations in a conversations/library surface or secondary entry, not as the default home hero.
 - Keep text readable. If a screenshot is too small, link to the original image.
-- Do not make a high-fidelity product UI until product flow is understood. HTML storyboard quality should be readable and polished, but it is not the final production design surface.
+- Optimize the board for behavior review, not visual satisfaction. Consistency and traceability matter more than polish here.
 - Do not hide long-term memory, mission judging, ranking, recommendations, or paid actions behind vague labels. Show the user-facing state and failure recovery where the user actually needs to inspect, correct, confirm, or recover them.
 - Do not make a product mechanism visually dominant just because it is important internally. Preserve the surface level approved in the screen contract.
 - For character-chat products, storyboard persona/setup as an entry gate after character detail and before chat room. Do not render it as a home feature, bottom-nav item, or primary navigation destination unless the screen contract explicitly approved that.
@@ -82,6 +81,6 @@ Create `03-storyboard.html` plus `screenshots/<storyboard-proof>.png` after brow
 
 ## Next Step
 
-- Use `product-blueprint:art-direction-brief` before high-fidelity visual design.
-- Then use `product-blueprint:visual-quality-gate` after a rendered mockup, storyboard proof, or visual direction exists.
-- After the design-system brief, use `product-blueprint:design-system-workbench` if the team needs production-grade visual direction and future frontend portability.
+- Use `product-blueprint:backend-systems-brief` when product-visible system constraints need consolidation.
+- Then use `product-blueprint:design-brief` and run the planning-stage validator.
+- Stop by default. Use `product-blueprint:design-production` only when the user explicitly requests visual UI or a prototype.

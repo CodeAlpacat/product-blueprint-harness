@@ -93,10 +93,10 @@ Use this file to keep user decisions, assumptions, and gate status from getting 
       <p style="font-size:13px;color:var(--muted)">지금 유저가 실제로 봐야 할 산출물 2~4개만. 각 항목 = 무엇을 확인/결정할지 1줄. 나머지는 근거.</p>
     </div>
 
-    <section><h2>1. 현재 상태</h2><p style="font-size:13px;color:var(--muted)">단계 · pass/conditional/fail · 이유.</p></section>
+    <section><h2>1. 현재 상태</h2><p style="font-size:13px;color:var(--muted)">단계 · pass/fail/ACCEPT-FLAG · 이유.</p></section>
     <section><h2>2. 지금 당신의 결정 대기</h2><p style="font-size:13px;color:var(--muted)">각 결정 = Approve / Change / Hold · 영향 · 바뀔 파일.</p></section>
     <section><h2>3. 유저플로우 스냅샷</h2><p style="font-size:13px;color:var(--muted)">진입→게이트→커밋→결과→복구 압축 맵 (텍스트 아닌 시각 우선).</p></section>
-    <section><h2>4. 디자인 스냅샷</h2><p style="font-size:13px;color:var(--muted)">현재 시각 방향 · 남은 디자인 · 품질 리스크.</p></section>
+    <section><h2>4. 경험 설계 스냅샷</h2><p style="font-size:13px;color:var(--muted)">주요 화면 · 흐름 · 상태 · 아직 정하지 않은 시각 디자인.</p></section>
     <section><h2>5. 스코프</h2><p style="font-size:13px;color:var(--muted)">P0 / P1 / P2 · 명시적 scope-out.</p></section>
     <section><h2>6. 산출물 지도</h2><p style="font-size:13px;color:var(--muted)">각 md = 1줄 목적 + 상태 + 핵심(★) 표시. 링크로 상세 연결.</p></section>
     <section><h2>7. 근거 / 갭</h2><p style="font-size:13px;color:var(--muted)">observed / user-confirmed / proposed / assumed / unverified.</p></section>
@@ -177,7 +177,7 @@ Use this file to keep user decisions, assumptions, and gate status from getting 
 
 ## Next Step
 
-- Use product-blueprint:screen-contract and product-blueprint:experience-mechanisms.
+- Lock one direction, then use product-blueprint:positioning-brand.
 """,
     "01.8-positioning-brand.md": """# Positioning & Brand
 
@@ -199,7 +199,7 @@ Use this file to keep user decisions, assumptions, and gate status from getting 
 
 - Use product-blueprint:experience-mechanisms.
 """,
-    "02.7-feasibility-checkpoint.md": """# Feasibility Checkpoint (before visual design)
+    "02.7-feasibility-checkpoint.md": """# Product Feasibility Checkpoint
 
 | Mechanism | Depending P0 screens | Verdict (feasible/conditional/infeasible) | Condition / closest alternative | User decision needed |
 | --- | --- | --- | --- | --- |
@@ -277,25 +277,93 @@ Not legal advice — real counsel reviews before launch.
 
 ## Product Thesis
 
-## Users
+## Target Users, Situations, And Anti-Users
 
-## Core Loop
+## Core Loop And Activation Moment
 
-## MVP Scope
+## MVP Scope And Non-Goals
+
+## Baseline Surface Classification
+
+| Surface | P0 / P1 / P2 / excluded | Decision ref | Current-release entry behavior |
+| --- | --- | --- | --- |
+
+## Feature Table
+
+| Feature | User job | Evidence | Scope | Required screens | Explicit non-goals |
+| --- | --- | --- | --- | --- | --- |
 
 ## User Stories
 
-## Requirements
+Use stable IDs: `us-<job>-<nn>`.
 
-## States
+## Functional Requirements
 
-## Risks
+## Product-Experience Mechanisms And Trust
+
+## Screen And State Inventory
+
+## Monetization And Cost Moments
+
+## Safety, Policy, Age, Privacy, And Abuse Risks
+
+## Metrics And Qualitative Success Signals
+
+## Open Questions And Unverified Flows
+
+## Entry-Point Inventory
+
+Cover first use, returning, route/deep link, auth gate, external/notification, refresh, back, cross-device, and offline. Mark `n/a` with a reason.
 
 ## Acceptance Criteria
 
+## Feature Checklist
+
+## Product Definition Seed
+
+| Requirement candidate | Kind | Persona / mental model | Entry point | Required result | Exception / boundary | Decision evidence |
+| --- | --- | --- | --- | --- | --- | --- |
+
 ## Next Step
 
-- Use product-blueprint:screen-contract.
+- Use product-blueprint:planning-quality-gate before confirming the first-version scope.
+""",
+    "02.05-planning-quality-review.md": """# Planning Quality Review
+
+## Executive Verdict
+
+## Lens Summaries
+
+### Product Strategy
+
+### User Evidence
+
+### Brand
+
+### PRD
+
+### Service Feasibility
+
+### Growth And Risk
+
+## Findings
+
+| ID | Lens | Severity | Status | Owner | Problem | Evidence | Required change |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+
+## Changes Applied
+
+## Recommended First-Version Scope
+
+## Known Limits
+
+- This review is not target-user validation or trademark clearance.
+
+## User Decision Needed
+
+## Next Step
+
+- After explicit first-version scope confirmation, use product-blueprint:product-definition.
 """,
     "02-mechanisms.md": """# Product Experience Mechanisms
 
@@ -369,10 +437,39 @@ Not legal advice — real counsel reviews before launch.
     <h1>Product Storyboard</h1>
     <p>Replace this with the evidence-backed storyboard.</p>
     <h2>Next Step</h2>
-    <p>Use product-blueprint:art-direction-brief.</p>
+    <p>Use product-blueprint:design-brief. This board defines behavior, not visual design.</p>
   </main>
 </body>
 </html>
+""",
+    "03-design-brief.md": """# Design Brief
+
+## Product In One Minute
+
+## Brand Direction
+
+## Experience Priorities
+
+## Screen And Flow Map
+
+## State And Recovery Requirements
+
+## Interaction Invariants
+
+## Responsive And Accessibility Requirements
+
+## System-Visible Constraints
+
+## Reference Status
+
+## Open Design Questions
+
+## Acceptance Criteria For Visual Exploration
+
+## Optional Next Step
+
+- Stop after planning approval by default.
+- If the user explicitly requests visual UI or a prototype, use product-blueprint:design-production.
 """,
     "03.5-art-direction-brief.md": """# Art Direction Brief
 
@@ -395,6 +492,32 @@ Not legal advice — real counsel reviews before launch.
 ## Next Step
 
 - Use product-blueprint:visual-quality-gate.
+""",
+    "03.4-visual-directions.md": """# Visual Directions
+
+## User Taste Evidence And Gaps
+
+## Shared Comparison Setup
+
+## Direction A
+
+## Direction B
+
+## Direction C (optional)
+
+## Comparable Evidence
+
+## Comparison
+
+## Recommendation And Tradeoffs
+
+## User Decision Status
+
+## Chosen Direction
+
+## Next Step
+
+- After explicit user choice, use product-blueprint:art-direction-brief to codify the selected direction.
 """,
     "04.1-visual-quality-gate.md": """# Visual Quality Gate
 
@@ -590,26 +713,62 @@ def main() -> int:
     parser.add_argument("name", help="Product or planning project name")
     parser.add_argument("--root", default="docs/product-planning", help="Output root directory")
     parser.add_argument("--force", action="store_true", help="Overwrite existing files")
-    parser.add_argument("--lite", action="store_true", help="Scaffold only the Lite-mode artifact set")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--lite", action="store_true", help="Scaffold only the Lite-mode artifact set")
+    mode.add_argument("--deep", action="store_true", help="Scaffold the full artifact set with Deep profile markers")
+    parser.add_argument(
+        "--with-design",
+        action="store_true",
+        help="Also add optional visual-design, prototype, acceptance, and handoff scaffolds",
+    )
     args = parser.parse_args()
 
     target = Path(args.root).expanduser() / slugify(args.name)
     target.mkdir(parents=True, exist_ok=True)
     (target / "screenshots").mkdir(exist_ok=True)
-    (target / "prototypes").mkdir(exist_ok=True)
-    (target / "tokens").mkdir(exist_ok=True)
+    if args.with_design:
+        (target / "prototypes").mkdir(exist_ok=True)
+        (target / "tokens").mkdir(exist_ok=True)
 
     template_path = Path(__file__).resolve().parent.parent / "assets" / "templates" / "service-manifest.json"
     manifest = json.loads(template_path.read_text(encoding="utf-8"))
     manifest["project"]["name"] = args.name
-    manifest["project"]["mode"] = "lite" if args.lite else "standard"
+    profile = "lite" if args.lite else "deep" if args.deep else "standard"
+    manifest["project"]["mode"] = profile
     manifest["evidence"]["demo_file"] = f"prototypes/{slugify(args.name)}-demo.html"
     files = dict(FILES)
     files["02.6-service-manifest.json"] = json.dumps(manifest, ensure_ascii=False, indent=2) + "\n"
     product_definition_path = Path(__file__).resolve().parent.parent / "assets" / "templates" / "product-definition.json"
     files["02.1-product-definition.json"] = product_definition_path.read_text(encoding="utf-8")
+    planning_review_path = Path(__file__).resolve().parent.parent / "assets" / "templates" / "planning-review.json"
+    planning_review = json.loads(planning_review_path.read_text(encoding="utf-8"))
+    planning_review["profile"] = profile
+    files["02.05-planning-quality-review.json"] = json.dumps(planning_review, ensure_ascii=False, indent=2) + "\n"
     design_acceptance_path = Path(__file__).resolve().parent.parent / "assets" / "templates" / "design-acceptance.json"
     files["05-design-acceptance.json"] = design_acceptance_path.read_text(encoding="utf-8")
+
+    PLANNING_FILES = {
+        "00-brief.md",
+        "00-decision-log.md",
+        "00-review-dashboard.html",
+        "01-reference-research.md",
+        "01-ideation.md",
+        "01.5-reference-deconstruction.md",
+        "01.6-parallel-concepts.md",
+        "01.8-positioning-brand.md",
+        "02-mechanisms.md",
+        "02-prd.md",
+        "02.05-planning-quality-review.md",
+        "02.05-planning-quality-review.json",
+        "02.1-product-definition.json",
+        "02.5-screen-contracts.md",
+        "02.6-service-manifest.json",
+        "02.7-feasibility-checkpoint.md",
+        "02.8-undefined-surfaces.md",
+        "03-storyboard.html",
+        "03-design-brief.md",
+        "04.2-backend-systems-brief.md",
+    }
 
     LITE_FILES = {
         "00-brief.md",
@@ -617,15 +776,44 @@ def main() -> int:
         "00-review-dashboard.html",
         "01-reference-research.md",
         "01-ideation.md",
+        "01.6-parallel-concepts.md",
+        "01.8-positioning-brand.md",
+        "02-mechanisms.md",
         "02-prd.md",
+        "02.05-planning-quality-review.md",
+        "02.05-planning-quality-review.json",
         "02.1-product-definition.json",
         "02.5-screen-contracts.md",
         "02.6-service-manifest.json",
+        "02.7-feasibility-checkpoint.md",
+        "02.8-undefined-surfaces.md",
         "03-storyboard.html",
+        "03-design-brief.md",
     }
 
+    DESIGN_FILES = {
+        "03.5-art-direction-brief.md",
+        "03.4-visual-directions.md",
+        "03.7-ux-writing.md",
+        "04.1-visual-quality-gate.md",
+        "04.3-design-system.md",
+        "04.32-design-system-workbench.md",
+        "04.36-clickable-demo.md",
+        "04.4-prototype-test.md",
+        "04.45-design-critique.md",
+        "04.5-feasibility-review.md",
+        "05-design-acceptance.json",
+        "05-engineering-handoff.md",
+    }
+
+    selected_files = set(LITE_FILES if args.lite else PLANNING_FILES)
+    if args.deep:
+        selected_files.add("04.55-risk-register.md")
+    if args.with_design:
+        selected_files.update(DESIGN_FILES)
+
     for filename, content in files.items():
-        if args.lite and filename not in LITE_FILES:
+        if filename not in selected_files:
             continue
         path = target / filename
         if path.exists() and not args.force:

@@ -37,6 +37,12 @@ class ServiceBlueprintValidatorTest(unittest.TestCase):
     def write_manifest(self, manifest: dict) -> None:
         (self.root / "02.6-service-manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
 
+    def planning_review(self) -> dict:
+        return json.loads((self.root / "02.05-planning-quality-review.json").read_text(encoding="utf-8"))
+
+    def write_planning_review(self, review: dict) -> None:
+        (self.root / "02.05-planning-quality-review.json").write_text(json.dumps(review, indent=2) + "\n", encoding="utf-8")
+
     def product_definition(self) -> dict:
         return json.loads((self.root / "02.1-product-definition.json").read_text(encoding="utf-8"))
 
@@ -66,6 +72,47 @@ class ServiceBlueprintValidatorTest(unittest.TestCase):
         (self.root / "04.36-clickable-demo.md").unlink()
         report = self.validate()
         self.assertIn("REQUIRED_ARTIFACT_MISSING", self.codes(report))
+
+    def test_contract_requires_concept_brand_and_mechanism_artifacts(self) -> None:
+        (self.root / "01.8-positioning-brand.md").unlink()
+        report = self.validate(stage="contract")
+        self.assertIn("REQUIRED_ARTIFACT_MISSING", self.codes(report))
+
+    def test_planning_review_requires_all_six_lenses(self) -> None:
+        review = self.planning_review()
+        review["lenses"] = [lens for lens in review["lenses"] if lens["id"] != "brand"]
+        self.write_planning_review(review)
+        report = self.validate(stage="contract")
+        self.assertIn("PLANNING_LENS_MISSING", self.codes(report))
+
+    def test_open_p0_or_p1_planning_finding_blocks_contract(self) -> None:
+        review = self.planning_review()
+        review["findings"][0]["status"] = "open"
+        self.write_planning_review(review)
+        report = self.validate(stage="contract")
+        self.assertIn("PLANNING_BLOCKER_OPEN", self.codes(report))
+
+    def test_planning_review_requires_explicit_mvp_lock(self) -> None:
+        review = self.planning_review()
+        review["status"] = "draft"
+        review["mvp_lock"]["status"] = "pending"
+        self.write_planning_review(review)
+        report = self.validate(stage="contract")
+        self.assertIn("PLANNING_REVIEW_UNCONFIRMED", self.codes(report))
+        self.assertIn("MVP_LOCK_UNCONFIRMED", self.codes(report))
+
+    def test_mvp_lock_decision_ref_must_exist_in_decision_log(self) -> None:
+        review = self.planning_review()
+        review["mvp_lock"]["decision_ref"] = "DEC-MISSING"
+        self.write_planning_review(review)
+        report = self.validate(stage="contract")
+        self.assertIn("MVP_LOCK_DECISION_REF_MISSING", self.codes(report))
+
+    def test_planning_review_rejects_stale_prd(self) -> None:
+        prd = self.root / "02-prd.md"
+        prd.write_text(prd.read_text(encoding="utf-8") + "\nChanged after review.\n", encoding="utf-8")
+        report = self.validate(stage="contract")
+        self.assertIn("PLANNING_REVIEW_STALE", self.codes(report))
 
     def test_ac02_false_readiness_claim_fails(self) -> None:
         manifest = self.manifest()
@@ -136,6 +183,9 @@ class ServiceBlueprintValidatorTest(unittest.TestCase):
         manifest = self.manifest()
         manifest["project"]["mode"] = "lite"
         self.write_manifest(manifest)
+        planning_review = self.planning_review()
+        planning_review["profile"] = "lite"
+        self.write_planning_review(planning_review)
         for relative in MODULE.STANDARD_ARTIFACTS:
             if relative not in MODULE.LITE_ARTIFACTS:
                 path = self.root / relative
@@ -301,6 +351,29 @@ class ServiceBlueprintValidatorTest(unittest.TestCase):
         self.assertEqual(report["status"], "contract-pass")
         self.assertFalse(report["engineering_ready"])
 
+    def test_planning_stage_passes_without_visual_design_artifacts(self) -> None:
+        for relative in MODULE.DESIGN_ARTIFACTS:
+            if relative not in MODULE.PLANNING_ARTIFACTS:
+                path = self.root / relative
+                if path.is_file():
+                    path.unlink()
+        report = self.validate(stage="planning")
+        self.assertEqual(report["status"], "planning-pass")
+        self.assertTrue(report["planning_ready"])
+        self.assertFalse(report["prototype_ready"])
+        self.assertFalse(report["design_accepted"])
+
+    def test_planning_stage_requires_design_brief(self) -> None:
+        (self.root / "03-design-brief.md").unlink()
+        report = self.validate(stage="planning")
+        self.assertIn("REQUIRED_ARTIFACT_MISSING", self.codes(report))
+
+    def test_design_stage_rejects_design_brief_changed_after_approval(self) -> None:
+        brief = self.root / "03-design-brief.md"
+        brief.write_text(brief.read_text(encoding="utf-8") + "\nChanged after approval.\n", encoding="utf-8")
+        report = self.validate(stage="design")
+        self.assertIn("DESIGN_BASELINE_STALE", self.codes(report))
+
     def test_prototype_stage_does_not_require_handoff_yet(self) -> None:
         (self.root / "04.4-prototype-test.md").unlink()
         (self.root / "05-engineering-handoff.md").unlink()
@@ -321,6 +394,11 @@ class ServiceBlueprintValidatorTest(unittest.TestCase):
         report = self.validate(stage="design")
         self.assertIn("DESIGN_NOT_APPROVED", self.codes(report))
         self.assertFalse(report["design_accepted"])
+
+    def test_design_stage_requires_compared_visual_directions(self) -> None:
+        (self.root / "03.4-visual-directions.md").unlink()
+        report = self.validate(stage="design")
+        self.assertIn("REQUIRED_ARTIFACT_MISSING", self.codes(report))
 
     def test_design_stage_requires_implementation_fidelity_react_sources(self) -> None:
         acceptance = self.design_acceptance()
@@ -368,6 +446,13 @@ class ServiceBlueprintValidatorTest(unittest.TestCase):
         visual.write_text(visual.read_text(encoding="utf-8") + "\n", encoding="utf-8")
         report = self.validate(stage="design")
         self.assertIn("VISUAL_EVIDENCE_STALE", self.codes(report))
+
+    def test_design_stage_rejects_planning_review_changed_after_approval(self) -> None:
+        review = self.planning_review()
+        review["reviewed_at"] = "2026-07-21T00:00:00Z"
+        self.write_planning_review(review)
+        report = self.validate(stage="design")
+        self.assertIn("DESIGN_BASELINE_STALE", self.codes(report))
 
     def test_unresolved_p0_design_finding_blocks_acceptance(self) -> None:
         acceptance = self.design_acceptance()

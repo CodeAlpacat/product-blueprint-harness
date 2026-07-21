@@ -81,5 +81,6 @@ Use `references/backend-brief-checklist.md` for detailed prompts.
 
 ## Next Step
 
-- Use `product-blueprint:design-system` if visual direction is ready.
-- Use `product-blueprint:feasibility-review` if backend/system risks need tradeoff discussion before more design work.
+- Use `product-blueprint:feasibility-review` in checkpoint mode if backend/system risks still need a product tradeoff.
+- Then use `product-blueprint:design-brief` to carry product-visible constraints into the planning handoff.
+- Visual system work starts later through `product-blueprint:design-production` only when the user requests it.

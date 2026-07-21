@@ -1,38 +1,35 @@
-# Why The Workflow Is Staged — Senior Team Process Rationale
+# Planning and Design Production Boundary
 
-Read this when the user asks why there are phases at all, why they can't jump straight to screens, or what a "senior team" would actually do.
+Product planning and visual design are connected but have different evidence and approval loops. The default Product Blueprint workflow owns the first and prepares a brief for the second.
 
-## The core claim
+## Default planning track
 
-A senior cross-functional team (PM, researcher, brand strategist, product designer, UX writer, design-systems designer, with engineering consulted throughout) does not produce quality by talent alone — it produces quality by **sequence and tension**:
+1. **Understand** — brief, research or ideation, and reference deconstruction.
+2. **Choose** — compare product concepts; confirm the product and brand direction with the user.
+3. **Specify** — define mechanisms, PRD, first-version scope, personas, mental models, and entry points.
+4. **Contract** — connect requirements to screens, actions, states, operations, and journeys.
+5. **Handoff to design** — map low-fidelity flows, record feasibility constraints, and write `03-design-brief.md`.
 
-1. **Sequence**: each stage locks a cheap-to-change decision before the next stage makes it expensive. Direction is cheaper than scope; scope is cheaper than flows; flows are cheaper than pixels; pixels are cheaper than code. Reversing this order is why "start from screens" products get rebuilt three times.
-2. **Tension**: quality comes from disagreement rituals — design critique, engineering feasibility pushback, risk review. A single voice (human or AI) converges to its own average. That is why this harness forces parallel concepts before lock, an adversarial fresh-context gate on visuals, a red-team pass on the PRD, and a feasibility checkpoint *before* screens are finalized — not because process is virtuous, but because each ritual is a stand-in for a colleague who would have said "no."
+The planning track does not choose a final visual language and does not claim high-fidelity UI quality.
 
-## What each stage is a stand-in for
+## Optional design-production track
 
-| Harness stage | The senior-team ritual it replaces |
-|---|---|
-| Brief / intake | PM kickoff: "what are we actually building and for whom" |
-| Research + reference deconstruction | UX researcher's competitive teardown with evidence, not vibes |
-| Parallel concepts + direction lock | Design leadership reviewing 2–3 directions before committing |
-| Positioning & brand | Brand strategist: name, voice, promise — decided before pixels inherit them |
-| Mechanisms + PRD | PM + systems designer writing behavior contracts for the invisible parts |
-| Screen contracts | Product designer's IA pass: each screen has one job, forbidden shortcuts named |
-| Feasibility checkpoint | The engineer in the room saying "that costs three sprints" BEFORE mockups promise it |
-| Storyboard | Flow review on a wall — the whole journey visible at once |
-| Art direction (measured) | Art director handing a spec, not adjectives |
-| Design system + React boards + flow preview | Design-systems team: branded tokens, reusable components, states, Depth screens, and all P0 flows from one source — not one hero shot |
-| Adversarial visual gate | The critique where a fresh pair of eyes fails your favorite screen |
-| Risk register | Legal/policy reviewer who reads it before launch, not after the incident |
-| Engineering handoff | The handoff meeting where developers can start architecting, not start asking |
+1. Gather user taste evidence and comparable references.
+2. Compare two or three product-specific visual directions.
+3. Apply the chosen direction to one representative screen and its critical states.
+4. Iterate with explicit user feedback until that screen establishes an accepted quality ceiling.
+5. Expand the approved system to all P0 screens, states, and viewports.
+6. Wire and test a prototype, critique it, absorb feasible constraints, and request user acceptance.
 
-## The two failure modes this prevents
+Visual production may expose a product-planning problem. When it does, return to the affected upstream artifact and reconfirm the decision instead of silently changing the contract in a mockup.
 
-- **The waterfall skip**: jumping to high-fidelity screens with no contracts under them. Screens look done, so nobody re-opens scope; the product ossifies around the first pretty mockup.
-- **The single-voice collapse**: one generator grading its own homework. Every gate in this harness that matters is either measurable (numbers) or fresh-context (a critic who didn't build it). Self-graded adjectives are treated as no gate at all.
-- **The prototype rewrite**: approving standalone HTML, then rebuilding components and layouts in the app. The React component/state board and Depth screens must use the same sources, so later work attaches behavior and data instead of redesigning the UI.
+## Common failure modes
 
-## When to compress
+- **The document pile**: many artifacts exist, but the user cannot tell what was decided. Keep the dashboard decision-focused.
+- **The premature mockup**: polished screens make uncertain scope look settled. Finish the product definition and design brief first.
+- **The full-batch reveal**: dozens of screens are generated before the user reacts to the visual direction. Approve one representative screen first.
+- **The generic system**: components use default AI/dashboard conventions without a product-specific visual thesis. Compare directions against the brief and references.
+- **The self-approval loop**: agent critique is treated as user satisfaction. Record explicit user review of current evidence.
+- **The silent product rewrite**: visual design changes navigation, screen roles, or required states without returning to planning. Invalidate and reconfirm affected contracts.
 
-Stages are not sacred; the decisions are. The Lite path keeps the decision sequence (direction → scope → flows) and drops the production-design stages. What is never skippable: the decision log, user decision gates, and labeling assumptions. A two-day plan with honest labels beats a two-week plan with hidden guesses.
+Planning validation and design acceptance are intentionally separate. Passing one never implies the other.

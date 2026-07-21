@@ -1,19 +1,19 @@
 ---
 name: positioning-brand
-description: Positioning statement, product naming with user taste-first iteration and availability signals, brand voice and tone, and mascot/wordmark direction. Use after direction lock and before art direction, or when the user asks to name the product, define the brand, pick a mascot, or write the tagline.
+description: Positioning statement, product naming with user taste-first iteration and availability signals, brand voice and tone, and optional identity direction. Use after the user confirms a product direction and before the PRD review and design brief.
 ---
 
 # Positioning & Brand
 
-Turn the locked direction into a positioning statement, a name, a voice, and a visual identity direction — BEFORE art direction, because the name/mascot/voice constrain the visual world (wordmark typography, mascot palette, copy tone in every mockup).
+Turn the confirmed product direction into positioning, a working name or shortlist, a voice, and optional identity principles. This phase gives later design useful constraints without pretending to complete visual design.
 
 ## Inputs
 
-- `00-decision-log.md` (direction lock), `01.6-parallel-concepts.md`, `01.5-reference-deconstruction.md` (competitor names/voices)
+- `00-decision-log.md` (confirmed product direction), `01.6-parallel-concepts.md`, `01.5-reference-deconstruction.md` (competitor names/voices)
 
 ## Output
 
-`01.8-positioning-brand.md` with the sections below. Update `00-decision-log.md` with a `BRAND-LOCK` entry when the user confirms.
+`01.8-positioning-brand.md` with the sections below. Update `00-decision-log.md` when the user confirms the brand direction.
 
 ## 1. Positioning
 
@@ -46,7 +46,7 @@ Anti-patterns: generating names by availability first (survivors have bad 어감
 - Usage boundaries: where the mascot appears (onboarding, empty states, long loading) and where it never appears (core content surfaces, chat/detail) — mascots that appear everywhere cheapen the product.
 - Motion signature if any (one loop, duration, easing) — motion only in waiting states.
 
-## Gate (before art direction consumes this)
+## Gate (before the PRD review and design brief consume this)
 
 - [ ] Positioning sentence approved or explicitly deferred by the user
 - [ ] Name: locked, or shortlist + availability signals recorded with the trademark warning

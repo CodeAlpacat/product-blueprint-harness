@@ -1,11 +1,11 @@
 ---
 name: art-direction-brief
-description: Creates a senior-level art direction brief before high-fidelity UI, connecting audience, product behavior, references, visual world, typography, color, imagery, motion, and anti-aesthetic. Use after screen contracts/storyboard and before visual mockups or design-system work when the user wants production-grade visual design instead of generic AI output.
+description: Codifies the user-chosen visual direction into a measured art-direction brief before one representative high-fidelity screen. Use only in the optional design-production workflow, after the design brief and visual-directions comparison.
 ---
 
 # Product Blueprint Art Direction Brief
 
-Use this before high-fidelity design. Art direction is not decoration; it is the product's visual point of view.
+Use this before the representative high-fidelity screen. Art direction is not decoration; it is the product's visual point of view. Read `03-design-brief.md`, `03.4-visual-directions.md`, and the decision-log entry that records the user's chosen direction. Do not invent a different direction here.
 
 Read first: `${CLAUDE_PLUGIN_ROOT}/references/anti-slop-doctrine.md` and `${CLAUDE_PLUGIN_ROOT}/references/measured-design-spec.md`. This brief is the input to the token substrate and the craft loop, so it must end in **numbers, not adjectives**.
 
@@ -65,6 +65,6 @@ Create `03.5-art-direction-brief.md` with:
 
 ## Next Step
 
-- 사용자가 결정할 것: 디자인 방향(팔레트·타입 램프·시그니처 요소) 승인 — 이 승인이 hi-fi 진입 게이트다. 바꾸려면 지금이 가장 싸다.
-- Use `product-blueprint:visual-quality-gate` after creating a mockup or storyboard proof.
-- Then use `product-blueprint:design-system` to turn the approved visual direction into reusable rules.
+- Produce one representative high-fidelity screen and its critical states from this brief.
+- Run `product-blueprint:visual-quality-gate` and return the screen to the user for feedback.
+- Use `product-blueprint:design-system` only after the representative screen establishes an explicitly approved quality ceiling.

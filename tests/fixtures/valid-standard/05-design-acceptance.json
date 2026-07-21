@@ -21,12 +21,17 @@
     "feasibility_sha256": "0cf1aef0049865ab2ee5aa0c31d395157f26ed010b6b9d359bcd2555cc8e594d"
   },
   "source_hashes": {
+    "02.05-planning-quality-review.json": "55064dda559bcc585d8afc280ac477012864e9f6a638a233d17d5d2b108eaab7",
     "02.1-product-definition.json": "6630546c56313c1602507d5c7a17492fdbb247d705a94fb7b970bec64dd8e93d",
     "02-prd.md": "b8a77d5befd48189990441072247b4bc72d8ab67a8f90140336ddc9353006fcf",
     "02.5-screen-contracts.md": "3e80311d65474b63532ae71f4c4595c0f5f6fad525106fcc4796e72e1f41e375",
     "02.6-service-manifest.json": "973c99e296648aa593cd79cb45942f64e4b930dd9f7503f4f4a20fda9c7623b7",
+    "02.7-feasibility-checkpoint.md": "262b74709fd565f1b451a79649d1e551726aa8cf1fd282af64bdc49f1bda6297",
     "02.8-undefined-surfaces.md": "ad65e639d0f15dd26a293ec5f35acf464f68966bb42ea68db9b32439a0cab5c5",
     "03-storyboard.html": "31956c073a053a05d59e96fb0cc90c1a156390dc707b66724ebf8d30026611e3",
+    "03-design-brief.md": "fb14891882c04b5fec60166fe4d897a58ea5fffb0dffcdf91f94a4235c152f3d",
+    "03.4-visual-directions.md": "288b1f77e7250b99071adf339cb79ba6b2eb949e7e86a0d962c25e74fd36eb83",
+    "03.5-art-direction-brief.md": "e11407266bd5a760ed6d811c4c3fe35cbeb1c6184ac9aca0b3d927c8bc77e79c",
     "03.7-ux-writing.md": "e9ff79a85b67c36f2c1ba2b78cc738bcd52ced030056330d3c43f52b8f1ba207",
     "04.1-visual-quality-gate.md": "a8e51031690a7b5e06f19e49d5e6a0b9c267f8b9a80dde4ccd24e0c6e4721461",
     "04.2-backend-systems-brief.md": "b934bc566e6f55c981e3a5c4bdd6bb52501b870ee1e93031a79aad9dd17be0a2",

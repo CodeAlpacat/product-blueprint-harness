@@ -14,19 +14,20 @@ Create or update `02.1-product-definition.json` from `assets/templates/product-d
 ## Inputs
 
 - brief, research/reference deconstruction, concept and brand decisions
-- PRD and decision log
+- PRD, current `02.05-planning-quality-review.json`, and decision log
 - the user's own terms for personas, jobs, objects, entry triggers, and expected outcomes
 
 ## Workflow
 
-1. Write each persona's mental model in user language. Do not use tables, routes, or implementation nouns as the explanation.
-2. Give stable IDs to every included or excluded requirement. Classify each as `journey`, `content`, `interaction`, `system`, or `quality`.
-3. Record P0/P1/P2, affected persona IDs, source refs, decision ref, and observable acceptance outcomes.
-4. Enumerate every entry path: first use, returning, external result/import, edit, post-success redirect, refresh, back, cross-device, and offline when applicable.
-5. For exclusions, state what the current-release entry point shows. “Later” without current behavior is not an exclusion.
-6. Present the user-language definition and entry-point map to the user. Keep `status: draft` until they explicitly confirm it.
-7. Only after explicit confirmation, write `status: user-confirmed` and the decision-log evidence. The agent must never self-approve this file.
-8. Run the contract stage after screen/service contracts exist. Any orphan requirement or entry point returns to this file or its downstream owner.
+1. Verify the planning review is current and its first-version scope is explicitly user-confirmed. The JSON stores that decision under `mvp_lock`; keep that field name internal. If it is not confirmed, return to `planning-quality-gate`.
+2. Write each persona's mental model in user language. Do not use tables, routes, or implementation nouns as the explanation.
+3. Give stable IDs to every included or excluded requirement. Classify each as `journey`, `content`, `interaction`, `system`, or `quality`.
+4. Record P0/P1/P2, affected persona IDs, source refs, decision ref, and observable acceptance outcomes.
+5. Enumerate every entry path: first use, returning, external result/import, edit, post-success redirect, refresh, back, cross-device, and offline when applicable.
+6. For exclusions, state what the current-release entry point shows. “Later” without current behavior is not an exclusion.
+7. Present the user-language definition and entry-point map to the user. Keep `status: draft` until they explicitly confirm it.
+8. Only after explicit confirmation, write `status: user-confirmed` and the decision-log evidence. The agent must never self-approve this file.
+9. Run the contract stage after screen/service contracts exist. Any orphan requirement or entry point returns to this file or its downstream owner.
 
 ## Coverage semantics
 

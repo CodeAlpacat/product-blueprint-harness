@@ -72,10 +72,10 @@ Evidence values:
 
 ## Output
 
-Create `02-prd.md`. End with a feature-by-feature checklist and a `Product Definition Seed` table: requirement candidate | kind | persona/mental model | entry point | required result | exception/boundary | decision evidence. Run `product-definition` next to turn this into the user-confirmed `02.1-product-definition.json`; that confirmed source set then drives screen and service contracts.
+Create `02-prd.md`. End with a feature-by-feature checklist and a `Product Definition Seed` table: requirement candidate | kind | persona/mental model | entry point | required result | exception/boundary | decision evidence. Keep the PRD draft until `planning-quality-gate` cross-reviews concept, brand, mechanisms, and PRD and the user confirms the first-version scope. Then run `product-definition` to create the user-confirmed `02.1-product-definition.json`; that confirmed source set drives screen and service contracts.
 
 ## Next Step
 
-- Use `product-blueprint:screen-contract` to define each priority screen's job, allowed actions, forbidden shortcuts, states, and transitions.
-- Then use `product-blueprint:service-contract` to bind stories, surfaces, actions, states, operations, and journeys before visual design.
-- Then use `product-blueprint:storyboard`.
+- Use `product-blueprint:planning-quality-gate` for independent six-lens review and first-version scope confirmation.
+- Then use `product-blueprint:product-definition` for the user-confirmed source set.
+- Only then use `product-blueprint:screen-contract` and `product-blueprint:service-contract` before the low-fidelity flow board and design brief.

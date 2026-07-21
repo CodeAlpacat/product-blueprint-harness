@@ -1,7 +1,7 @@
 {
   "name": "product-blueprint",
   "version": "0.4.0",
-  "description": "Guided product/design workflow for Claude Code: turns ideas into branded Depth-based screens, reusable React component/state boards, complete fixture-data flows, feasibility-checked visual evidence, explicit approval, and honest handoff before technical architecture.",
+  "description": "Guided product-planning workflow for Claude Code: turns ideas into compared concepts, brand direction, a cross-reviewed PRD, confirmed product definition, complete screen and service flows, and a design brief. Visual UI and prototype production are a separate opt-in workflow.",
   "author": {
     "name": "CodeAlpacat",
     "url": "https://github.com/CodeAlpacat"
@@ -12,14 +12,14 @@
   "keywords": [
     "product-planning",
     "prd",
+    "planning-quality-gate",
+    "design-brief",
+    "optional-design-production",
+    "visual-direction-comparison",
     "design-system",
     "art-direction",
-    "anti-ai-slop",
     "ux",
     "storyboard",
-    "shadcn",
-    "radix",
-    "design-tokens",
     "design-readiness",
     "design-acceptance",
     "feasibility-consultation",

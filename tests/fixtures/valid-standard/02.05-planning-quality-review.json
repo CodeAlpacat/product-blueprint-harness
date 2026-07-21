@@ -1,0 +1,71 @@
+{
+  "schema_version": "1.0",
+  "status": "user-confirmed",
+  "profile": "standard",
+  "reviewed_at": "2026-07-20T00:00:00Z",
+  "input_hashes": {
+    "00-brief.md": "a724df9050517abb4260e9b25a224329d5527c6e5ba00e0d15a6a8716f161665",
+    "01.6-parallel-concepts.md": "dbf880d104046dbb7e3d1013241af025e3e12a6ebcb2cb72e286cfb4c77223d0",
+    "01.8-positioning-brand.md": "f04a9a9ce894a9962047be6deb349b8c816c5654558cb2e102bf49aebb27bf53",
+    "02-mechanisms.md": "e84c2f53705b977c3226224e0762cd19be0a8b7ce2893277657f9d94096a67d2",
+    "02-prd.md": "b8a77d5befd48189990441072247b4bc72d8ab67a8f90140336ddc9353006fcf"
+  },
+  "lenses": [
+    {
+      "id": "product-strategy",
+      "status": "pass",
+      "summary": "The public inspection loop, activation outcome, and non-goals form one coherent MVP.",
+      "finding_ids": []
+    },
+    {
+      "id": "user-evidence",
+      "status": "pass-with-followups",
+      "summary": "The package labels fixture assumptions and does not claim target-user demand validation.",
+      "finding_ids": []
+    },
+    {
+      "id": "brand",
+      "status": "pass-with-followups",
+      "summary": "Positioning and recovery voice are coherent; the fixture name is explicitly temporary.",
+      "finding_ids": []
+    },
+    {
+      "id": "prd",
+      "status": "pass",
+      "summary": "P0 stories include entry, result, exception, boundary state, and acceptance evidence.",
+      "finding_ids": ["recovery-owner"]
+    },
+    {
+      "id": "service-feasibility",
+      "status": "pass",
+      "summary": "Loading, retry, and shared-link recovery have explicit product ownership.",
+      "finding_ids": []
+    },
+    {
+      "id": "growth-risk",
+      "status": "pass",
+      "summary": "P0 avoids account, payment, hidden persistence, and misleading validation claims.",
+      "finding_ids": []
+    }
+  ],
+  "findings": [
+    {
+      "id": "recovery-owner",
+      "lens_id": "prd",
+      "severity": "P1",
+      "status": "resolved",
+      "owner": "prd",
+      "artifact": "02-prd.md",
+      "problem": "The original draft did not assign the retry outcome to a stable P0 story.",
+      "evidence_refs": ["02-prd.md#recover-item-load", "02-mechanisms.md#failure-and-recovery"],
+      "required_change": "Bind retry to the recovery story and preserve the selected item context."
+    }
+  ],
+  "mvp_lock": {
+    "status": "confirmed",
+    "kind": "explicit-user",
+    "decision_ref": "DEC-1",
+    "confirmed_at": "2026-07-20T00:00:00Z",
+    "evidence": "The user approved the public inspection MVP after reviewing all six lenses."
+  }
+}

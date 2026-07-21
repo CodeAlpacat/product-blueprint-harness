@@ -13,9 +13,10 @@ Markdown remains the source of truth. The dashboard is the user's decision cockp
 
 - `00-decision-log.md`
 - Current phase artifact
-- Storyboard plus rendered React ComponentBoard, DepthBoard, and FlowPreview when available
+- Storyboard and design brief; rendered screens or prototypes only when the optional design-production workflow is active
 - Screenshots when available
 - Open questions and gate status
+- `02.05-planning-quality-review.json` when the PRD draft exists
 - `05-readiness-report.json` when design readiness has run
 
 ## Output
@@ -30,11 +31,13 @@ Create or update:
 2. **Review This First (핵심 2~4)**: the 2–4 artifacts the user must actually look at now, each marked ★, each with a one-line "what to confirm/decide." Do not list all artifacts here — only the few that matter this phase.
 3. **Decision Queue**: each decision as `Approve`, `Change`, or `Hold`; include impact and the file that changes.
 4. **Flow Snapshot**: compact user-flow map with entry, gate, commitment, result, and recovery.
-5. **Design Snapshot**: current visual direction, missing design work, and quality risks.
+5. **Experience / Design Boundary**: current screens and flows, what visual design has not started or approved, and the design brief when ready.
 6. **Scope Snapshot**: P0/P1/P2 and explicit scope-out.
 7. **Artifact Map**: every artifact grouped (planning / spec / design), each with a one-line purpose + status, so the founder sees the whole package at a glance and knows which are ★-key vs supporting evidence.
 8. **Evidence / Gaps**: what is observed, user-confirmed, proposed, assumed, or unverified.
 9. **Next Step**: one recommended skill, why, and what it will produce.
+
+During the planning-quality phase, show the six review perspectives, unresolved issue counts, whether the review is current, and the recommended first-version scope. Keep internal severity and hash mechanics in the detail view; do not make the founder open the review JSON.
 
 ## Rules
 
@@ -46,8 +49,9 @@ Create or update:
 - Use Korean when the user is Korean.
 - Show unresolved issues honestly; do not make a polished dashboard hide missing work.
 - When production design is not ready, say so visibly.
-- Dashboard readiness is derived, never self-declared. Its root element carries `data-readiness-status="not-evaluated|fail|pass|lite-pass"` matching the latest report.
-- Before a handoff report exists, say `디자인 확정 진행 중`, not implementation-ready. After a report exists, show its manifest SHA-256, checked time, findings count, `design_accepted`, `ready_for_technical_design`, `user_validated`, and accepted limitations.
+- Dashboard readiness is derived, never self-declared. Its root element carries a status matching the latest report.
+- At the default finish line, say `기획 완료 · 시각 디자인 미진행`. Show design approval only when the separate design-production workflow has current evidence and explicit user approval.
+- Keep manifest hashes and internal readiness field names in a collapsible technical detail area, not the primary user summary.
 - If the current manifest hash differs from the report hash, show `stale/fail` and rerun `design-readiness`; do not preserve an old green badge.
 
 ## Pass / Fail

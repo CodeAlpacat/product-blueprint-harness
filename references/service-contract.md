@@ -2,7 +2,7 @@
 
 Use this reference when creating or consuming `02.6-service-manifest.json`. Markdown explains intent; this manifest is the machine-readable identity and wiring source for product/design readiness.
 
-`02.1-product-definition.json` is the confirmed source set. The service manifest does not decide which user requirements or entry points exist; it proves how that set becomes surfaces, actions, operations, states, and journeys.
+`02.05-planning-quality-review.json` proves that concept, brand, mechanisms, and PRD received all six planning lenses, that P0/P1 findings were resolved, that source hashes are current, and that the user confirmed the first-version scope. `02.1-product-definition.json` is then the confirmed source set. The service manifest does not decide which user requirements or entry points exist; it proves how that set becomes surfaces, actions, operations, states, and journeys.
 
 ## Stable IDs
 
@@ -72,12 +72,14 @@ Use `n/a:<reason>` when a field truly does not apply. Use `decision-needed:<deci
 
 ```bash
 python3 <plugin-root>/scripts/validate_service_blueprint.py <planning-dir> --stage contract --no-write
+python3 <plugin-root>/scripts/validate_service_blueprint.py <planning-dir> --stage planning --no-write
 python3 <plugin-root>/scripts/validate_service_blueprint.py <planning-dir> --stage prototype --no-write
 python3 <plugin-root>/scripts/validate_service_blueprint.py <planning-dir> --stage design --no-write
 python3 <plugin-root>/scripts/validate_service_blueprint.py <planning-dir> --stage handoff
 ```
 
 - `contract`: graph, references, operations, journey lifecycle. Prototype may not exist yet.
+- `planning`: contract plus feasibility notes, coverage audit, low-fidelity flows, systems constraints, and a design brief. Visual UI does not exist yet.
 - `prototype`: DOM evidence, states, controls, transitions. Handoff may not exist yet.
 - `design`: visual/state evidence, feasibility consultation, absorbed constraints, and explicit user approval.
 - `handoff`: full product/design artifact set and authoritative `05-readiness-report.{json,md}`. It does not claim technical or implementation readiness.

@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0",
+  "status": "draft",
+  "profile": "standard",
+  "reviewed_at": "",
+  "input_hashes": {
+    "00-brief.md": "",
+    "01.6-parallel-concepts.md": "",
+    "01.8-positioning-brand.md": "",
+    "02-mechanisms.md": "",
+    "02-prd.md": ""
+  },
+  "lenses": [
+    {"id": "product-strategy", "status": "pending", "summary": "", "finding_ids": []},
+    {"id": "user-evidence", "status": "pending", "summary": "", "finding_ids": []},
+    {"id": "brand", "status": "pending", "summary": "", "finding_ids": []},
+    {"id": "prd", "status": "pending", "summary": "", "finding_ids": []},
+    {"id": "service-feasibility", "status": "pending", "summary": "", "finding_ids": []},
+    {"id": "growth-risk", "status": "pending", "summary": "", "finding_ids": []}
+  ],
+  "findings": [],
+  "mvp_lock": {
+    "status": "pending",
+    "kind": "explicit-user",
+    "decision_ref": "",
+    "confirmed_at": "",
+    "evidence": ""
+  }
+}

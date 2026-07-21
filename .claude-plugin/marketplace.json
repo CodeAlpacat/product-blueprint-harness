@@ -5,22 +5,23 @@
     "url": "https://github.com/CodeAlpacat"
   },
   "metadata": {
-    "description": "Product Blueprint — pre-development planning-to-design harness that turns an idea into a production-grade design system without AI slop.",
+    "description": "Product Blueprint — a planning-first harness that turns an idea into a reviewed PRD, product flows, and a design handoff brief, with visual production available separately.",
     "version": "0.2.0"
   },
   "plugins": [
     {
       "name": "product-blueprint",
       "source": "./",
-      "description": "Guided product/design freeze harness: confirmed mental models, continuous user flows, complete screen/state/viewport evidence, developer-lens feasibility consultation, iterative user approval, and an honest design handoff before separate technical architecture.",
-      "category": "design",
+      "description": "Guided product-planning harness: compared concepts, brand direction, cross-reviewed PRD, confirmed product definition, complete screen and service flows, and a clear design brief. Visual design is optional and separate.",
+      "category": "productivity",
       "tags": [
         "product-planning",
-        "design-system",
-        "art-direction",
-        "anti-ai-slop",
+        "design-brief",
+        "optional-design-production",
+        "visual-direction-comparison",
         "ux",
         "prd",
+        "planning-quality-gate",
         "storyboard",
         "handoff"
       ]

@@ -1,39 +1,35 @@
-# Professional Design Process Notes
+# Planning and Design Production Boundary
 
-Use these notes to keep Product Blueprint aligned with common senior product-design practice.
+Product planning and visual design are connected but have different evidence and approval loops. The default Product Blueprint workflow owns the first and prepares a brief for the second.
 
-## Source Models
+## Default planning track
 
-- Design Council Double Diamond: discover/define/develop/deliver. Use divergent exploration before converging on one direction.
-- IDEO design thinking: balance human desirability, technical feasibility, and organizational viability.
-- Nielsen Norman Group design thinking: empathize, define, ideate, prototype, test, implement. Do not skip prototype testing.
-- Figma guidance: pages/sections organize review, component properties/variants expose intended change, variables/modes express context, and named flows connect frames. Product Blueprint maps these to reusable React sources; see `${CLAUDE_PLUGIN_ROOT}/references/figma-design-process.md`.
+1. **Understand** — brief, research or ideation, and reference deconstruction.
+2. **Choose** — compare product concepts; confirm the product and brand direction with the user.
+3. **Specify** — define mechanisms, PRD, first-version scope, personas, mental models, and entry points.
+4. **Contract** — connect requirements to screens, actions, states, operations, and journeys.
+5. **Handoff to design** — map low-fidelity flows, record feasibility constraints, and write `03-design-brief.md`.
 
-## Product Blueprint Translation
+The planning track does not choose a final visual language and does not claim high-fidelity UI quality.
 
-1. **Discover**: `research`, `reference-deconstruction`, or `ideation`.
-2. **Define**: `experience-mechanisms`, `prd`, `screen-contract`.
-3. **Develop**: `parallel-concepts`, `storyboard`, `art-direction-brief`, `visual-quality-gate`, `design-system`, `design-system-workbench`, optional `high-fidelity-screen`.
-4. **Deliver preparation**: `backend-systems-brief`, `prototype-test`, `design-critique`, `feasibility-review`, `engineering-handoff`.
+## Optional design-production track
 
-## Senior Designer Behaviors To Enforce
+1. Gather user taste evidence and comparable references.
+2. Compare two or three product-specific visual directions.
+3. Apply the chosen direction to one representative screen and its critical states.
+4. Iterate with explicit user feedback until that screen establishes an accepted quality ceiling.
+5. Expand the approved system to all P0 screens, states, and viewports.
+6. Wire and test a prototype, critique it, absorb feasible constraints, and request user acceptance.
 
-- Define the screen's job before drawing the screen.
-- Explore multiple concepts before polishing one.
-- Convert reference screenshots into principles and gates, not copied styling.
-- Use art direction to reject generic visual output.
-- Design states and recovery paths, not just happy paths.
-- Use HTML boards only for cheap flow/IA review. Final visual approval uses React ComponentBoard, DepthBoard, and FlowPreview importing the same sources.
-- Use AI for divergent first drafts, realistic content, organization, and interaction assistance; lock direction before system-constrained assembly and audit the edge cases AI tends to simplify.
-- Use single-screen high-fidelity specimens only as an extra pixel pass after the workbench, not as the whole design-system deliverable.
-- Test prototypes with concrete tasks.
-- Critique against product intent, not personal taste.
+Visual production may expose a product-planning problem. When it does, return to the affected upstream artifact and reconfirm the decision instead of silently changing the contract in a mockup.
 
-## Source Links
+## Common failure modes
 
-- https://www.designcouncil.org.uk/resources/the-double-diamond/
-- https://designthinking.ideo.com/
-- https://www.nngroup.com/articles/design-thinking/
-- https://help.figma.com/hc/en-us/articles/14552802134807-Lesson-1-Welcome-to-design-systems
-- https://help.figma.com/hc/en-us/articles/15297425105303-Explore-design-files
-- https://help.figma.com/hc/en-us/articles/23870272542231-Use-AI-tools-in-Figma-Design
+- **The document pile**: many artifacts exist, but the user cannot tell what was decided. Keep the dashboard decision-focused.
+- **The premature mockup**: polished screens make uncertain scope look settled. Finish the product definition and design brief first.
+- **The full-batch reveal**: dozens of screens are generated before the user reacts to the visual direction. Approve one representative screen first.
+- **The generic system**: components use default AI/dashboard conventions without a product-specific visual thesis. Compare directions against the brief and references.
+- **The self-approval loop**: agent critique is treated as user satisfaction. Record explicit user review of current evidence.
+- **The silent product rewrite**: visual design changes navigation, screen roles, or required states without returning to planning. Invalidate and reconfirm affected contracts.
+
+Planning validation and design acceptance are intentionally separate. Passing one never implies the other.

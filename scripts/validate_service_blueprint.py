@@ -23,12 +23,21 @@ STANDARD_ARTIFACTS = (
     "00-brief.md",
     "00-decision-log.md",
     "00-review-dashboard.html",
+    "01.6-parallel-concepts.md",
+    "01.8-positioning-brand.md",
+    "02-mechanisms.md",
     "02-prd.md",
+    "02.05-planning-quality-review.md",
+    "02.05-planning-quality-review.json",
     "02.1-product-definition.json",
     "02.5-screen-contracts.md",
     "02.6-service-manifest.json",
+    "02.7-feasibility-checkpoint.md",
     "02.8-undefined-surfaces.md",
     "03-storyboard.html",
+    "03-design-brief.md",
+    "03.5-art-direction-brief.md",
+    "03.4-visual-directions.md",
     "03.7-ux-writing.md",
     "04.1-visual-quality-gate.md",
     "04.2-backend-systems-brief.md",
@@ -46,37 +55,64 @@ LITE_ARTIFACTS = (
     "00-brief.md",
     "00-decision-log.md",
     "00-review-dashboard.html",
+    "01.6-parallel-concepts.md",
+    "01.8-positioning-brand.md",
+    "02-mechanisms.md",
     "02-prd.md",
+    "02.05-planning-quality-review.md",
+    "02.05-planning-quality-review.json",
     "02.1-product-definition.json",
     "02.5-screen-contracts.md",
     "02.6-service-manifest.json",
+    "02.7-feasibility-checkpoint.md",
+    "02.8-undefined-surfaces.md",
     "03-storyboard.html",
+    "03-design-brief.md",
 )
 
 CONTRACT_ARTIFACTS = (
     "00-brief.md",
     "00-decision-log.md",
     "00-review-dashboard.html",
+    "01.6-parallel-concepts.md",
+    "01.8-positioning-brand.md",
+    "02-mechanisms.md",
     "02-prd.md",
+    "02.05-planning-quality-review.md",
+    "02.05-planning-quality-review.json",
     "02.1-product-definition.json",
     "02.5-screen-contracts.md",
     "02.6-service-manifest.json",
 )
 
-PROTOTYPE_ARTIFACTS = CONTRACT_ARTIFACTS + (
+LITE_PLANNING_ARTIFACTS = CONTRACT_ARTIFACTS + (
+    "02.7-feasibility-checkpoint.md",
+    "02.8-undefined-surfaces.md",
     "03-storyboard.html",
+    "03-design-brief.md",
+)
+
+PLANNING_ARTIFACTS = LITE_PLANNING_ARTIFACTS + (
     "04.2-backend-systems-brief.md",
+)
+
+PROTOTYPE_ARTIFACTS = PLANNING_ARTIFACTS + (
     "04.36-clickable-demo.md",
 )
 
 DESIGN_ARTIFACTS = tuple(item for item in STANDARD_ARTIFACTS if item != "05-engineering-handoff.md")
 DESIGN_SOURCE_FILES = (
+    "02.05-planning-quality-review.json",
     "02.1-product-definition.json",
     "02-prd.md",
     "02.5-screen-contracts.md",
     "02.6-service-manifest.json",
+    "02.7-feasibility-checkpoint.md",
     "02.8-undefined-surfaces.md",
     "03-storyboard.html",
+    "03-design-brief.md",
+    "03.5-art-direction-brief.md",
+    "03.4-visual-directions.md",
     "03.7-ux-writing.md",
     "04.1-visual-quality-gate.md",
     "04.2-backend-systems-brief.md",
@@ -98,6 +134,24 @@ PERSISTENCE_TYPES = {"none", "session", "account", "cross-device"}
 RISK_DOMAINS = {"adult", "minors", "payments", "ugc", "pii", "ai-generated"}
 STATUS_KEYS = ("defined", "prototyped", "wired", "contracted", "verified")
 REQUIREMENT_KINDS = {"journey", "content", "interaction", "system", "quality"}
+PLANNING_SOURCE_FILES = (
+    "00-brief.md",
+    "01.6-parallel-concepts.md",
+    "01.8-positioning-brand.md",
+    "02-mechanisms.md",
+    "02-prd.md",
+)
+PLANNING_REVIEW_LENSES = {
+    "product-strategy",
+    "user-evidence",
+    "brand",
+    "prd",
+    "service-feasibility",
+    "growth-risk",
+}
+PLANNING_LENS_STATUSES = {"pass", "pass-with-followups"}
+PLANNING_FINDING_SEVERITIES = {"P0", "P1", "P2"}
+PLANNING_FINDING_STATUSES = {"open", "resolved", "accepted"}
 ENTRY_POINT_LIFECYCLES = {
     "first-use",
     "returning",
@@ -158,9 +212,11 @@ class Validator:
         self.profile_override = profile
         self.stage = stage
         self.manifest_path = self.root / "02.6-service-manifest.json"
+        self.planning_review_path = self.root / "02.05-planning-quality-review.json"
         self.product_definition_path = self.root / "02.1-product-definition.json"
         self.design_acceptance_path = self.root / "05-design-acceptance.json"
         self.manifest: dict[str, Any] = {}
+        self.planning_review: dict[str, Any] = {}
         self.product_definition: dict[str, Any] = {}
         self.design_acceptance: dict[str, Any] = {}
         self.personas: dict[str, dict[str, Any]] = {}
@@ -174,11 +230,14 @@ class Validator:
 
     def run(self) -> dict[str, Any]:
         self._load_manifest()
+        self._load_planning_review()
         self._load_product_definition()
         profile = self._profile()
         if self.stage in {"design", "handoff"} and profile != "lite":
             self._load_design_acceptance()
         self._validate_artifacts(profile, self.stage)
+        if self.planning_review:
+            self._validate_planning_review(profile)
         if self.product_definition:
             self._validate_product_definition()
         if self.manifest:
@@ -228,6 +287,30 @@ class Validator:
             return
         self.product_definition = loaded
 
+    def _load_planning_review(self) -> None:
+        if not self.planning_review_path.exists():
+            self.add(
+                "PLANNING_REVIEW_MISSING",
+                "Run product-blueprint:planning-quality-gate and confirm the first-version scope before product definition.",
+                "02.05-planning-quality-review.json",
+                "planning-quality-gate",
+            )
+            return
+        try:
+            loaded = json.loads(self.planning_review_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            self.add("PLANNING_REVIEW_INVALID", str(exc), "02.05-planning-quality-review.json", "planning-quality-gate")
+            return
+        if not isinstance(loaded, dict):
+            self.add(
+                "PLANNING_REVIEW_INVALID",
+                "Planning review root must be an object.",
+                "02.05-planning-quality-review.json",
+                "planning-quality-gate",
+            )
+            return
+        self.planning_review = loaded
+
     def _load_design_acceptance(self) -> None:
         if not self.design_acceptance_path.exists():
             self.add(
@@ -257,6 +340,10 @@ class Validator:
     def _validate_artifacts(self, profile: str, stage: str) -> None:
         if stage == "contract":
             required = CONTRACT_ARTIFACTS
+        elif stage == "planning":
+            required = LITE_PLANNING_ARTIFACTS if profile == "lite" else PLANNING_ARTIFACTS
+            if profile == "deep":
+                required = required + ("04.55-risk-register.md",)
         elif stage == "prototype":
             required = PROTOTYPE_ARTIFACTS
         elif stage == "design":
@@ -295,7 +382,7 @@ class Validator:
         risk_domains = release.get("risk_domains", [])
         if not isinstance(risk_domains, list) or any(item not in RISK_DOMAINS for item in risk_domains):
             self.add("INVALID_RISK_DOMAINS", f"risk_domains must contain only: {', '.join(sorted(RISK_DOMAINS))}.", "release_profile.risk_domains", "risk-register")
-        elif self.stage in {"design", "handoff", "technical"} and risk_domains and not (self.root / "04.55-risk-register.md").is_file():
+        elif self.stage in {"planning", "design", "handoff", "technical"} and risk_domains and not (self.root / "04.55-risk-register.md").is_file():
             self.add("RISK_REGISTER_MISSING", "A risk register is mandatory for the declared risk domains.", "04.55-risk-register.md", "risk-register")
 
         for key in ("surfaces", "actions", "states", "operations", "ai_assists", "journeys"):
@@ -312,6 +399,120 @@ class Validator:
             self.add("INVALID_USER_VALIDATION_STATUS", "Use not-run, heuristic, or real-user.", "user_validation.status", "prototype-test")
         if status == "real-user" and not validation.get("evidence"):
             self.add("REAL_USER_EVIDENCE_MISSING", "real-user status requires evidence.", "user_validation.evidence", "prototype-test")
+
+    def _validate_planning_review(self, profile: str) -> None:
+        review = self.planning_review
+        owner = "planning-quality-gate"
+        if review.get("schema_version") != "1.0":
+            self.add("UNSUPPORTED_PLANNING_REVIEW_VERSION", "schema_version must be 1.0.", "schema_version", owner)
+        if review.get("profile") != profile:
+            self.add("PLANNING_REVIEW_PROFILE_MISMATCH", f"Planning review profile must be {profile!r}.", "profile", owner)
+        if review.get("status") != "user-confirmed":
+            self.add("PLANNING_REVIEW_UNCONFIRMED", "The planning review and first-version scope need explicit user confirmation.", "status", owner)
+        if not self._meaningful(review.get("reviewed_at")):
+            self.add("PLANNING_REVIEW_INCOMPLETE", "reviewed_at is required.", "reviewed_at", owner)
+
+        hashes = review.get("input_hashes")
+        if not isinstance(hashes, dict):
+            self.add("PLANNING_REVIEW_HASHES_MISSING", "input_hashes must be an object.", "input_hashes", owner)
+        else:
+            for relative in PLANNING_SOURCE_FILES:
+                expected = self._file_hash(self.root / relative)
+                recorded = hashes.get(relative)
+                if not self._meaningful(recorded):
+                    self.add("PLANNING_REVIEW_HASH_MISSING", f"Missing source hash for {relative}.", f"input_hashes.{relative}", owner)
+                elif expected != recorded:
+                    self.add("PLANNING_REVIEW_STALE", f"Planning source changed after review: {relative}.", f"input_hashes.{relative}", owner)
+
+        raw_lenses = review.get("lenses")
+        lenses: dict[str, dict[str, Any]] = {}
+        if not isinstance(raw_lenses, list):
+            self.add("PLANNING_LENSES_INVALID", "lenses must be an array.", "lenses", owner)
+        else:
+            for index, lens in enumerate(raw_lenses):
+                path = f"lenses[{index}]"
+                if not isinstance(lens, dict):
+                    self.add("PLANNING_LENS_INVALID", "Each lens must be an object.", path, owner)
+                    continue
+                lens_id = lens.get("id")
+                if lens_id not in PLANNING_REVIEW_LENSES:
+                    self.add("UNKNOWN_PLANNING_LENS", f"Unknown planning lens: {lens_id!r}.", f"{path}.id", owner)
+                    continue
+                if lens_id in lenses:
+                    self.add("DUPLICATE_PLANNING_LENS", f"Duplicate planning lens: {lens_id}.", f"{path}.id", owner)
+                    continue
+                lenses[lens_id] = lens
+                if lens.get("status") not in PLANNING_LENS_STATUSES:
+                    self.add("PLANNING_LENS_NOT_PASSED", f"Lens {lens_id} must pass or pass with follow-ups.", f"{path}.status", owner)
+                if not self._meaningful(lens.get("summary")):
+                    self.add("PLANNING_LENS_INCOMPLETE", f"Lens {lens_id} needs a concrete summary.", f"{path}.summary", owner)
+                if not isinstance(lens.get("finding_ids"), list):
+                    self.add("PLANNING_LENS_INCOMPLETE", f"Lens {lens_id} finding_ids must be an array.", f"{path}.finding_ids", owner)
+            for lens_id in sorted(PLANNING_REVIEW_LENSES - set(lenses)):
+                self.add("PLANNING_LENS_MISSING", f"Required planning lens is missing: {lens_id}.", "lenses", owner)
+
+        raw_findings = review.get("findings")
+        finding_ids: set[str] = set()
+        findings_by_lens: dict[str, set[str]] = {lens_id: set() for lens_id in PLANNING_REVIEW_LENSES}
+        if not isinstance(raw_findings, list):
+            self.add("PLANNING_FINDINGS_INVALID", "findings must be an array.", "findings", owner)
+        else:
+            for index, finding in enumerate(raw_findings):
+                path = f"findings[{index}]"
+                if not isinstance(finding, dict):
+                    self.add("PLANNING_FINDING_INVALID", "Each finding must be an object.", path, owner)
+                    continue
+                finding_id = finding.get("id")
+                if not isinstance(finding_id, str) or not ID_RE.fullmatch(finding_id):
+                    self.add("INVALID_PLANNING_FINDING_ID", "Finding id must use stable kebab-case.", f"{path}.id", owner)
+                elif finding_id in finding_ids:
+                    self.add("DUPLICATE_PLANNING_FINDING", f"Duplicate finding id: {finding_id}.", f"{path}.id", owner)
+                else:
+                    finding_ids.add(finding_id)
+                lens_id = finding.get("lens_id")
+                if lens_id not in PLANNING_REVIEW_LENSES:
+                    self.add("UNKNOWN_PLANNING_LENS", f"Unknown finding lens: {lens_id!r}.", f"{path}.lens_id", owner)
+                elif isinstance(finding_id, str):
+                    findings_by_lens[lens_id].add(finding_id)
+                severity = finding.get("severity")
+                status = finding.get("status")
+                if severity not in PLANNING_FINDING_SEVERITIES:
+                    self.add("INVALID_PLANNING_FINDING_SEVERITY", "severity must be P0, P1, or P2.", f"{path}.severity", owner)
+                if status not in PLANNING_FINDING_STATUSES:
+                    self.add("INVALID_PLANNING_FINDING_STATUS", "status must be open, resolved, or accepted.", f"{path}.status", owner)
+                if severity in {"P0", "P1"} and status != "resolved":
+                    self.add("PLANNING_BLOCKER_OPEN", f"{severity} finding {finding_id!r} must be resolved before the first-version scope is confirmed.", f"{path}.status", owner)
+                for key in ("owner", "artifact", "problem", "required_change"):
+                    if not self._meaningful(finding.get(key)):
+                        self.add("PLANNING_FINDING_INCOMPLETE", f"{key} is required.", f"{path}.{key}", owner)
+                if not isinstance(finding.get("evidence_refs"), list) or not finding.get("evidence_refs"):
+                    self.add("PLANNING_FINDING_INCOMPLETE", "evidence_refs needs at least one item.", f"{path}.evidence_refs", owner)
+
+        for lens_id, lens in lenses.items():
+            declared = lens.get("finding_ids")
+            if isinstance(declared, list) and set(declared) != findings_by_lens[lens_id]:
+                self.add("PLANNING_LENS_FINDING_MISMATCH", f"Lens {lens_id} finding_ids do not match its findings.", f"lenses.{lens_id}.finding_ids", owner)
+
+        lock = review.get("mvp_lock")
+        if not isinstance(lock, dict):
+            self.add("MVP_LOCK_UNCONFIRMED", "mvp_lock must be an object.", "mvp_lock", owner)
+        else:
+            if lock.get("status") != "confirmed" or lock.get("kind") != "explicit-user":
+                self.add("MVP_LOCK_UNCONFIRMED", "The first-version scope requires explicit user confirmation.", "mvp_lock", owner)
+            for key in ("decision_ref", "confirmed_at", "evidence"):
+                if not self._meaningful(lock.get(key)):
+                    self.add("MVP_LOCK_UNCONFIRMED", f"mvp_lock.{key} is required.", f"mvp_lock.{key}", owner)
+            decision_ref = lock.get("decision_ref")
+            decision_log_path = self.root / "00-decision-log.md"
+            if self._meaningful(decision_ref) and decision_log_path.is_file():
+                decision_log = decision_log_path.read_text(encoding="utf-8")
+                if str(decision_ref) not in decision_log:
+                    self.add(
+                        "MVP_LOCK_DECISION_REF_MISSING",
+                        f"Decision log does not contain first-version scope decision reference {decision_ref!r}.",
+                        "mvp_lock.decision_ref",
+                        owner,
+                    )
 
     def _validate_product_definition(self) -> None:
         definition = self.product_definition
@@ -1418,10 +1619,11 @@ class Validator:
         errors = [finding for finding in self.findings if finding.severity == "error"]
         validation = self.manifest.get("user_validation", {}) if self.manifest else {}
         user_validated = isinstance(validation, dict) and validation.get("status") == "real-user" and bool(validation.get("evidence"))
-        stage_rank = {"contract": 0, "prototype": 1, "design": 2, "handoff": 3}.get(self.stage, -1)
+        stage_rank = {"contract": 0, "planning": 1, "prototype": 2, "design": 3, "handoff": 4}.get(self.stage, -1)
         error_owners = {finding.owner for finding in errors}
         contract_owners = {"product-definition", "prd", "screen-contract", "service-contract", "backend-systems-brief"}
-        prototype_owners = contract_owners | {"clickable-demo", "prototype-test", "design-readiness"}
+        planning_owners = contract_owners | {"planning-quality-gate", "feasibility-review", "storyboard", "design-brief", "orchestrate"}
+        prototype_owners = planning_owners | {"clickable-demo", "prototype-test", "design-readiness"}
         design_owners = prototype_owners | {
             "design-acceptance",
             "visual-quality-gate",
@@ -1433,7 +1635,8 @@ class Validator:
         }
         handoff_owners = design_owners | {"engineering-handoff", "decision-dashboard", "orchestrate"}
         product_contract_ready = profile != "lite" and stage_rank >= 0 and not (error_owners & contract_owners)
-        prototype_ready = product_contract_ready and stage_rank >= 1 and not (error_owners & prototype_owners)
+        planning_ready = product_contract_ready and self.stage in {"planning", "prototype", "design", "handoff"} and not (error_owners & planning_owners)
+        prototype_ready = planning_ready and self.stage in {"prototype", "design", "handoff"} and not (error_owners & prototype_owners)
         design_owner_approved = self.design_acceptance.get("status") == "user-approved" if self.design_acceptance else False
         design_accepted = prototype_ready and stage_rank >= 2 and design_owner_approved and not (error_owners & design_owners)
         design_handoff_ready = design_accepted and stage_rank >= 3 and not (error_owners & handoff_owners)
@@ -1456,6 +1659,7 @@ class Validator:
             "profile": profile,
             "engineering_ready": engineering_ready,
             "product_contract_ready": product_contract_ready,
+            "planning_ready": planning_ready,
             "prototype_ready": prototype_ready,
             "design_owner_approved": design_owner_approved,
             "design_accepted": design_accepted,
@@ -1466,7 +1670,9 @@ class Validator:
             "implementation_ready": implementation_ready,
             "user_validated": user_validated,
             "manifest_sha256": self._manifest_hash(),
+            "planning_review_sha256": self._file_hash(self.planning_review_path),
             "product_definition_sha256": self._file_hash(self.product_definition_path),
+            "design_brief_sha256": self._file_hash(self.root / "03-design-brief.md"),
             "design_acceptance_sha256": self._file_hash(self.design_acceptance_path),
             "feasibility_sha256": self._feasibility_hash(),
             "checked_at": datetime.now(timezone.utc).isoformat(),
@@ -1485,6 +1691,7 @@ def write_report(root: Path, report: dict[str, Any]) -> None:
         "",
         f"- Status: **{report['status']}**",
         f"- Product contract ready: **{str(report['product_contract_ready']).lower()}**",
+        f"- Planning ready: **{str(report['planning_ready']).lower()}**",
         f"- Prototype ready: **{str(report['prototype_ready']).lower()}**",
         f"- Design owner approved: **{str(report['design_owner_approved']).lower()}**",
         f"- Design accepted: **{str(report['design_accepted']).lower()}**",
@@ -1493,6 +1700,7 @@ def write_report(root: Path, report: dict[str, Any]) -> None:
         "- Technical/implementation readiness: **outside this harness**",
         f"- User validated: **{str(report['user_validated']).lower()}**",
         f"- Manifest SHA-256: `{report['manifest_sha256'] or 'missing'}`",
+        f"- Planning review SHA-256: `{report['planning_review_sha256'] or 'missing'}`",
         f"- Feasibility SHA-256: `{report['feasibility_sha256'] or 'missing'}`",
         f"- Checked at: `{report['checked_at']}`",
         "",
@@ -1522,7 +1730,7 @@ def parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("planning_dir", type=Path)
     parser.add_argument("--profile", choices=("lite", "standard", "deep"))
-    parser.add_argument("--stage", choices=("contract", "prototype", "design", "handoff"), default="handoff")
+    parser.add_argument("--stage", choices=("contract", "planning", "prototype", "design", "handoff"), default="handoff")
     parser.add_argument("--no-write", action="store_true", help="Print findings without writing readiness reports")
     parser.add_argument("--json", action="store_true", help="Print the full JSON report")
     return parser.parse_args(argv)
@@ -1543,7 +1751,7 @@ def main(argv: Iterable[str] | None = None) -> int:
         print(f"{report['status']}: {len(report['findings'])} finding(s)")
         for finding in report["findings"]:
             print(f"- {finding['code']} [{finding['severity']}]: {finding['message']} ({finding['path']})")
-    return 0 if report["status"] in {"contract-pass", "prototype-pass", "design-pass", "handoff-pass", "lite-pass"} else 1
+    return 0 if report["status"] in {"contract-pass", "planning-pass", "prototype-pass", "design-pass", "handoff-pass", "lite-pass"} else 1
 
 
 if __name__ == "__main__":

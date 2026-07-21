@@ -89,4 +89,4 @@ If an AI mechanism creates, drafts, recommends, judges, or summarizes, its linke
 
 - 사용자가 결정할 것: 각 메커니즘의 surface 레벨(백그라운드/사이드/전용 화면)과 P0 편입 여부 — 단독 결정 금지 영역.
 - Use `product-blueprint:prd` if product requirements are not yet written.
-- Use `product-blueprint:screen-contract` once the MVP scope and priority screens are clear.
+- Use `product-blueprint:prd`, then `planning-quality-gate` and `product-definition`; run `screen-contract` only after those gates pass.
