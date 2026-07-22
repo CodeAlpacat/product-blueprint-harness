@@ -60,5 +60,5 @@ Create `01.6-parallel-concepts.md` with:
 ## Next Step
 
 - 사용자가 결정할 것: 컨셉 A/B/C 중 제품 방향 — 비교표와 대표 흐름만 보고 결정 가능해야 하며, 구분이 안 되면 컨셉을 다시 구체화한다.
-- After the user confirms the product direction, use `product-blueprint:positioning-brand` for the working brand.
+- After the user confirms the product direction, append `00-decision-log.md`, record the same decision with `scripts/workflow_state.py confirm <planning-dir> --gate product-direction ...`, then use `product-blueprint:positioning-brand` for the working brand.
 - Then use `product-blueprint:experience-mechanisms` and `product-blueprint:prd`; screen contracts come only after the planning-quality and product-definition gates.

@@ -1,6 +1,6 @@
 ---
 name: planning-quality-gate
-description: Cross-reviews product concept, positioning and brand, experience mechanisms, and PRD through independent product-strategy, user-evidence, brand, requirements, service-feasibility, and growth-risk lenses before the user confirms the first-version scope and product definition.
+description: Cross-reviews product concept, positioning and brand, experience mechanisms, and PRD through six evidence-linked product, user, brand, requirements, feasibility, and risk lenses before the user confirms the first-version scope.
 ---
 
 # Planning Quality Gate
@@ -24,9 +24,9 @@ Use `assets/templates/planning-review.json` for the machine-readable review. Pro
 - `02.05-planning-quality-review.md` for the founder-facing review
 - `02.05-planning-quality-review.json` for the deterministic gate
 
-## Independent Lenses
+## Six Review Lenses
 
-Run all six lenses. Keep their findings separate before reconciling them.
+Run all six lenses. Keep their evidence and findings separate before reconciling them. When one agent runs all six in the same context, describe them as perspectives, not independent reviewers. Independence may be claimed only when genuinely separate reviewers or contexts were used and their provenance is recorded.
 
 1. `product-strategy`: target/job clarity, core-loop pull, differentiation, MVP coherence, non-goals.
 2. `user-evidence`: observed vs assumed claims, reference limits, user language, unsupported demand claims.
@@ -35,7 +35,7 @@ Run all six lenses. Keep their findings separate before reconciling them.
 5. `service-feasibility`: lifecycle continuity, invisible mechanisms, trust/recovery, operational or cost constraints that change the product promise.
 6. `growth-risk`: activation, retention, monetization trust, safety/privacy/policy exposure, scope lies.
 
-Use subagents only when the user explicitly approves delegation and the environment supports it. Otherwise run the lenses sequentially with a fresh review pass for each lens. Never let one lens copy another lens's conclusion without checking the source artifacts.
+Use subagents only when the user explicitly approves delegation and the environment supports it. Otherwise run the lenses sequentially with a fresh source check for each lens. Every lens must cite concrete evidence references; never let one perspective copy another perspective's conclusion without checking the source artifacts.
 
 ## Finding Contract
 
@@ -55,14 +55,20 @@ Do not write vague findings such as “needs more detail.” Name the missing de
 ## Review Loop
 
 1. Hash the five required planning sources listed in the JSON template.
-2. Run each lens independently and record findings.
-3. Reconcile duplicates without erasing disagreements.
-4. Fix every P0 and P1 finding in its owning upstream artifact.
-5. Re-run affected lenses after edits and refresh source hashes.
-6. Present the recommended first-version scope: included work, non-goals, main risk, and the condition under which an alternative wins.
-7. Keep `status: draft` and the internal `mvp_lock.status: pending` field until the user explicitly confirms. Do not show “MVP lock” as the user-facing decision label.
-8. After explicit confirmation, record `status: user-confirmed`, confirmation evidence, and the decision-log reference.
-9. Run `design-readiness --stage contract` only after `product-definition`, screen contracts, and the service manifest exist.
+2. Add at least one substantive `01-reference-research.md` or `01-ideation.md` source to `evidence_sources`, including its kind and current SHA-256.
+3. Run each lens and record its concrete `evidence_refs` and findings.
+4. Reconcile duplicates without erasing disagreements.
+5. Fix every P0 and P1 finding in its owning upstream artifact.
+6. Re-run affected lenses after edits and refresh source and evidence hashes.
+7. Present the recommended first-version scope: included work, non-goals, main risk, and the condition under which an alternative wins.
+8. Keep `status: draft` and the internal `mvp_lock.status: pending` field until the user explicitly confirms. Do not show “MVP lock” as the user-facing decision label.
+9. After explicit confirmation, record `status: user-confirmed`, confirmation evidence, and the decision-log reference. Record the same decision in workflow state:
+
+   ```bash
+   python3 scripts/workflow_state.py confirm <planning-dir> --gate first-version-scope --decision-ref <ref> --evidence-ref <conversation-ref> --summary <plain-language-summary>
+   ```
+
+10. Run `design-readiness --stage contract` only after `product-definition`, screen contracts, and the service manifest exist.
 
 An accepted P0 or P1 is not a pass. If the user knowingly carries one forward, record an `ACCEPT-FLAG` in the decision log and keep this gate blocked. Open P2 findings may remain when they have an owner and next validation point.
 
@@ -87,6 +93,6 @@ Pass only when:
 - no P0 or P1 finding is open or accepted
 - the required source hashes match current files
 - the user explicitly confirms the first-version scope
-- the decision log and review dashboard reflect the same state
+- the decision log, workflow state, and generated review dashboard reflect the same state
 
 Next use `product-blueprint:product-definition`, then `screen-contract` and `service-contract`.

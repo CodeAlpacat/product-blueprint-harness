@@ -1,0 +1,88 @@
+{
+  "schema_version": "1.0",
+  "profile": "standard",
+  "locale": "en",
+  "current_phase": "intake",
+  "updated_at": "",
+  "gates": {
+    "product-direction": {
+      "status": "pending",
+      "kind": "",
+      "decision_ref": "",
+      "confirmed_at": "",
+      "evidence": {
+        "source": "",
+        "ref": "",
+        "summary": ""
+      }
+    },
+    "brand-direction": {
+      "status": "pending",
+      "kind": "",
+      "decision_ref": "",
+      "confirmed_at": "",
+      "evidence": {
+        "source": "",
+        "ref": "",
+        "summary": ""
+      }
+    },
+    "first-version-scope": {
+      "status": "pending",
+      "kind": "",
+      "decision_ref": "",
+      "confirmed_at": "",
+      "evidence": {
+        "source": "",
+        "ref": "",
+        "summary": ""
+      }
+    },
+    "product-definition": {
+      "status": "pending",
+      "kind": "",
+      "decision_ref": "",
+      "confirmed_at": "",
+      "evidence": {
+        "source": "",
+        "ref": "",
+        "summary": ""
+      }
+    },
+    "design-entry": {
+      "status": "pending",
+      "kind": "",
+      "decision_ref": "",
+      "confirmed_at": "",
+      "evidence": {
+        "source": "",
+        "ref": "",
+        "summary": ""
+      }
+    },
+    "visual-direction": {
+      "status": "pending",
+      "kind": "",
+      "decision_ref": "",
+      "confirmed_at": "",
+      "evidence": {
+        "source": "",
+        "ref": "",
+        "summary": ""
+      }
+    },
+    "key-screen": {
+      "status": "pending",
+      "kind": "",
+      "decision_ref": "",
+      "confirmed_at": "",
+      "evidence": {
+        "source": "",
+        "ref": "",
+        "summary": ""
+      }
+    }
+  },
+  "history": [],
+  "invalidations": []
+}

@@ -21,10 +21,10 @@
 - `user-approved` means the product owner/founder explicitly accepted the current baseline.
 - `real-user` means target users completed the recorded protocol. Never infer it from owner approval or heuristic walkthrough.
 - A rejected design remains pending. User-requested review rounds have no retry cap.
-- `ready_for_technical_design` means an engineer may begin a separate architecture process without first rediscovering product-visible constraints. It does not mean implementation can begin unchanged.
+- `design-pass` means the current product-design baseline is accepted, but `design_handoff_ready` and `ready_for_technical_design` remain false. Those become true only after a separate `handoff-pass`; even then implementation cannot begin unchanged without project-specific technical design.
 
 ## Change cascade
 
-Any source, feasibility verdict, or evidence mismatch makes the baseline stale. Fix the owning artifact, regenerate browser/visual evidence, repeat review, and request approval again. Never update a stale hash merely to restore green status.
+Any source, workflow decision, feasibility verdict, or evidence mismatch makes the baseline stale. Invalidate from the earliest affected workflow gate, fix the owning artifact, regenerate browser/visual evidence, repeat review, and request approval again. Never update a stale hash merely to restore green status.
 
 Standalone HTML does not qualify as implementation-bearing visual evidence. Every component contract and visual evidence row references the React source that produced it.

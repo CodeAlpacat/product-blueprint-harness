@@ -5,7 +5,7 @@ description: Creates one production-grade React screen specimen from an approved
 
 # Product Blueprint High-Fidelity React Screen
 
-Use this after `product-blueprint:design-system-workbench` when one decisive screen needs an additional pixel-level pass. This skill creates a single high-fidelity React screen specimen, not the full product, not frontend architecture, and not a rough HTML storyboard.
+Use this after `product-blueprint:design-system-workbench` when one screen needs an additional pixel-level pass. This is not the initial representative-screen gate: `product-blueprint:key-screen-exploration` owns that earlier approval. This skill must inherit the approved key-screen direction and cannot replace or overwrite its review artifact.
 
 If the user expects tokens, component catalog, states, and multiple production screen mockups, use `product-blueprint:design-system-workbench` first. A single screen specimen is not enough for design-system handoff.
 
@@ -17,11 +17,11 @@ The first render is the training-average draft, not the deliverable. Craft this 
 
 1. Structure (hierarchy, focal point) → 2. Layout & grid → 3. Typography (measured ramp) → 4. Color & material (OKLCH tokens, hairlines over shadows) → 5. Imagery (art-directed treatment, no placeholder wells) → 6. Density & polish → 7. Distinctiveness push (strengthen the signature; break the template read).
 
-Build on the shared React/CSS token substrate. When Claude Code design skills are available, delegate the pixel craft to them and keep product logic here:
+Build on the shared React/CSS token substrate. When the user explicitly approves delegation and Claude Code design skills are available, delegate the pixel craft to them and keep product logic here:
 
 - If the environment provides them: `impeccable`/`craft` for shape→build, `layout`, `typeset`, `colorize`, `distill`, `polish` for passes 2–6, `bolder` for pass 7, `critique`/`audit` for review. If it provides none, apply the passes by hand — the doctrine is self-sufficient.
 
-Render full-size at real viewport (mobile 390×844, desktop 1440), screenshot at 2x, then run the adversarial visual gate (`${CLAUDE_PLUGIN_ROOT}/references/adversarial-visual-gate.md`). Loop until it passes — conditional is not pass. This screen becomes the anchor the workbench and other screens are gated against.
+Render full-size at real viewport (mobile 390×844, desktop 1440), screenshot at 2x, then run the adversarial visual gate (`${CLAUDE_PLUGIN_ROOT}/references/adversarial-visual-gate.md`). Loop until it passes — conditional is not pass. Compare it against the already approved key-screen quality ceiling and shared workbench rather than establishing a new direction.
 
 ## Rendering medium
 

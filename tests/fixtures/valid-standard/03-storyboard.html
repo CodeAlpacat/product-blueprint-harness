@@ -1,1 +1,20 @@
-<!doctype html><html><body>home → detail</body></html>
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Fixture storyboard</title></head>
+<body>
+  <main>
+    <h1>Public inspection storyboard</h1>
+    <p>Journey <code>guest-inspects-item</code> begins on public home and ends with readable detail or a recoverable error.</p>
+    <section id="board-home">
+      <h2>home</h2>
+      <p>A guest arrives without an account, understands that the catalogue is public, and sees the stable <code>home-loading</code> content skeleton while items load.</p>
+      <p>The guest activates <code>open-detail</code> on one item. The action carries the selected item identifier into the next surface.</p>
+    </section>
+    <section id="board-detail">
+      <h2>detail</h2>
+      <p>The selected item becomes the page context. Successful loading reveals its detail and keeps a clear route back to home.</p>
+      <p>If loading fails, <code>detail-error</code> replaces the content region with an explanation and the contracted <code>retry-detail</code> action. Retry preserves the item, moves through loading feedback, and restores detail.</p>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "status": "pending",
+  "surface_id": "",
+  "critical_state_ids": [],
+  "evidence": [],
+  "quality_review": {
+    "status": "pending",
+    "summary": "",
+    "open_blockers": []
+  },
+  "approval": {
+    "kind": "",
+    "decision_ref": "",
+    "approved_at": "",
+    "evidence": ""
+  },
+  "source_hashes": {
+    "03-design-brief.md": "",
+    "03.4-visual-directions.json": "",
+    "03.5-art-direction-brief.md": "",
+    "03.8-key-screen-review.md": ""
+  }
+}

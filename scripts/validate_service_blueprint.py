@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import html
 import json
 import re
 import sys
@@ -22,7 +23,7 @@ NA_PREFIX = "n/a:"
 STANDARD_ARTIFACTS = (
     "00-brief.md",
     "00-decision-log.md",
-    "00-review-dashboard.html",
+    "00-workflow-state.json",
     "01.6-parallel-concepts.md",
     "01.8-positioning-brand.md",
     "02-mechanisms.md",
@@ -36,8 +37,11 @@ STANDARD_ARTIFACTS = (
     "02.8-undefined-surfaces.md",
     "03-storyboard.html",
     "03-design-brief.md",
-    "03.5-art-direction-brief.md",
     "03.4-visual-directions.md",
+    "03.4-visual-directions.json",
+    "03.5-art-direction-brief.md",
+    "03.8-key-screen-review.md",
+    "03.8-key-screen-review.json",
     "03.7-ux-writing.md",
     "04.1-visual-quality-gate.md",
     "04.2-backend-systems-brief.md",
@@ -53,27 +57,17 @@ STANDARD_ARTIFACTS = (
 
 LITE_ARTIFACTS = (
     "00-brief.md",
-    "00-decision-log.md",
-    "00-review-dashboard.html",
-    "01.6-parallel-concepts.md",
-    "01.8-positioning-brand.md",
-    "02-mechanisms.md",
-    "02-prd.md",
-    "02.05-planning-quality-review.md",
-    "02.05-planning-quality-review.json",
-    "02.1-product-definition.json",
-    "02.5-screen-contracts.md",
+    "00-workflow-state.json",
+    "01-lite-direction.md",
+    "02-lite-plan.md",
     "02.6-service-manifest.json",
-    "02.7-feasibility-checkpoint.md",
-    "02.8-undefined-surfaces.md",
-    "03-storyboard.html",
     "03-design-brief.md",
 )
 
 CONTRACT_ARTIFACTS = (
     "00-brief.md",
     "00-decision-log.md",
-    "00-review-dashboard.html",
+    "00-workflow-state.json",
     "01.6-parallel-concepts.md",
     "01.8-positioning-brand.md",
     "02-mechanisms.md",
@@ -85,23 +79,37 @@ CONTRACT_ARTIFACTS = (
     "02.6-service-manifest.json",
 )
 
-LITE_PLANNING_ARTIFACTS = CONTRACT_ARTIFACTS + (
+PLANNING_ARTIFACTS = CONTRACT_ARTIFACTS + (
     "02.7-feasibility-checkpoint.md",
     "02.8-undefined-surfaces.md",
     "03-storyboard.html",
     "03-design-brief.md",
-)
-
-PLANNING_ARTIFACTS = LITE_PLANNING_ARTIFACTS + (
     "04.2-backend-systems-brief.md",
 )
 
-PROTOTYPE_ARTIFACTS = PLANNING_ARTIFACTS + (
+VISUAL_DIRECTION_ARTIFACTS = PLANNING_ARTIFACTS + (
+    "03.4-visual-directions.md",
+    "03.4-visual-directions.json",
+    "03.5-art-direction-brief.md",
+)
+
+KEY_SCREEN_ARTIFACTS = VISUAL_DIRECTION_ARTIFACTS + (
+    "03.8-key-screen-review.md",
+    "03.8-key-screen-review.json",
+)
+
+PROTOTYPE_ARTIFACTS = KEY_SCREEN_ARTIFACTS + (
+    "03.7-ux-writing.md",
+    "04.1-visual-quality-gate.md",
+    "04.3-design-system.md",
+    "04.32-design-system-workbench.md",
     "04.36-clickable-demo.md",
+    "04.4-prototype-test.md",
 )
 
 DESIGN_ARTIFACTS = tuple(item for item in STANDARD_ARTIFACTS if item != "05-engineering-handoff.md")
 DESIGN_SOURCE_FILES = (
+    "00-workflow-state.json",
     "02.05-planning-quality-review.json",
     "02.1-product-definition.json",
     "02-prd.md",
@@ -111,8 +119,11 @@ DESIGN_SOURCE_FILES = (
     "02.8-undefined-surfaces.md",
     "03-storyboard.html",
     "03-design-brief.md",
-    "03.5-art-direction-brief.md",
     "03.4-visual-directions.md",
+    "03.4-visual-directions.json",
+    "03.5-art-direction-brief.md",
+    "03.8-key-screen-review.md",
+    "03.8-key-screen-review.json",
     "03.7-ux-writing.md",
     "04.1-visual-quality-gate.md",
     "04.2-backend-systems-brief.md",
@@ -167,6 +178,26 @@ DESIGN_FINDING_CATEGORIES = {"mental-model", "flow", "surface", "responsive", "v
 FEASIBILITY_LENSES = {"frontend", "backend", "platform", "accessibility", "security", "cost"}
 FEASIBILITY_VERDICTS = {"feasible", "feasible-with-constraint", "infeasible"}
 VISUAL_EVIDENCE_SUFFIXES = {".png", ".jpg", ".jpeg", ".webp", ".svg"}
+STAGE_RANK = {
+    "contract": 0,
+    "planning": 1,
+    "visual-direction": 2,
+    "key-screen": 3,
+    "prototype": 4,
+    "design": 5,
+    "handoff": 6,
+}
+WORKFLOW_GATES = (
+    "product-direction",
+    "brand-direction",
+    "first-version-scope",
+    "product-definition",
+    "design-entry",
+    "visual-direction",
+    "key-screen",
+)
+PLANNING_GATES = WORKFLOW_GATES[:4]
+EVIDENCE_ARTIFACTS = {"01-reference-research.md", "01-ideation.md"}
 
 
 @dataclass(frozen=True)
@@ -207,17 +238,23 @@ class DemoParser(HTMLParser):
 
 
 class Validator:
-    def __init__(self, root: Path, profile: str | None = None, stage: str = "handoff") -> None:
+    def __init__(self, root: Path, profile: str | None = None, stage: str = "planning") -> None:
         self.root = root.resolve()
         self.profile_override = profile
         self.stage = stage
         self.manifest_path = self.root / "02.6-service-manifest.json"
+        self.workflow_state_path = self.root / "00-workflow-state.json"
         self.planning_review_path = self.root / "02.05-planning-quality-review.json"
         self.product_definition_path = self.root / "02.1-product-definition.json"
+        self.visual_direction_path = self.root / "03.4-visual-directions.json"
+        self.key_screen_path = self.root / "03.8-key-screen-review.json"
         self.design_acceptance_path = self.root / "05-design-acceptance.json"
         self.manifest: dict[str, Any] = {}
+        self.workflow_state: dict[str, Any] = {}
         self.planning_review: dict[str, Any] = {}
         self.product_definition: dict[str, Any] = {}
+        self.visual_direction: dict[str, Any] = {}
+        self.key_screen: dict[str, Any] = {}
         self.design_acceptance: dict[str, Any] = {}
         self.personas: dict[str, dict[str, Any]] = {}
         self.requirements: dict[str, dict[str, Any]] = {}
@@ -230,16 +267,33 @@ class Validator:
 
     def run(self) -> dict[str, Any]:
         self._load_manifest()
-        self._load_planning_review()
-        self._load_product_definition()
         profile = self._profile()
+        self._load_workflow_state()
+        if profile != "lite":
+            self._load_planning_review()
+            self._load_product_definition()
+        if STAGE_RANK.get(self.stage, -1) >= STAGE_RANK["visual-direction"] and profile != "lite":
+            self._load_visual_direction()
+        if STAGE_RANK.get(self.stage, -1) >= STAGE_RANK["key-screen"] and profile != "lite":
+            self._load_key_screen()
         if self.stage in {"design", "handoff"} and profile != "lite":
             self._load_design_acceptance()
         self._validate_artifacts(profile, self.stage)
-        if self.planning_review:
+        if self.workflow_state:
+            self._validate_workflow_state(profile)
+        if profile == "lite":
+            self._validate_lite_plan()
+        elif self.planning_review:
             self._validate_planning_review(profile)
-        if self.product_definition:
+        if profile != "lite" and self.product_definition:
             self._validate_product_definition()
+        self._validate_substantive_artifacts(profile)
+        if profile != "lite" and STAGE_RANK.get(self.stage, -1) >= STAGE_RANK["planning"]:
+            self._validate_storyboard_coverage()
+        if self.visual_direction:
+            self._validate_visual_direction()
+        if self.key_screen:
+            self._validate_key_screen()
         if self.manifest:
             self._validate_shape(profile)
             self._validate_contract(profile, self.stage)
@@ -248,6 +302,415 @@ class Validator:
             if self.stage == "handoff":
                 self._validate_readiness_claims()
         return self._report(profile)
+
+    def _load_json_artifact(self, path: Path, code: str, message: str, owner: str) -> dict[str, Any]:
+        if not path.is_file():
+            self.add(code, message, path.name, owner)
+            return {}
+        try:
+            loaded = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            self.add(code, str(exc), path.name, owner)
+            return {}
+        if not isinstance(loaded, dict):
+            self.add(code, f"{path.name} root must be an object.", path.name, owner)
+            return {}
+        return loaded
+
+    def _load_workflow_state(self) -> None:
+        self.workflow_state = self._load_json_artifact(
+            self.workflow_state_path,
+            "WORKFLOW_STATE_MISSING",
+            "Create 00-workflow-state.json and record user decision gates before validation.",
+            "orchestrate",
+        )
+
+    def _load_visual_direction(self) -> None:
+        self.visual_direction = self._load_json_artifact(
+            self.visual_direction_path,
+            "VISUAL_DIRECTION_REVIEW_MISSING",
+            "Create 03.4-visual-directions.json after comparable visual exploration.",
+            "visual-directions",
+        )
+
+    def _load_key_screen(self) -> None:
+        self.key_screen = self._load_json_artifact(
+            self.key_screen_path,
+            "KEY_SCREEN_REVIEW_MISSING",
+            "Create 03.8-key-screen-review.json before expanding to the full design system.",
+            "key-screen-exploration",
+        )
+
+    def _required_workflow_gates(self) -> tuple[str, ...]:
+        rank = STAGE_RANK.get(self.stage, -1)
+        required = list(PLANNING_GATES)
+        if rank >= STAGE_RANK["visual-direction"]:
+            required.extend(("design-entry", "visual-direction"))
+        if rank >= STAGE_RANK["key-screen"]:
+            required.append("key-screen")
+        return tuple(required)
+
+    def _validate_workflow_state(self, profile: str) -> None:
+        state = self.workflow_state
+        owner = "orchestrate"
+        if state.get("schema_version") != "1.0":
+            self.add("UNSUPPORTED_WORKFLOW_STATE_VERSION", "workflow state schema_version must be 1.0.", "00-workflow-state.json", owner)
+        if state.get("profile") != profile:
+            self.add("WORKFLOW_PROFILE_MISMATCH", f"workflow state profile must be {profile!r}.", "profile", owner)
+        if not self._meaningful(state.get("current_phase")):
+            self.add("WORKFLOW_STATE_INCOMPLETE", "current_phase is required.", "current_phase", owner)
+        gates = state.get("gates")
+        if not isinstance(gates, dict):
+            self.add("WORKFLOW_GATES_INVALID", "gates must be an object.", "gates", owner)
+            return
+        history = state.get("history")
+        if not isinstance(history, list):
+            self.add("WORKFLOW_HISTORY_INVALID", "history must be an array.", "history", owner)
+            history = []
+        decision_log = ""
+        decision_log_path = self.root / "00-decision-log.md"
+        if profile != "lite" and decision_log_path.is_file():
+            decision_log = decision_log_path.read_text(encoding="utf-8", errors="replace")
+
+        for gate_id in self._required_workflow_gates():
+            gate = gates.get(gate_id)
+            path = f"gates.{gate_id}"
+            if not isinstance(gate, dict):
+                self.add("WORKFLOW_GATE_MISSING", f"Required workflow gate is missing: {gate_id}.", path, owner)
+                continue
+            if gate.get("status") != "confirmed" or gate.get("kind") != "explicit-user":
+                self.add("WORKFLOW_GATE_UNCONFIRMED", f"{gate_id} needs a recorded explicit-user confirmation.", path, owner)
+                continue
+            for key in ("decision_ref", "confirmed_at"):
+                if not self._meaningful(gate.get(key)):
+                    self.add("WORKFLOW_GATE_INCOMPLETE", f"{path}.{key} is required.", f"{path}.{key}", owner)
+            evidence = gate.get("evidence")
+            if not isinstance(evidence, dict) or evidence.get("source") != "conversation":
+                self.add("WORKFLOW_GATE_EVIDENCE_MISSING", f"{gate_id} needs conversation evidence.", f"{path}.evidence", owner)
+            else:
+                for key in ("ref", "summary"):
+                    if not self._meaningful(evidence.get(key)):
+                        self.add("WORKFLOW_GATE_EVIDENCE_MISSING", f"{path}.evidence.{key} is required.", f"{path}.evidence.{key}", owner)
+            decision_ref = gate.get("decision_ref")
+            matching_events = [
+                event
+                for event in history
+                if isinstance(event, dict)
+                and event.get("type") == "gate-confirmed"
+                and event.get("gate_id") == gate_id
+                and event.get("decision_ref") == decision_ref
+                and event.get("actor") == "user"
+                and self._meaningful(event.get("evidence_ref"))
+            ]
+            if not matching_events:
+                self.add("WORKFLOW_GATE_HISTORY_MISSING", f"{gate_id} confirmation needs a matching user history event.", path, owner)
+            if profile != "lite" and self._meaningful(decision_ref) and str(decision_ref) not in decision_log:
+                self.add("WORKFLOW_DECISION_LOG_MISMATCH", f"Decision log does not contain {gate_id} reference {decision_ref!r}.", path, owner)
+
+        if profile == "lite" and STAGE_RANK.get(self.stage, -1) > STAGE_RANK["planning"]:
+            self.add("LITE_DESIGN_UNSUPPORTED", "Lite ends at compact planning. Upgrade the project to Standard before design production.", "profile", owner)
+
+    def _substantive_length(self, relative: str) -> int:
+        path = self.root / relative
+        if not path.is_file():
+            return 0
+        text = path.read_text(encoding="utf-8", errors="replace")
+        text = re.sub(r"<!--[\s\S]*?-->", " ", text)
+        text = re.sub(r"<[^>]+>", " ", text)
+        kept: list[str] = []
+        for line in text.splitlines():
+            stripped = line.strip()
+            if not stripped or stripped.startswith("#") or re.fullmatch(r"[|:\- ]+", stripped):
+                continue
+            if re.search(r"(?i)\b(todo|tbd|replace this|fill this|placeholder)\b|<[^>]+>", stripped):
+                continue
+            if stripped.lower().startswith(("use product-blueprint:", "- use product-blueprint:", "next step")):
+                continue
+            kept.append(stripped)
+        return len(re.sub(r"\s+", "", " ".join(kept)))
+
+    def _require_substantive(self, relative: str, minimum: int, owner: str) -> None:
+        if not (self.root / relative).is_file():
+            return
+        actual = self._substantive_length(relative)
+        if actual < minimum:
+            self.add(
+                "ARTIFACT_CONTENT_INCOMPLETE",
+                f"{relative} has only {actual} substantive characters; at least {minimum} are required for this structural gate.",
+                relative,
+                owner,
+            )
+
+    def _validate_lite_plan(self) -> None:
+        self._require_substantive("00-brief.md", 120, "orchestrate")
+        self._require_substantive("01-lite-direction.md", 240, "parallel-concepts")
+        self._require_substantive("02-lite-plan.md", 420, "prd")
+        self._require_substantive("03-design-brief.md", 260, "design-brief")
+
+    def _validate_substantive_artifacts(self, profile: str) -> None:
+        if profile == "lite":
+            return
+        requirements = {
+            "00-brief.md": (120, "orchestrate"),
+            "01.6-parallel-concepts.md": (220, "parallel-concepts"),
+            "01.8-positioning-brand.md": (180, "positioning-brand"),
+            "02-mechanisms.md": (140, "experience-mechanisms"),
+            "02-prd.md": (420, "prd"),
+            "02.05-planning-quality-review.md": (160, "planning-quality-gate"),
+            "02.5-screen-contracts.md": (220, "screen-contract"),
+        }
+        if STAGE_RANK.get(self.stage, -1) >= STAGE_RANK["planning"]:
+            requirements.update(
+                {
+                    "02.7-feasibility-checkpoint.md": (100, "feasibility-review"),
+                    "02.8-undefined-surfaces.md": (60, "screen-contract"),
+                    "03-storyboard.html": (180, "storyboard"),
+                    "03-design-brief.md": (260, "design-brief"),
+                    "04.2-backend-systems-brief.md": (180, "backend-systems-brief"),
+                }
+            )
+        if STAGE_RANK.get(self.stage, -1) >= STAGE_RANK["visual-direction"]:
+            requirements.update(
+                {
+                    "03.4-visual-directions.md": (220, "visual-directions"),
+                    "03.5-art-direction-brief.md": (220, "art-direction-brief"),
+                }
+            )
+        if STAGE_RANK.get(self.stage, -1) >= STAGE_RANK["key-screen"]:
+            requirements["03.8-key-screen-review.md"] = (160, "key-screen-exploration")
+        if profile == "deep" and STAGE_RANK.get(self.stage, -1) >= STAGE_RANK["planning"]:
+            requirements["04.55-risk-register.md"] = (220, "risk-register")
+        for relative, (minimum, owner) in requirements.items():
+            self._require_substantive(relative, minimum, owner)
+
+    def _validate_storyboard_coverage(self) -> None:
+        storyboard = self.root / "03-storyboard.html"
+        if not storyboard.is_file() or not self.manifest:
+            return
+        text = storyboard.read_text(encoding="utf-8", errors="replace")
+        required_ids: list[tuple[str, str]] = []
+        for surface in self.manifest.get("surfaces", []):
+            if isinstance(surface, dict) and surface.get("priority") == "P0" and surface.get("type") != "background":
+                required_ids.append((str(surface.get("id", "")), "surface"))
+        for action in self.manifest.get("actions", []):
+            if isinstance(action, dict):
+                required_ids.append((str(action.get("id", "")), "action"))
+        for state in self.manifest.get("states", []):
+            if isinstance(state, dict) and state.get("required") is True:
+                required_ids.append((str(state.get("id", "")), "state"))
+        for journey in self.manifest.get("journeys", []):
+            if isinstance(journey, dict):
+                required_ids.append((str(journey.get("id", "")), "journey"))
+        for item_id, kind in required_ids:
+            if item_id and not re.search(rf"(?<![a-z0-9-]){re.escape(item_id)}(?![a-z0-9-])", text):
+                self.add(
+                    "STORYBOARD_CONTRACT_GAP",
+                    f"Storyboard does not identify required {kind} {item_id!r}.",
+                    "03-storyboard.html",
+                    "storyboard",
+                )
+
+    def _validate_source_hashes(self, values: Any, required: tuple[str, ...], owner: str, code: str) -> None:
+        if not isinstance(values, dict):
+            self.add(code, "source_hashes must be an object.", "source_hashes", owner)
+            return
+        for relative in required:
+            expected = values.get(relative)
+            path = self.root / relative
+            if not path.is_file() or not self._meaningful(expected):
+                self.add(code, f"Missing current source hash for {relative}.", f"source_hashes.{relative}", owner)
+                continue
+            actual = hashlib.sha256(path.read_bytes()).hexdigest()
+            if expected != actual:
+                self.add(code, f"Source changed after review: {relative}.", f"source_hashes.{relative}", owner)
+
+    def _validate_approval(self, approval: Any, owner: str, code: str, path: str = "approval") -> str | None:
+        if not isinstance(approval, dict):
+            self.add(code, "approval must be an object.", path, owner)
+            return None
+        if approval.get("kind") != "explicit-user":
+            self.add(code, "approval.kind must be explicit-user.", f"{path}.kind", owner)
+        for key in ("decision_ref", "approved_at", "evidence"):
+            if not self._meaningful(approval.get(key)):
+                self.add(code, f"{path}.{key} is required.", f"{path}.{key}", owner)
+        return approval.get("decision_ref") if self._meaningful(approval.get("decision_ref")) else None
+
+    def _workflow_gate_decision_ref(self, gate_id: str) -> str | None:
+        gates = self.workflow_state.get("gates", {}) if self.workflow_state else {}
+        gate = gates.get(gate_id, {}) if isinstance(gates, dict) else {}
+        return gate.get("decision_ref") if isinstance(gate, dict) and self._meaningful(gate.get("decision_ref")) else None
+
+    def _validate_local_evidence(self, evidence: Any, path: str, owner: str, code: str) -> None:
+        if not isinstance(evidence, dict):
+            self.add(code, "Evidence must be an object with file and sha256.", path, owner)
+            return
+        visual_path = self._safe_path(evidence.get("file"))
+        expected = evidence.get("sha256")
+        if visual_path is None or not visual_path.is_file() or visual_path.suffix.lower() not in VISUAL_EVIDENCE_SUFFIXES:
+            self.add(code, "Evidence must reference a local png, jpg, jpeg, webp, or svg file.", path, owner)
+            return
+        actual = hashlib.sha256(visual_path.read_bytes()).hexdigest()
+        if expected != actual:
+            self.add(code, "Evidence hash is missing or stale.", path, owner)
+
+    def _validate_visual_direction(self) -> None:
+        review = self.visual_direction
+        owner = "visual-directions"
+        if review.get("schema_version") != "1.0":
+            self.add("UNSUPPORTED_VISUAL_DIRECTION_VERSION", "schema_version must be 1.0.", "03.4-visual-directions.json", owner)
+        if review.get("status") != "user-approved":
+            self.add("VISUAL_DIRECTION_UNAPPROVED", "A visual direction must be explicitly approved before key-screen work.", "status", owner)
+        setup = review.get("comparison_setup")
+        if not isinstance(setup, dict):
+            self.add("VISUAL_COMPARISON_INVALID", "comparison_setup must be an object.", "comparison_setup", owner)
+        else:
+            for key in ("surface_id", "viewport", "state_id", "content_fixture"):
+                if not self._meaningful(setup.get(key)):
+                    self.add("VISUAL_COMPARISON_INVALID", f"comparison_setup.{key} is required.", f"comparison_setup.{key}", owner)
+            surface_id = setup.get("surface_id")
+            surface_ids = {item.get("id") for item in self.manifest.get("surfaces", []) if isinstance(item, dict)}
+            if surface_id not in surface_ids:
+                self.add("VISUAL_COMPARISON_INVALID", "comparison_setup.surface_id must reference a contracted surface.", "comparison_setup.surface_id", owner)
+            state_surfaces = {
+                item.get("id"): item.get("surface_id")
+                for item in self.manifest.get("states", [])
+                if isinstance(item, dict)
+            }
+            if setup.get("state_id") not in state_surfaces or state_surfaces.get(setup.get("state_id")) != surface_id:
+                self.add("VISUAL_COMPARISON_INVALID", "comparison_setup.state_id must belong to the compared surface.", "comparison_setup.state_id", owner)
+        raw_directions = review.get("directions")
+        direction_ids: set[str] = set()
+        evidence_files: set[str] = set()
+        if not isinstance(raw_directions, list) or not 2 <= len(raw_directions) <= 3:
+            self.add("VISUAL_DIRECTIONS_INCOMPLETE", "Compare two or three visual directions at equal fidelity.", "directions", owner)
+        else:
+            for index, direction in enumerate(raw_directions):
+                path = f"directions[{index}]"
+                if not isinstance(direction, dict):
+                    self.add("VISUAL_DIRECTION_INVALID", "Each direction must be an object.", path, owner)
+                    continue
+                direction_id = direction.get("id")
+                if not isinstance(direction_id, str) or not ID_RE.fullmatch(direction_id) or direction_id in direction_ids:
+                    self.add("VISUAL_DIRECTION_INVALID", "Direction IDs must be unique kebab-case.", f"{path}.id", owner)
+                else:
+                    direction_ids.add(direction_id)
+                if not self._meaningful(direction.get("thesis")):
+                    self.add("VISUAL_DIRECTION_INCOMPLETE", "Each direction needs a concrete thesis.", f"{path}.thesis", owner)
+                differentiators = direction.get("differentiators")
+                if not isinstance(differentiators, list) or len(differentiators) < 3:
+                    self.add("VISUAL_DIRECTION_INCOMPLETE", "Each direction needs at least three concrete differentiators.", f"{path}.differentiators", owner)
+                evidence = direction.get("evidence")
+                if not isinstance(evidence, list) or not evidence:
+                    self.add("VISUAL_DIRECTION_EVIDENCE_MISSING", "Each direction needs comparable visual evidence.", f"{path}.evidence", owner)
+                else:
+                    for evidence_index, row in enumerate(evidence):
+                        evidence_path = f"{path}.evidence[{evidence_index}]"
+                        self._validate_local_evidence(row, evidence_path, owner, "VISUAL_DIRECTION_EVIDENCE_INVALID")
+                        if isinstance(row, dict) and isinstance(setup, dict):
+                            for key in ("surface_id", "viewport", "state_id", "content_fixture"):
+                                if row.get(key) != setup.get(key):
+                                    self.add(
+                                        "VISUAL_COMPARISON_MISMATCH",
+                                        f"Every direction must use the shared comparison {key}.",
+                                        f"{evidence_path}.{key}",
+                                        owner,
+                                    )
+                            relative = row.get("file")
+                            if self._meaningful(relative):
+                                if relative in evidence_files:
+                                    self.add(
+                                        "VISUAL_DIRECTION_EVIDENCE_DUPLICATE",
+                                        "Different directions cannot reuse the same evidence file.",
+                                        f"{evidence_path}.file",
+                                        owner,
+                                    )
+                                evidence_files.add(relative)
+        selected = review.get("selected_direction_id")
+        if selected not in direction_ids:
+            self.add("VISUAL_DIRECTION_SELECTION_INVALID", "selected_direction_id must reference a compared direction.", "selected_direction_id", owner)
+        decision_ref = self._validate_approval(review.get("approval"), owner, "VISUAL_DIRECTION_UNAPPROVED")
+        gate_ref = self._workflow_gate_decision_ref("visual-direction")
+        if decision_ref and gate_ref != decision_ref:
+            self.add("VISUAL_DIRECTION_GATE_MISMATCH", "Visual-direction approval must match the workflow-state gate.", "approval.decision_ref", owner)
+        self._validate_source_hashes(
+            review.get("source_hashes"),
+            ("03-design-brief.md", "03.4-visual-directions.md"),
+            owner,
+            "VISUAL_DIRECTION_STALE",
+        )
+
+    def _validate_key_screen(self) -> None:
+        review = self.key_screen
+        owner = "key-screen-exploration"
+        if review.get("schema_version") != "1.0":
+            self.add("UNSUPPORTED_KEY_SCREEN_VERSION", "schema_version must be 1.0.", "03.8-key-screen-review.json", owner)
+        if review.get("status") != "user-approved":
+            self.add("KEY_SCREEN_UNAPPROVED", "The representative screen must be approved before full-system expansion.", "status", owner)
+        surface_id = review.get("surface_id")
+        manifest_surfaces = {item.get("id") for item in self.manifest.get("surfaces", []) if isinstance(item, dict)} if self.manifest else set()
+        if surface_id not in manifest_surfaces:
+            self.add("KEY_SCREEN_SURFACE_INVALID", "surface_id must reference a contracted surface.", "surface_id", owner)
+        critical_states = review.get("critical_state_ids")
+        if not isinstance(critical_states, list) or not critical_states:
+            self.add("KEY_SCREEN_STATES_MISSING", "At least one critical state is required.", "critical_state_ids", owner)
+        else:
+            state_surfaces = {
+                item.get("id"): item.get("surface_id")
+                for item in self.manifest.get("states", [])
+                if isinstance(item, dict)
+            }
+            for state_id in critical_states:
+                if state_id not in state_surfaces or state_surfaces[state_id] != surface_id:
+                    self.add(
+                        "KEY_SCREEN_STATE_INVALID",
+                        f"Critical state {state_id!r} must belong to key surface {surface_id!r}.",
+                        "critical_state_ids",
+                        owner,
+                    )
+        evidence = review.get("evidence")
+        viewports: set[str] = set()
+        covered_states: set[str] = set()
+        evidence_ids: set[str] = set()
+        if not isinstance(evidence, list) or len(evidence) < 2:
+            self.add("KEY_SCREEN_EVIDENCE_MISSING", "Key-screen review needs at least narrow and wide evidence.", "evidence", owner)
+        else:
+            for index, row in enumerate(evidence):
+                path = f"evidence[{index}]"
+                self._validate_local_evidence(row, path, owner, "KEY_SCREEN_EVIDENCE_INVALID")
+                if isinstance(row, dict):
+                    evidence_id = row.get("id")
+                    if not isinstance(evidence_id, str) or not ID_RE.fullmatch(evidence_id) or evidence_id in evidence_ids:
+                        self.add("KEY_SCREEN_EVIDENCE_INVALID", "Evidence IDs must be unique kebab-case.", f"{path}.id", owner)
+                    else:
+                        evidence_ids.add(evidence_id)
+                    if self._meaningful(row.get("viewport")):
+                        viewports.add(row["viewport"])
+                    if not self._meaningful(row.get("render_source_ref")):
+                        self.add("KEY_SCREEN_EVIDENCE_INVALID", "render_source_ref is required.", f"{path}.render_source_ref", owner)
+                    state_ids = row.get("state_ids")
+                    if not isinstance(state_ids, list):
+                        self.add("KEY_SCREEN_EVIDENCE_INVALID", "state_ids must be an array.", f"{path}.state_ids", owner)
+                    else:
+                        covered_states.update(item for item in state_ids if isinstance(item, str))
+        if len(viewports) < 2:
+            self.add("KEY_SCREEN_VIEWPORTS_MISSING", "Key-screen evidence must cover at least two distinct viewports.", "evidence", owner)
+        if isinstance(critical_states, list) and not set(critical_states).issubset(covered_states):
+            self.add("KEY_SCREEN_STATES_MISSING", "Every critical state must appear in current key-screen evidence.", "evidence.state_ids", owner)
+        quality = review.get("quality_review")
+        if not isinstance(quality, dict) or quality.get("status") != "pass" or not self._meaningful(quality.get("summary")):
+            self.add("KEY_SCREEN_QUALITY_UNRESOLVED", "quality_review must pass with a concrete summary.", "quality_review", owner)
+        elif quality.get("open_blockers") not in ([], None):
+            self.add("KEY_SCREEN_QUALITY_UNRESOLVED", "Key-screen blockers must be empty before approval.", "quality_review.open_blockers", owner)
+        decision_ref = self._validate_approval(review.get("approval"), owner, "KEY_SCREEN_UNAPPROVED")
+        gate_ref = self._workflow_gate_decision_ref("key-screen")
+        if decision_ref and gate_ref != decision_ref:
+            self.add("KEY_SCREEN_GATE_MISMATCH", "Key-screen approval must match the workflow-state gate.", "approval.decision_ref", owner)
+        self._validate_source_hashes(
+            review.get("source_hashes"),
+            ("03-design-brief.md", "03.4-visual-directions.json", "03.5-art-direction-brief.md", "03.8-key-screen-review.md"),
+            owner,
+            "KEY_SCREEN_STALE",
+        )
 
     def _load_manifest(self) -> None:
         if not self.manifest_path.exists():
@@ -338,18 +801,24 @@ class Validator:
         return mode if mode in {"lite", "standard", "deep"} else "standard"
 
     def _validate_artifacts(self, profile: str, stage: str) -> None:
-        if stage == "contract":
+        if profile == "lite":
+            required = LITE_ARTIFACTS
+        elif stage == "contract":
             required = CONTRACT_ARTIFACTS
         elif stage == "planning":
-            required = LITE_PLANNING_ARTIFACTS if profile == "lite" else PLANNING_ARTIFACTS
-            if profile == "deep":
-                required = required + ("04.55-risk-register.md",)
+            required = PLANNING_ARTIFACTS
+        elif stage == "visual-direction":
+            required = VISUAL_DIRECTION_ARTIFACTS
+        elif stage == "key-screen":
+            required = KEY_SCREEN_ARTIFACTS
         elif stage == "prototype":
             required = PROTOTYPE_ARTIFACTS
         elif stage == "design":
             required = DESIGN_ARTIFACTS
         else:
-            required = LITE_ARTIFACTS if profile == "lite" else STANDARD_ARTIFACTS
+            required = STANDARD_ARTIFACTS
+        if profile == "deep" and STAGE_RANK.get(stage, -1) >= STAGE_RANK["planning"]:
+            required = required + ("04.55-risk-register.md",)
         for relative in required:
             if not (self.root / relative).is_file():
                 self.add(
@@ -382,7 +851,7 @@ class Validator:
         risk_domains = release.get("risk_domains", [])
         if not isinstance(risk_domains, list) or any(item not in RISK_DOMAINS for item in risk_domains):
             self.add("INVALID_RISK_DOMAINS", f"risk_domains must contain only: {', '.join(sorted(RISK_DOMAINS))}.", "release_profile.risk_domains", "risk-register")
-        elif self.stage in {"planning", "design", "handoff", "technical"} and risk_domains and not (self.root / "04.55-risk-register.md").is_file():
+        elif STAGE_RANK.get(self.stage, -1) >= STAGE_RANK["planning"] and risk_domains and not (self.root / "04.55-risk-register.md").is_file():
             self.add("RISK_REGISTER_MISSING", "A risk register is mandatory for the declared risk domains.", "04.55-risk-register.md", "risk-register")
 
         for key in ("surfaces", "actions", "states", "operations", "ai_assists", "journeys"):
@@ -403,8 +872,8 @@ class Validator:
     def _validate_planning_review(self, profile: str) -> None:
         review = self.planning_review
         owner = "planning-quality-gate"
-        if review.get("schema_version") != "1.0":
-            self.add("UNSUPPORTED_PLANNING_REVIEW_VERSION", "schema_version must be 1.0.", "schema_version", owner)
+        if review.get("schema_version") != "1.1":
+            self.add("UNSUPPORTED_PLANNING_REVIEW_VERSION", "schema_version must be 1.1.", "schema_version", owner)
         if review.get("profile") != profile:
             self.add("PLANNING_REVIEW_PROFILE_MISMATCH", f"Planning review profile must be {profile!r}.", "profile", owner)
         if review.get("status") != "user-confirmed":
@@ -423,6 +892,50 @@ class Validator:
                     self.add("PLANNING_REVIEW_HASH_MISSING", f"Missing source hash for {relative}.", f"input_hashes.{relative}", owner)
                 elif expected != recorded:
                     self.add("PLANNING_REVIEW_STALE", f"Planning source changed after review: {relative}.", f"input_hashes.{relative}", owner)
+
+        raw_evidence = review.get("evidence_sources")
+        evidence_files: set[str] = set()
+        if not isinstance(raw_evidence, list) or not raw_evidence:
+            self.add(
+                "PLANNING_EVIDENCE_MISSING",
+                "At least one substantive research or ideation source is required.",
+                "evidence_sources",
+                owner,
+            )
+        else:
+            for index, source in enumerate(raw_evidence):
+                path = f"evidence_sources[{index}]"
+                if not isinstance(source, dict):
+                    self.add("PLANNING_EVIDENCE_INVALID", "Each evidence source must be an object.", path, owner)
+                    continue
+                relative = source.get("file")
+                if relative not in EVIDENCE_ARTIFACTS:
+                    self.add(
+                        "PLANNING_EVIDENCE_INVALID",
+                        f"Evidence file must be one of: {', '.join(sorted(EVIDENCE_ARTIFACTS))}.",
+                        f"{path}.file",
+                        owner,
+                    )
+                    continue
+                if relative in evidence_files:
+                    self.add("PLANNING_EVIDENCE_DUPLICATE", f"Duplicate evidence source: {relative}.", f"{path}.file", owner)
+                evidence_files.add(relative)
+                if source.get("kind") not in {"research", "ideation"}:
+                    self.add("PLANNING_EVIDENCE_INVALID", "kind must be research or ideation.", f"{path}.kind", owner)
+                evidence_path = self.root / relative
+                expected = self._file_hash(evidence_path)
+                recorded = source.get("sha256")
+                if not evidence_path.is_file():
+                    self.add("PLANNING_EVIDENCE_MISSING", f"Evidence file does not exist: {relative}.", f"{path}.file", owner)
+                elif not self._meaningful(recorded) or recorded != expected:
+                    self.add("PLANNING_EVIDENCE_STALE", f"Evidence hash is missing or stale: {relative}.", f"{path}.sha256", owner)
+                if self._substantive_length(relative) < 160:
+                    self.add(
+                        "PLANNING_EVIDENCE_EMPTY",
+                        f"Evidence source is too thin to support the planning review: {relative}.",
+                        f"{path}.file",
+                        owner,
+                    )
 
         raw_lenses = review.get("lenses")
         lenses: dict[str, dict[str, Any]] = {}
@@ -448,6 +961,34 @@ class Validator:
                     self.add("PLANNING_LENS_INCOMPLETE", f"Lens {lens_id} needs a concrete summary.", f"{path}.summary", owner)
                 if not isinstance(lens.get("finding_ids"), list):
                     self.add("PLANNING_LENS_INCOMPLETE", f"Lens {lens_id} finding_ids must be an array.", f"{path}.finding_ids", owner)
+                evidence_refs = lens.get("evidence_refs")
+                if not isinstance(evidence_refs, list) or not evidence_refs or any(not self._meaningful(ref) for ref in evidence_refs):
+                    self.add(
+                        "PLANNING_LENS_EVIDENCE_MISSING",
+                        f"Lens {lens_id} needs at least one concrete evidence reference.",
+                        f"{path}.evidence_refs",
+                        owner,
+                    )
+                else:
+                    referenced_files: set[str] = set()
+                    for ref_index, ref in enumerate(evidence_refs):
+                        relative = str(ref).split("#", 1)[0]
+                        referenced_files.add(relative)
+                        resolved = self._safe_path(relative)
+                        if resolved is None or not resolved.is_file():
+                            self.add(
+                                "PLANNING_LENS_EVIDENCE_INVALID",
+                                f"Lens {lens_id} references a missing local source: {relative}.",
+                                f"{path}.evidence_refs[{ref_index}]",
+                                owner,
+                            )
+                    if lens_id == "user-evidence" and not (referenced_files & evidence_files):
+                        self.add(
+                            "PLANNING_LENS_EVIDENCE_INVALID",
+                            "The user-evidence lens must cite a bound research or ideation source.",
+                            f"{path}.evidence_refs",
+                            owner,
+                        )
             for lens_id in sorted(PLANNING_REVIEW_LENSES - set(lenses)):
                 self.add("PLANNING_LENS_MISSING", f"Required planning lens is missing: {lens_id}.", "lenses", owner)
 
@@ -503,6 +1044,14 @@ class Validator:
                 if not self._meaningful(lock.get(key)):
                     self.add("MVP_LOCK_UNCONFIRMED", f"mvp_lock.{key} is required.", f"mvp_lock.{key}", owner)
             decision_ref = lock.get("decision_ref")
+            state_ref = self.workflow_state.get("gates", {}).get("first-version-scope", {}).get("decision_ref")
+            if self._meaningful(decision_ref) and decision_ref != state_ref:
+                self.add(
+                    "MVP_LOCK_STATE_MISMATCH",
+                    "mvp_lock.decision_ref must match the confirmed first-version-scope workflow gate.",
+                    "mvp_lock.decision_ref",
+                    owner,
+                )
             decision_log_path = self.root / "00-decision-log.md"
             if self._meaningful(decision_ref) and decision_log_path.is_file():
                 decision_log = decision_log_path.read_text(encoding="utf-8")
@@ -529,6 +1078,14 @@ class Validator:
             for key in ("decision_ref", "confirmed_at", "evidence"):
                 if not self._meaningful(confirmation.get(key)):
                     self.add("PRODUCT_DEFINITION_UNCONFIRMED", f"confirmation.{key} is required.", f"confirmation.{key}", "product-definition")
+            state_ref = self.workflow_state.get("gates", {}).get("product-definition", {}).get("decision_ref")
+            if self._meaningful(confirmation.get("decision_ref")) and confirmation.get("decision_ref") != state_ref:
+                self.add(
+                    "PRODUCT_DEFINITION_STATE_MISMATCH",
+                    "Product definition confirmation must match the workflow-state product-definition gate.",
+                    "confirmation.decision_ref",
+                    "product-definition",
+                )
 
         self.personas = self._definition_index("personas")
         self.requirements = self._definition_index("requirements")
@@ -625,7 +1182,7 @@ class Validator:
         self._validate_journeys(journeys, surfaces, actions, states, profile)
         self._validate_product_traceability(surfaces, actions, operations, journeys)
         self._validate_reachability(surfaces, actions, journeys)
-        if profile != "lite" and stage in {"prototype", "design", "handoff", "technical"}:
+        if profile != "lite" and stage in {"prototype", "design", "handoff"}:
             self._validate_uncontracted_controls(actions)
             self._validate_runtime_evidence(actions, states)
 
@@ -787,10 +1344,10 @@ class Validator:
                 required_status = ("defined",)
                 if stage == "prototype":
                     required_status = STATUS_KEYS[:-1]
-                elif stage in {"design", "handoff", "technical"}:
+                elif stage in {"design", "handoff"}:
                     required_status = STATUS_KEYS
                 self._validate_status(surface.get("status"), path, required_status)
-                if stage in {"prototype", "design", "handoff", "technical"}:
+                if stage in {"prototype", "design", "handoff"}:
                     self._validate_dom_reference(surface.get("prototype"), surface_id, "data-surface", "SURFACE_NOT_PROTOTYPED", path, "clickable-demo")
 
             if responsive_web and surface.get("priority") == "P0" and surface.get("type") == "screen" and profile != "lite":
@@ -802,7 +1359,7 @@ class Validator:
                     has_rule = self._meaningful(responsive.get("derivation_rule"))
                     if not (has_desktop or has_rule):
                         self.add("RESPONSIVE_EVIDENCE_MISSING", "Provide desktop evidence or an explicit derivation rule.", f"{path}.responsive", "clickable-demo")
-                    if has_desktop and stage in {"prototype", "design", "handoff", "technical"}:
+                    if has_desktop and stage in {"prototype", "design", "handoff"}:
                         prototype = surface.get("prototype", {})
                         reference = {"file": prototype.get("file"), "element_id": responsive.get("desktop_element_id")}
                         self._validate_dom_reference(reference, None, None, "RESPONSIVE_EVIDENCE_MISSING", f"{path}.responsive", "clickable-demo")
@@ -869,7 +1426,7 @@ class Validator:
                     if not self._meaningful(values.get(key)):
                         self.add("INCOMPLETE_ACTION_CONTRACT", f"{group}.{key} is required; use n/a:<reason> only when inapplicable.", f"{path}.{group}.{key}", "screen-contract")
 
-            if profile != "lite" and stage in {"prototype", "design", "handoff", "technical"}:
+            if profile != "lite" and stage in {"prototype", "design", "handoff"}:
                 self._validate_action_dom(action_id, action)
 
     def _validate_states(
@@ -891,7 +1448,7 @@ class Validator:
             recovery = state.get("recovery_action_id")
             if recovery and recovery not in actions:
                 self.add("UNKNOWN_ACTION_REFERENCE", f"Unknown recovery action {recovery!r}.", f"{path}.recovery_action_id", "screen-contract")
-            if state.get("required") is True and profile != "lite" and stage in {"prototype", "design", "handoff", "technical"}:
+            if state.get("required") is True and profile != "lite" and stage in {"prototype", "design", "handoff"}:
                 if not self._meaningful(state.get("reproduction")):
                     self.add("STATE_REPRODUCTION_MISSING", "Required state needs a stable browser reproduction path.", f"{path}.reproduction", "clickable-demo")
                 self._validate_dom_reference(state.get("prototype"), None, None, "STATE_NOT_REPRODUCIBLE", path, "clickable-demo")
@@ -1586,7 +2143,7 @@ class Validator:
         claims_pass = False
         if dashboard.exists():
             text = dashboard.read_text(encoding="utf-8", errors="replace")
-            claims_pass = bool(re.search(r'data-readiness-status=["\']pass["\']|개발 착수 준비 완료', text, re.IGNORECASE))
+            claims_pass = bool(re.search(r'data-readiness-status=["\'][a-z-]+-pass["\']|개발 착수 준비 완료', text, re.IGNORECASE))
         if handoff.exists():
             text = handoff.read_text(encoding="utf-8", errors="replace")
             claims_pass = claims_pass or bool(re.search(r"planning-readiness:\s*pass", text, re.IGNORECASE))
@@ -1619,27 +2176,29 @@ class Validator:
         errors = [finding for finding in self.findings if finding.severity == "error"]
         validation = self.manifest.get("user_validation", {}) if self.manifest else {}
         user_validated = isinstance(validation, dict) and validation.get("status") == "real-user" and bool(validation.get("evidence"))
-        stage_rank = {"contract": 0, "planning": 1, "prototype": 2, "design": 3, "handoff": 4}.get(self.stage, -1)
-        error_owners = {finding.owner for finding in errors}
-        contract_owners = {"product-definition", "prd", "screen-contract", "service-contract", "backend-systems-brief"}
-        planning_owners = contract_owners | {"planning-quality-gate", "feasibility-review", "storyboard", "design-brief", "orchestrate"}
-        prototype_owners = planning_owners | {"clickable-demo", "prototype-test", "design-readiness"}
-        design_owners = prototype_owners | {
-            "design-acceptance",
-            "visual-quality-gate",
-            "design-system",
-            "design-critique",
-            "feasibility-review",
-            "ux-writing",
-            "risk-register",
-        }
-        handoff_owners = design_owners | {"engineering-handoff", "decision-dashboard", "orchestrate"}
-        product_contract_ready = profile != "lite" and stage_rank >= 0 and not (error_owners & contract_owners)
-        planning_ready = product_contract_ready and self.stage in {"planning", "prototype", "design", "handoff"} and not (error_owners & planning_owners)
-        prototype_ready = planning_ready and self.stage in {"prototype", "design", "handoff"} and not (error_owners & prototype_owners)
+        stage_rank = STAGE_RANK.get(self.stage, -1)
+        passed = not errors
+        product_contract_ready = profile != "lite" and stage_rank >= STAGE_RANK["contract"] and passed
+        planning_ready = passed and (
+            (profile == "lite" and self.stage in {"contract", "planning"})
+            or (profile != "lite" and stage_rank >= STAGE_RANK["planning"])
+        )
+        visual_direction_approved = (
+            profile != "lite"
+            and stage_rank >= STAGE_RANK["visual-direction"]
+            and self.visual_direction.get("status") == "user-approved"
+            and passed
+        )
+        key_screen_approved = (
+            visual_direction_approved
+            and stage_rank >= STAGE_RANK["key-screen"]
+            and self.key_screen.get("status") == "user-approved"
+            and passed
+        )
+        prototype_ready = profile != "lite" and stage_rank >= STAGE_RANK["prototype"] and passed
         design_owner_approved = self.design_acceptance.get("status") == "user-approved" if self.design_acceptance else False
-        design_accepted = prototype_ready and stage_rank >= 2 and design_owner_approved and not (error_owners & design_owners)
-        design_handoff_ready = design_accepted and stage_rank >= 3 and not (error_owners & handoff_owners)
+        design_accepted = profile != "lite" and self.stage in {"design", "handoff"} and design_owner_approved and passed
+        design_handoff_ready = self.stage == "handoff" and design_accepted and passed
         ready_for_technical_design = design_handoff_ready
         # Compatibility fields remain false by design. This harness freezes product/design
         # intent; a later project-specific workflow owns technical and implementation readiness.
@@ -1649,17 +2208,60 @@ class Validator:
         if errors:
             status = "fail"
         elif profile == "lite":
-            status = "lite-pass"
+            status = "lite-planning-pass"
+        elif self.stage == "planning":
+            status = "planning-structure-pass"
         else:
             status = f"{self.stage}-pass"
+        artifact_files = set(_dashboard_artifacts(profile, self.stage))
+        if isinstance(self.planning_review.get("evidence_sources"), list):
+            artifact_files.update(
+                str(row.get("file"))
+                for row in self.planning_review["evidence_sources"]
+                if isinstance(row, dict) and self._meaningful(row.get("file"))
+            )
+        for review in (self.visual_direction, self.key_screen):
+            for row in review.get("evidence", []) if isinstance(review.get("evidence"), list) else []:
+                if isinstance(row, dict) and self._meaningful(row.get("file")):
+                    artifact_files.add(str(row["file"]))
+            for direction in review.get("directions", []) if isinstance(review.get("directions"), list) else []:
+                if not isinstance(direction, dict):
+                    continue
+                for row in direction.get("evidence", []) if isinstance(direction.get("evidence"), list) else []:
+                    if isinstance(row, dict) and self._meaningful(row.get("file")):
+                        artifact_files.add(str(row["file"]))
+        for row in self.design_acceptance.get("visual_evidence", []) if isinstance(self.design_acceptance.get("visual_evidence"), list) else []:
+            if isinstance(row, dict) and self._meaningful(row.get("file")):
+                artifact_files.add(str(row["file"]))
+        implementation = self.design_acceptance.get("visual_implementation", {})
+        if isinstance(implementation, dict) and isinstance(implementation.get("source_hashes"), dict):
+            artifact_files.update(str(relative) for relative in implementation["source_hashes"])
+        manifest_evidence = self.manifest.get("evidence", {}) if self.manifest else {}
+        if isinstance(manifest_evidence, dict):
+            artifact_files.update(
+                str(value)
+                for key, value in manifest_evidence.items()
+                if key.endswith("_file") and self._meaningful(value)
+            )
+        artifact_hashes: dict[str, str | None] = {}
+        for relative in sorted(artifact_files):
+            candidate = (self.root / relative).resolve()
+            if candidate == self.root or self.root not in candidate.parents:
+                continue
+            artifact_hashes[relative] = self._file_hash(candidate)
         return {
-            "schema_version": "1.0",
+            "schema_version": "1.1",
             "status": status,
             "stage": self.stage,
             "profile": profile,
+            "validation_scope": "structural-consistency-and-recorded-evidence",
+            "planning_quality_validated": False,
             "engineering_ready": engineering_ready,
             "product_contract_ready": product_contract_ready,
             "planning_ready": planning_ready,
+            "ready_for_design_exploration": profile != "lite" and planning_ready,
+            "visual_direction_approved": visual_direction_approved,
+            "key_screen_approved": key_screen_approved,
             "prototype_ready": prototype_ready,
             "design_owner_approved": design_owner_approved,
             "design_accepted": design_accepted,
@@ -1670,15 +2272,211 @@ class Validator:
             "implementation_ready": implementation_ready,
             "user_validated": user_validated,
             "manifest_sha256": self._manifest_hash(),
+            "workflow_state_sha256": self._file_hash(self.workflow_state_path),
             "planning_review_sha256": self._file_hash(self.planning_review_path),
             "product_definition_sha256": self._file_hash(self.product_definition_path),
             "design_brief_sha256": self._file_hash(self.root / "03-design-brief.md"),
+            "visual_direction_sha256": self._file_hash(self.visual_direction_path),
+            "key_screen_sha256": self._file_hash(self.key_screen_path),
             "design_acceptance_sha256": self._file_hash(self.design_acceptance_path),
             "feasibility_sha256": self._feasibility_hash(),
+            "artifact_sha256": artifact_hashes,
             "checked_at": datetime.now(timezone.utc).isoformat(),
             "findings": [asdict(finding) for finding in self.findings],
             "accepted_limitations": self._mapping("release_profile").get("accepted_limitations", []) if self.manifest else [],
         }
+
+
+def _dashboard_artifacts(profile: str, stage: str) -> tuple[str, ...]:
+    if profile == "lite":
+        return LITE_ARTIFACTS
+    rank = STAGE_RANK.get(stage, -1)
+    if rank >= STAGE_RANK["handoff"]:
+        return STANDARD_ARTIFACTS
+    if rank >= STAGE_RANK["design"]:
+        return DESIGN_ARTIFACTS
+    if rank >= STAGE_RANK["prototype"]:
+        return PROTOTYPE_ARTIFACTS
+    if rank >= STAGE_RANK["key-screen"]:
+        return KEY_SCREEN_ARTIFACTS
+    if rank >= STAGE_RANK["visual-direction"]:
+        return VISUAL_DIRECTION_ARTIFACTS
+    if rank >= STAGE_RANK["planning"]:
+        return PLANNING_ARTIFACTS
+    return CONTRACT_ARTIFACTS
+
+
+def _render_review_dashboard(root: Path, report: dict[str, Any]) -> str:
+    state: dict[str, Any] = {}
+    state_path = root / "00-workflow-state.json"
+    if state_path.is_file():
+        try:
+            loaded = json.loads(state_path.read_text(encoding="utf-8"))
+            if isinstance(loaded, dict):
+                state = loaded
+        except (OSError, json.JSONDecodeError):
+            pass
+
+    locale = "ko" if state.get("locale") == "ko" else "en"
+    is_korean = locale == "ko"
+    copy = {
+        "title": "Product Blueprint 검토" if is_korean else "Product Blueprint Review",
+        "heading": "검토 대시보드" if is_korean else "Review dashboard",
+        "scope": (
+            "이 결과는 문서의 실질 내용, 사용자 결정 기록, 파일 지문과 제품 계약의 일관성을 확인합니다. "
+            "시장 수요, 기획 판단의 품질, 디자인 만족도나 구현 준비 완료를 증명하지는 않습니다."
+            if is_korean
+            else "This report checks artifact substance, recorded user gates, hashes, traceability, and contract consistency. It does not prove market demand, planning quality, design satisfaction, or implementation readiness."
+        ),
+        "gates": "기록된 사용자 결정" if is_korean else "Recorded user decisions",
+        "gate": "결정" if is_korean else "Decision",
+        "status": "상태" if is_korean else "Status",
+        "decision_ref": "결정 기록" if is_korean else "Decision reference",
+        "artifacts": "이 단계에서 필요한 파일" if is_korean else "Artifacts required at this stage",
+        "findings": "현재 확인할 항목" if is_korean else "Validator findings",
+        "present": "있음" if is_korean else "present",
+        "missing": "없음" if is_korean else "missing",
+        "none": "구조·일관성 검증에서 발견된 항목이 없습니다." if is_korean else "No structural-consistency findings.",
+    }
+    gate_labels = {
+        "product-direction": "제품 방향",
+        "brand-direction": "브랜드 방향",
+        "first-version-scope": "첫 버전 범위",
+        "product-definition": "사용자와 제품 정의",
+        "design-entry": "시각 디자인 시작",
+        "visual-direction": "시각 방향",
+        "key-screen": "대표 화면",
+    }
+    status_labels = {
+        "contract-pass": "제품 계약 구조 확인됨",
+        "planning-structure-pass": "기획 구조 확인됨 · 판단 품질은 별도 검토",
+        "lite-planning-pass": "Lite 기획 구조 확인됨",
+        "visual-direction-pass": "시각 방향 승인 기록 확인됨",
+        "key-screen-pass": "대표 화면 승인 기록 확인됨",
+        "prototype-pass": "프로토타입 계약 확인됨",
+        "design-pass": "디자인 기준선 승인됨 · 전달 문서는 아직 별도",
+        "handoff-pass": "제품·디자인 전달 구조 확인됨",
+        "fail": "확인 또는 수정 필요",
+    }
+
+    gate_rows: list[str] = []
+    gates = state.get("gates", {}) if isinstance(state.get("gates"), dict) else {}
+    for gate_id in WORKFLOW_GATES:
+        gate = gates.get(gate_id, {}) if isinstance(gates.get(gate_id), dict) else {}
+        gate_status = str(gate.get("status", "missing"))
+        visible_gate_status = {"confirmed": "확정됨", "pending": "대기", "missing": "기록 없음"}.get(gate_status, gate_status) if is_korean else gate_status
+        decision_ref = str(gate.get("decision_ref") or "—")
+        gate_rows.append(
+            "<tr><th scope=\"row\">{}</th><td>{}</td><td><code>{}</code></td></tr>".format(
+                html.escape(gate_labels.get(gate_id, gate_id) if is_korean else gate_id), html.escape(visible_gate_status), html.escape(decision_ref)
+            )
+        )
+
+    artifact_rows: list[str] = []
+    for relative in _dashboard_artifacts(str(report["profile"]), str(report["stage"])):
+        exists = (root / relative).is_file()
+        artifact_rows.append(
+            "<li class=\"{}\"><a href=\"{}\">{}</a><span>{}</span></li>".format(
+                copy["present"] if exists else copy["missing"],
+                html.escape(relative, quote=True),
+                html.escape(relative),
+                "present" if exists else "missing",
+            )
+        )
+
+    finding_rows: list[str] = []
+    for finding in report.get("findings", []):
+        finding_rows.append(
+            "<li><code>{}</code> <strong>{}</strong> {} <small>{} · {}</small></li>".format(
+                html.escape(str(finding.get("code", ""))),
+                html.escape(str(finding.get("severity", ""))),
+                html.escape(str(finding.get("message", ""))),
+                html.escape(str(finding.get("owner", ""))),
+                html.escape(str(finding.get("path", ""))),
+            )
+        )
+    if not finding_rows:
+        finding_rows.append(f"<li>{html.escape(copy['none'])}</li>")
+
+    return """<!doctype html>
+<html lang="{locale}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{title}</title>
+  <style>
+    :root {{ color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, sans-serif; background:#f5f3ee; color:#1e2623; }}
+    body {{ margin:0; }} main {{ max-width:1040px; margin:auto; padding:48px 24px 80px; }}
+    header, section {{ background:#fff; border:1px solid #d8ddd9; border-radius:16px; padding:24px; margin-bottom:18px; }}
+    h1,h2 {{ margin-top:0; }} .eyebrow {{ color:#527267; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }}
+    .status {{ font-size:1.25rem; font-weight:750; }} .scope {{ color:#59645f; max-width:72ch; }}
+    table {{ width:100%; border-collapse:collapse; }} th,td {{ text-align:left; border-bottom:1px solid #e5e8e5; padding:10px 8px; }}
+    ul {{ padding-left:20px; }} li {{ margin:8px 0; }} .artifacts {{ list-style:none; padding:0; }}
+    .artifacts li {{ display:flex; justify-content:space-between; gap:16px; border-bottom:1px solid #edf0ed; padding:8px 0; }}
+    .missing, .missing a {{ color:#a43d34; }} .present span {{ color:#527267; }} small {{ display:block; color:#69736f; margin-top:3px; }}
+    code {{ overflow-wrap:anywhere; }} a {{ color:#215d4d; }}
+  </style>
+</head>
+<body data-readiness-status="{status}" data-stage="{stage}">
+<main>
+  <header>
+    <div class="eyebrow">Product Blueprint · {profile}</div>
+    <h1>{heading}</h1>
+    <p class="status">{visible_status}</p>
+    <p class="scope">{scope}</p>
+  </header>
+  <section><h2>{gates_heading}</h2><table><thead><tr><th>{gate_heading}</th><th>{status_heading}</th><th>{decision_ref_heading}</th></tr></thead><tbody>{gate_rows}</tbody></table></section>
+  <section><h2>{artifacts_heading}</h2><ul class="artifacts">{artifact_rows}</ul></section>
+  <section><h2>{findings_heading}</h2><ul>{finding_rows}</ul></section>
+</main>
+</body>
+</html>
+""".format(
+        status=html.escape(str(report["status"]), quote=True),
+        stage=html.escape(str(report["stage"]), quote=True),
+        profile=html.escape(str(report["profile"])),
+        locale=locale,
+        title=html.escape(copy["title"]),
+        heading=html.escape(copy["heading"]),
+        visible_status=html.escape(status_labels.get(str(report["status"]), str(report["status"])) if is_korean else str(report["status"])),
+        scope=html.escape(copy["scope"]),
+        gates_heading=html.escape(copy["gates"]),
+        gate_heading=html.escape(copy["gate"]),
+        status_heading=html.escape(copy["status"]),
+        decision_ref_heading=html.escape(copy["decision_ref"]),
+        artifacts_heading=html.escape(copy["artifacts"]),
+        findings_heading=html.escape(copy["findings"]),
+        gate_rows="".join(gate_rows),
+        artifact_rows="".join(artifact_rows),
+        finding_rows="".join(finding_rows),
+    )
+
+
+def write_stage_report(root: Path, report: dict[str, Any]) -> None:
+    _atomic_write(root / "00-validation-report.json", json.dumps(report, ensure_ascii=False, indent=2) + "\n")
+    lines = [
+        "# Product Blueprint Validation",
+        "",
+        f"- Status: **{report['status']}**",
+        f"- Stage: **{report['stage']}**",
+        f"- Profile: **{report['profile']}**",
+        f"- Planning ready: **{str(report['planning_ready']).lower()}**",
+        f"- Ready for design exploration: **{str(report['ready_for_design_exploration']).lower()}**",
+        f"- Visual direction approved: **{str(report['visual_direction_approved']).lower()}**",
+        f"- Key screen approved: **{str(report['key_screen_approved']).lower()}**",
+        f"- Design handoff ready: **{str(report['design_handoff_ready']).lower()}**",
+        "- Validation scope: **structural consistency and recorded evidence**",
+        "- Market, planning, and design quality still require human judgment.",
+        "",
+        "## Findings",
+        "",
+    ]
+    if report["findings"]:
+        lines.extend("- `{code}` [{severity}] {message} — `{owner}` / `{path}`".format(**item) for item in report["findings"])
+    else:
+        lines.append("- None")
+    _atomic_write(root / "00-validation-report.md", "\n".join(lines) + "\n")
+    _atomic_write(root / "00-review-dashboard.html", _render_review_dashboard(root, report))
 
 
 def write_report(root: Path, report: dict[str, Any]) -> None:
@@ -1730,8 +2528,12 @@ def parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("planning_dir", type=Path)
     parser.add_argument("--profile", choices=("lite", "standard", "deep"))
-    parser.add_argument("--stage", choices=("contract", "planning", "prototype", "design", "handoff"), default="handoff")
-    parser.add_argument("--no-write", action="store_true", help="Print findings without writing readiness reports")
+    parser.add_argument(
+        "--stage",
+        choices=("contract", "planning", "visual-direction", "key-screen", "prototype", "design", "handoff"),
+        default="planning",
+    )
+    parser.add_argument("--no-write", action="store_true", help="Print findings without writing validation reports or the review dashboard")
     parser.add_argument("--json", action="store_true", help="Print the full JSON report")
     return parser.parse_args(argv)
 
@@ -1743,15 +2545,27 @@ def main(argv: Iterable[str] | None = None) -> int:
         print(f"Planning directory does not exist: {root}", file=sys.stderr)
         return 2
     report = Validator(root, args.profile, args.stage).run()
-    if not args.no_write and args.stage == "handoff":
-        write_report(root, report)
+    if not args.no_write:
+        write_stage_report(root, report)
+        if args.stage == "handoff":
+            write_report(root, report)
     if args.json:
         print(json.dumps(report, ensure_ascii=False, indent=2))
     else:
         print(f"{report['status']}: {len(report['findings'])} finding(s)")
         for finding in report["findings"]:
             print(f"- {finding['code']} [{finding['severity']}]: {finding['message']} ({finding['path']})")
-    return 0 if report["status"] in {"contract-pass", "planning-pass", "prototype-pass", "design-pass", "handoff-pass", "lite-pass"} else 1
+    passing_statuses = {
+        "contract-pass",
+        "planning-structure-pass",
+        "visual-direction-pass",
+        "key-screen-pass",
+        "prototype-pass",
+        "design-pass",
+        "handoff-pass",
+        "lite-planning-pass",
+    }
+    return 0 if report["status"] in passing_statuses else 1
 
 
 if __name__ == "__main__":

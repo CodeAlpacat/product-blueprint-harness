@@ -5,7 +5,7 @@ description: Produces and compares two or three genuinely different visual UI di
 
 # Visual Directions
 
-Create `03.4-visual-directions.md` and comparable visual evidence for two or three directions. This is the divergent gate of the optional design-production workflow.
+Create `03.4-visual-directions.md`, `03.4-visual-directions.json` from `assets/templates/visual-direction-review.json`, and comparable visual evidence for two or three directions. This is the divergent gate of the optional design-production workflow.
 
 ## Preconditions
 
@@ -36,7 +36,7 @@ Use suitable frontend-design and image-generation capabilities when available. W
 
 ## User decision
 
-Recommend one direction with evidence and say when another would win. Ask the user to choose, request a revision, or pause. Record the decision and reviewed evidence in `00-decision-log.md`.
+Recommend one direction with evidence and say when another would win. Ask the user to choose, request a revision, or pause. Record the decision and reviewed evidence in `00-decision-log.md`. After explicit approval, record the same reference with `scripts/workflow_state.py confirm <planning-dir> --gate visual-direction ...`.
 
 Do not self-approve. Do not continue into the design system or remaining screens until the user confirms a direction.
 
@@ -53,4 +53,6 @@ Do not self-approve. Do not continue into the design system or remaining screens
 - explicit user decision status
 - chosen direction, when confirmed
 
-After confirmation, use `product-blueprint:art-direction-brief` to codify the chosen direction, then produce one representative high-fidelity screen for feedback.
+The JSON binds the shared comparison setup, each direction's local evidence and SHA-256, the selected direction, explicit approval evidence, and hashes for the design brief and Markdown comparison. Keep it pending until the user reviews current evidence.
+
+After confirmation, run `validate_service_blueprint.py <planning-dir> --stage visual-direction`. Only after `visual-direction-pass`, use `product-blueprint:art-direction-brief` to codify the chosen direction, then use `product-blueprint:key-screen-exploration` for one representative high-fidelity screen.

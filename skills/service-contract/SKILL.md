@@ -34,12 +34,12 @@ Read `${CLAUDE_PLUGIN_ROOT}/references/service-contract.md` before editing the m
 10. Run the contract-stage validator and fix every error before the low-fidelity flow board and design brief:
 
 ```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/validate_service_blueprint.py" <planning-dir> --stage contract --no-write
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/validate_service_blueprint.py" <planning-dir> --stage contract
 ```
 
 ## Change discipline
 
-Any product-definition, PRD scope, screen, state, action, mechanism, risk mitigation, or feature-adoption change updates this manifest in the same phase. Then cascade only to downstream consumers: storyboard → UX copy/workbench → demo → prototype test → design acceptance → readiness/handoff/technical plan.
+Any product-definition, PRD scope, screen, state, action, mechanism, risk mitigation, or feature-adoption change updates this manifest in the same phase. Invalidate from the earliest affected workflow gate, then cascade only to downstream consumers: storyboard → key-screen/workbench → demo → prototype test → design acceptance → readiness/handoff/technical plan.
 
 Do not infer legacy markdown into a ready manifest. Migrate it, run the validator, and keep unresolved values as `decision-needed:<id>` blockers.
 

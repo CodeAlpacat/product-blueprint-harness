@@ -40,7 +40,7 @@ Ask for explicit user confirmation at these four boundaries:
 3. **First-version scope** — the included loop, excluded work, and accepted limitations.
 4. **Product definition** — personas, mental models, entry points, journeys, and required outcomes.
 
-Record each decision in `00-decision-log.md`. Do not hide these decisions behind internal terms such as “lock” in user-facing summaries.
+Record each decision in `00-decision-log.md`. Also record it in `00-workflow-state.json` with `scripts/workflow_state.py confirm`. A prose claim or agent-authored `explicit-user` string without matching conversation evidence and user history does not satisfy the gate. Do not hide decisions behind internal terms such as “lock” in user-facing summaries.
 
 ## Planning sequence
 
@@ -52,7 +52,26 @@ Run:
 python3 scripts/init_prd_project.py "<product name>" --root <planning-root>
 ```
 
-Use `--lite` or `--deep` only when the chosen mode differs from Standard. Resume existing artifacts without overwriting them. Keep `00-review-dashboard.html` as the user’s review entry point and update it after each decision boundary.
+Use `--lite` or `--deep` only when the chosen mode differs from Standard. Resume existing artifacts without overwriting them. On every resume, inspect state before choosing a skill:
+
+```bash
+python3 scripts/workflow_state.py status <planning-dir> --json
+```
+
+Route from `next_gate`; do not infer progress from the largest or newest Markdown file. If status reports `validation-stale`, rerun the validator, identify the earliest changed decision, and invalidate from that gate before continuing. The validator regenerates `00-review-dashboard.html`, so do not hand-author readiness badges in it.
+
+#### Lite compact branch
+
+For Lite, do not run the Standard artifact sequence below and do not add design-production scaffolds. Keep the seven-file scaffold compact:
+
+1. Fill `00-brief.md` and capture evidence or clearly labeled assumptions in `01-lite-direction.md`.
+2. Compare product directions, obtain the user's product-direction confirmation, then define and confirm the brand direction in the same compact direction file.
+3. Write `02-lite-plan.md` with the first-version loop, exclusions, user/job, entry points, critical screens/actions/states, service responsibility, risks, and acceptance outcomes.
+4. Obtain separate explicit confirmations for first-version scope and the user-language product definition; record all four planning gates with `workflow_state.py`.
+5. Bring `02.6-service-manifest.json` and `03-design-brief.md` in line with the compact plan.
+6. Run `--stage planning`. Report `lite-planning-pass` only as a compact planning result. Lite cannot enter visual-direction, prototype, design, or handoff stages; upgrade to Standard first.
+
+For Standard and Deep, continue with the full sequence below.
 
 ### 1. Clarify the brief
 
@@ -66,11 +85,11 @@ Fill `00-brief.md` with the idea, intended user, core job, constraints, referenc
 
 ### 3. Compare product directions
 
-Use `product-blueprint:parallel-concepts` to compare meaningfully different product concepts, not cosmetic variants. Show the recommendation and tradeoffs in the dashboard. Continue only after the user confirms a product direction.
+Use `product-blueprint:parallel-concepts` to compare meaningfully different product concepts, not cosmetic variants. Show the recommendation and tradeoffs. Continue only after the user confirms a product direction. Append the decision log and run `workflow_state.py confirm --gate product-direction` with the actual conversation reference.
 
 ### 4. Establish the brand direction
 
-Use `product-blueprint:positioning-brand`. Define positioning, voice, naming direction, and brand principles. Availability checks are signals, not trademark clearance. Continue only after the user confirms the direction; a working name is acceptable.
+Use `product-blueprint:positioning-brand`. Define positioning, voice, naming direction, and brand principles. Availability checks are signals, not trademark clearance. Continue only after the user confirms the direction; a working name is acceptable. Record it with `workflow_state.py confirm --gate brand-direction`.
 
 ### 5. Define product mechanisms and draft the PRD
 
@@ -80,7 +99,7 @@ The PRD must include the first-version loop, user stories, feature and surface s
 
 ### 6. Run the planning review
 
-Use `product-blueprint:planning-quality-gate`. It reviews the plan through six independent lenses: product strategy, user evidence, brand, PRD quality, service feasibility, and growth/risk.
+Use `product-blueprint:planning-quality-gate`. It reviews the plan through six evidence-linked lenses: product strategy, user evidence, brand, PRD quality, service feasibility, and growth/risk. When one agent runs all six, call them review perspectives rather than independent reviewers. Standard and Deep cannot pass without a substantive research or ideation artifact bound into the review JSON, and each lens records its own evidence references.
 
 Resolve all critical and major findings. Present the recommended first-version scope in plain language, then continue only after explicit user confirmation.
 
@@ -121,22 +140,13 @@ Validate the planning package:
 python3 scripts/validate_service_blueprint.py <planning-dir> --stage planning
 ```
 
-Update the dashboard with:
-
-- what was decided
-- what remains uncertain
-- the most important flows and states
-- current constraints and accepted limitations
-- the design brief
-- the optional next step
-
-Then stop. Report **planning complete** only when the planning validator passes and required user decisions are recorded.
+The validator writes `00-validation-report.{json,md}` and regenerates the dashboard from current state and findings. Then stop. Report **planning structure passed** only when it returns `planning-structure-pass` and all required user decisions are recorded. This is not a claim that market demand or planning quality has been proven.
 
 ## Optional continuation: visual design and prototype
 
 If the user explicitly asks for UI design, screens, or a prototype, start `product-blueprint:design-production`. Do not silently continue into it.
 
-That workflow first compares two or three visual directions, applies the chosen direction to one representative screen, asks for user feedback, and only then expands to the full screen set and prototype.
+Record a separate `design-entry` user gate. That workflow first compares two or three visual directions, validates `--stage visual-direction`, applies the chosen direction to one representative screen through `key-screen-exploration`, validates `--stage key-screen`, and only then expands to the full screen set and prototype.
 
 ## Quality rules
 
@@ -146,6 +156,7 @@ That workflow first compares two or three visual directions, applies the chosen 
 - A storyboard is not visual design.
 - A generated screen is not an accepted design.
 - If visual exploration reveals a product change, return to the affected planning artifact and reconfirm it.
+- Use `workflow_state.py invalidate --from-gate ...` when an upstream artifact or decision changes; never refresh downstream hashes as a substitute for re-review.
 - Do not claim target-user validation without real target-user evidence.
 - Do not claim trademark clearance from search signals.
 - Do not claim technical or implementation readiness; those require a later project-specific workflow.

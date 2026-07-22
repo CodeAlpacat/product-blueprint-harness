@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "status": "pending",
+  "comparison_setup": {
+    "surface_id": "",
+    "viewport": "",
+    "state_id": "",
+    "content_fixture": ""
+  },
+  "directions": [],
+  "selected_direction_id": "",
+  "approval": {
+    "kind": "",
+    "decision_ref": "",
+    "approved_at": "",
+    "evidence": ""
+  },
+  "source_hashes": {
+    "03-design-brief.md": "",
+    "03.4-visual-directions.md": ""
+  }
+}

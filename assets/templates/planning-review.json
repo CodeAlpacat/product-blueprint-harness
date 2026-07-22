@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "status": "draft",
   "profile": "standard",
   "reviewed_at": "",
@@ -10,13 +10,14 @@
     "02-mechanisms.md": "",
     "02-prd.md": ""
   },
+  "evidence_sources": [],
   "lenses": [
-    {"id": "product-strategy", "status": "pending", "summary": "", "finding_ids": []},
-    {"id": "user-evidence", "status": "pending", "summary": "", "finding_ids": []},
-    {"id": "brand", "status": "pending", "summary": "", "finding_ids": []},
-    {"id": "prd", "status": "pending", "summary": "", "finding_ids": []},
-    {"id": "service-feasibility", "status": "pending", "summary": "", "finding_ids": []},
-    {"id": "growth-risk", "status": "pending", "summary": "", "finding_ids": []}
+    {"id": "product-strategy", "status": "pending", "summary": "", "evidence_refs": [], "finding_ids": []},
+    {"id": "user-evidence", "status": "pending", "summary": "", "evidence_refs": [], "finding_ids": []},
+    {"id": "brand", "status": "pending", "summary": "", "evidence_refs": [], "finding_ids": []},
+    {"id": "prd", "status": "pending", "summary": "", "evidence_refs": [], "finding_ids": []},
+    {"id": "service-feasibility", "status": "pending", "summary": "", "evidence_refs": [], "finding_ids": []},
+    {"id": "growth-risk", "status": "pending", "summary": "", "evidence_refs": [], "finding_ids": []}
   ],
   "findings": [],
   "mvp_lock": {

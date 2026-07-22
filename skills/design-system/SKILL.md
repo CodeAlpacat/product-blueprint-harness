@@ -1,11 +1,11 @@
 ---
 name: design-system
-description: Turns an approved PRD, storyboard, and visual quality gate into a production design brief, visual direction, design-system candidates, component inventory, and screen design rules. Use after product flow/storyboard approval and visual-quality review when the user wants real product design direction without pretending frontend implementation is complete.
+description: Expands an approved visual direction and key-screen quality ceiling into design-system candidates, component inventory, and screen rules. Use only after key-screen validation passes in the optional design-production workflow.
 ---
 
 # Product Blueprint Design System
 
-Use this after storyboard approval and `product-blueprint:visual-quality-gate`. The design system should serve the product thesis, not decorate the board. This is a production design brief, not frontend implementation.
+Use this only after `key-screen-pass`. Read the approved visual-direction JSON, art-direction brief, and key-screen review. The design system expands that quality ceiling; it must not choose a new direction. This is a production design brief, not frontend implementation.
 
 HTML storyboards are acceptable inputs here because they are flow/IA contracts. Do not treat them as final visual UI. Production-grade output continues into reusable React components, boards, and previews through `product-blueprint:design-system-workbench`.
 
@@ -22,7 +22,7 @@ HTML storyboards are acceptable inputs here because they are flow/IA contracts. 
 ## Workflow
 
 1. Define brand position, audience emotion, and anti-aesthetic.
-2. Define a named art direction tied to product behavior and references.
+2. Restate the approved named art direction and reject any proposed token that drifts from it.
 3. Create design principles tied to product behavior.
 4. Define candidate tokens: color, typography, spacing, radius, elevation, motion.
 5. Define component inventory from storyboard screens.

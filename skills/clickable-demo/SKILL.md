@@ -11,7 +11,7 @@ One self-contained HTML file makes the contracted flow portable and auditable. I
 
 - `02.5-screen-contracts.md` — the P0 screen list and the entry/exit map (transitions MUST match it)
 - `02.6-service-manifest.json` — authoritative surface/action/state/operation/journey IDs; the contract-stage validator MUST pass
-- locked UX writing and screen/service contracts
+- approved UX writing and screen/service contracts
 
 ## Output
 
@@ -32,7 +32,7 @@ One self-contained HTML file makes the contracted flow portable and auditable. I
 
 - **Transition-map check**: script-drive the demo (or click through in a browser tool) and assert every entry/exit edge in the screen contract is reachable and lands on the right screen. Record the pass as a list of `from → to ⇒ landed`. A wired demo with unverified transitions is not done.
 - **Runtime report**: browser-drive every manifest transition, same-surface effect, and required state reproduction. Write `04.37-runtime-verification.json` with `runner: browser`, current manifest/demo SHA-256 values, and pass/fail rows keyed by action/state ID. A hand-written claim without current hashes is stale evidence.
-- **Deterministic contract check**: run `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/validate_service_blueprint.py" <planning-dir> --stage prototype --no-write`. Fix every missing DOM ID, uncontracted control, mismatched `data-go`/`data-effect`, unreachable P0 surface, and unreproducible state.
+- **Deterministic contract check**: run `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/validate_service_blueprint.py" <planning-dir> --stage prototype`. Fix every missing DOM ID, uncontracted control, mismatched `data-go`/`data-effect`, unreachable P0 surface, and unreproducible state.
 - **Render check**: open in a real browser, screenshot demo mode (2–3 key screens) AND board mode (full page). Fix visual defects before declaring done.
 - **Not visual acceptance**: screenshots from this HTML never populate the final design-acceptance visual matrix. That evidence must come from the React boards/preview.
 

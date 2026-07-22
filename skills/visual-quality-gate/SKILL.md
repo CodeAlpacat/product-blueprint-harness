@@ -11,7 +11,7 @@ Use this as a gate, not as decoration. It decides whether the current visual dir
 
 The gate is worthless if the model that produced the screen also grades it against an adjective list; it will pass its own slop (this is a common failure — weak output slips through as "conditional pass"). Follow `${CLAUDE_PLUGIN_ROOT}/references/adversarial-visual-gate.md`:
 
-- **Fresh critic.** Run the gate as a fresh-context subagent (or the `critique` + `audit` skills) that receives only the rendered screenshots, the measured spec/tokens, and the screen contract — **not** the generation conversation. Its job is to find reasons to reject; default to fail on doubt.
+- **Fresh critic when authorized.** If the user explicitly approves delegation and the environment supports it, use a fresh-context critic that receives only the rendered screenshots, measured spec/tokens, and screen contract. Otherwise run a distinct adversarial pass and describe it honestly as the producing agent's critique, not an independent review. Its job is to find reasons to reject; default to fail on doubt.
 - **Measurable, not vibes.** Compute WCAG contrast for each text pair, check the type-scale ratio, sample spacing for off-grid values, count palette hues, and scan for each named slop signature S1–S14 in `${CLAUDE_PLUGIN_ROOT}/references/anti-slop-doctrine.md`. Cite where each finding appears.
 - **Two template tests.** "Could this be any shadcn/SaaS starter with content swapped?" and "Would a senior designer put this in a portfolio?" A wrong answer to either = fail.
 - **Loop until clean, capped.** CONDITIONAL is not PASS — return ranked fixes to the craft loop, fix, re-screenshot, re-gate. Cap at **3 fix cycles** per artifact; still failing → record **ACCEPT-FLAG** in the decision log (what failed, why accepted, later fix) and surface it in the dashboard — never quietly pass, never loop forever (`references/quality-bar.md`).
@@ -100,6 +100,6 @@ Use `references/visual-quality-checklist.md` for detailed checks.
 
 ## Next Step
 
-- If the verdict is fail, revise `product-blueprint:art-direction-brief`, `product-blueprint:screen-contract`, or the prototype before continuing.
-- If the verdict is pass (including pass with recorded ACCEPT-FLAG rows), use `product-blueprint:backend-systems-brief` and `product-blueprint:design-system`.
+- If a ceiling scan fails, return to `product-blueprint:key-screen-exploration` or `product-blueprint:art-direction-brief`; if an all-P0 scan fails, return to the named screen, design-system, or prototype owner. Product-behavior failures return to `product-blueprint:screen-contract`.
+- If the all-P0 verdict passes (including pass with recorded ACCEPT-FLAG rows), continue to the clickable prototype or final design critique as appropriate. `backend-systems-brief` belongs to planning and is never the next visual-design step.
 - If design quality is the main risk, follow the design-system brief with `product-blueprint:design-system-workbench` before engineering handoff.

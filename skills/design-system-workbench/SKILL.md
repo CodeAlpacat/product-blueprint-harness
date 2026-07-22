@@ -20,6 +20,7 @@ The output is functional-data-free but implementation-faithful React source. A s
 - reference evidence or a user-approved direction interview;
 - `02.5-screen-contracts.md` and `02.6-service-manifest.json`;
 - `03-storyboard.html`, `03.5-art-direction-brief.md`, `03.7-ux-writing.md`;
+- approved `03.8-key-screen-review.json` and its current narrow/wide evidence;
 - `04.1-visual-quality-gate.md`, `04.3-design-system.md`, and `DESIGN.md`;
 - existing product tokens/components/screenshots when extending a product.
 
@@ -50,7 +51,7 @@ For a greenfield project, use `visual-workbench/`. For an existing app, keep sou
 
 ## Craft sequence
 
-Create the decisive ceiling screen first. Run structure → layout → typography → color/material → imagery → density/polish → distinctiveness passes and the adversarial visual gate. Then propagate the exact tokens/components to all P0 screens; propagation without a rendered screen is not coverage.
+Begin from the already approved key-screen ceiling and reuse its measured choices. Run structure → layout → typography → color/material → imagery → density/polish → distinctiveness passes on each expansion while checking for drift. Then propagate the exact tokens/components to all P0 screens; propagation without a rendered screen is not coverage.
 
 ## Pass
 

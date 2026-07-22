@@ -13,7 +13,7 @@ Turn the confirmed product direction into positioning, a working name or shortli
 
 ## Output
 
-`01.8-positioning-brand.md` with the sections below. Update `00-decision-log.md` when the user confirms the brand direction.
+`01.8-positioning-brand.md` with the sections below. When the user confirms the brand direction, update `00-decision-log.md` and record the same explicit decision in `00-workflow-state.json` with `scripts/workflow_state.py confirm --gate brand-direction`.
 
 ## 1. Positioning
 
@@ -55,5 +55,5 @@ Anti-patterns: generating names by availability first (survivors have bad 어감
 
 ## Next Step
 
-- 다음 추천: `product-blueprint:experience-mechanisms` (Standard order) — 또는 이름이 이미 확정돼 시각으로 직행할 때는 `product-blueprint:art-direction-brief`.
+- 다음 추천: `product-blueprint:experience-mechanisms`. 시각 디자인은 PRD, 제품 정의, 화면·서비스 계약과 기획 검증을 마친 뒤 사용자가 별도로 `product-blueprint:design-production`을 요청할 때만 시작합니다.
 - 사용자가 결정할 것: 이름 확정 여부 / 태그라인 / 마스코트 채택.

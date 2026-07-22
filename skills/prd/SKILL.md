@@ -76,6 +76,6 @@ Create `02-prd.md`. End with a feature-by-feature checklist and a `Product Defin
 
 ## Next Step
 
-- Use `product-blueprint:planning-quality-gate` for independent six-lens review and first-version scope confirmation.
+- Use `product-blueprint:planning-quality-gate` for an evidence-linked six-lens review and first-version scope confirmation.
 - Then use `product-blueprint:product-definition` for the user-confirmed source set.
 - Only then use `product-blueprint:screen-contract` and `product-blueprint:service-contract` before the low-fidelity flow board and design brief.

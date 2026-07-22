@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "profile": "standard",
+  "locale": "en",
+  "current_phase": "handoff",
+  "updated_at": "2026-07-20T00:30:00Z",
+  "gates": {
+    "product-direction": {
+      "status": "confirmed",
+      "kind": "explicit-user",
+      "decision_ref": "DEC-PRODUCT",
+      "confirmed_at": "2026-07-20T00:00:00Z",
+      "evidence": {"source": "conversation", "ref": "conversation:product-direction", "summary": "The user selected the public inspection concept."}
+    },
+    "brand-direction": {
+      "status": "confirmed",
+      "kind": "explicit-user",
+      "decision_ref": "DEC-BRAND",
+      "confirmed_at": "2026-07-20T00:02:00Z",
+      "evidence": {"source": "conversation", "ref": "conversation:brand-direction", "summary": "The user selected a calm and direct product voice."}
+    },
+    "first-version-scope": {
+      "status": "confirmed",
+      "kind": "explicit-user",
+      "decision_ref": "DEC-1",
+      "confirmed_at": "2026-07-20T00:04:00Z",
+      "evidence": {"source": "conversation", "ref": "conversation:first-version", "summary": "The user approved the public inspection P0 and its explicit exclusions."}
+    },
+    "product-definition": {
+      "status": "confirmed",
+      "kind": "explicit-user",
+      "decision_ref": "DEC-1",
+      "confirmed_at": "2026-07-20T00:06:00Z",
+      "evidence": {"source": "conversation", "ref": "conversation:product-definition", "summary": "The user confirmed the guest, requirements, and public-home entry point."}
+    },
+    "design-entry": {
+      "status": "confirmed",
+      "kind": "explicit-user",
+      "decision_ref": "DEC-17",
+      "confirmed_at": "2026-07-20T00:10:00Z",
+      "evidence": {"source": "conversation", "ref": "conversation:design-entry", "summary": "The user chose to continue from accepted planning into visual exploration."}
+    },
+    "visual-direction": {
+      "status": "confirmed",
+      "kind": "explicit-user",
+      "decision_ref": "DEC-18",
+      "confirmed_at": "2026-07-20T00:15:00Z",
+      "evidence": {"source": "conversation", "ref": "conversation:visual-direction", "summary": "The user selected the calm catalogue direction from two comparable options."}
+    },
+    "key-screen": {
+      "status": "confirmed",
+      "kind": "explicit-user",
+      "decision_ref": "DEC-19",
+      "confirmed_at": "2026-07-20T00:20:00Z",
+      "evidence": {"source": "conversation", "ref": "conversation:key-screen", "summary": "The user approved the responsive home key screen and loading treatment."}
+    }
+  },
+  "history": [
+    {"type": "gate-confirmed", "gate_id": "product-direction", "decision_ref": "DEC-PRODUCT", "actor": "user", "evidence_ref": "conversation:product-direction", "at": "2026-07-20T00:00:00Z"},
+    {"type": "gate-confirmed", "gate_id": "brand-direction", "decision_ref": "DEC-BRAND", "actor": "user", "evidence_ref": "conversation:brand-direction", "at": "2026-07-20T00:02:00Z"},
+    {"type": "gate-confirmed", "gate_id": "first-version-scope", "decision_ref": "DEC-1", "actor": "user", "evidence_ref": "conversation:first-version", "at": "2026-07-20T00:04:00Z"},
+    {"type": "gate-confirmed", "gate_id": "product-definition", "decision_ref": "DEC-1", "actor": "user", "evidence_ref": "conversation:product-definition", "at": "2026-07-20T00:06:00Z"},
+    {"type": "gate-confirmed", "gate_id": "design-entry", "decision_ref": "DEC-17", "actor": "user", "evidence_ref": "conversation:design-entry", "at": "2026-07-20T00:10:00Z"},
+    {"type": "gate-confirmed", "gate_id": "visual-direction", "decision_ref": "DEC-18", "actor": "user", "evidence_ref": "conversation:visual-direction", "at": "2026-07-20T00:15:00Z"},
+    {"type": "gate-confirmed", "gate_id": "key-screen", "decision_ref": "DEC-19", "actor": "user", "evidence_ref": "conversation:key-screen", "at": "2026-07-20T00:20:00Z"}
+  ],
+  "invalidations": []
+}

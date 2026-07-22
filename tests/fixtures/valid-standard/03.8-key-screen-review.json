@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "status": "user-approved",
+  "surface_id": "home",
+  "critical_state_ids": [
+    "home-loading"
+  ],
+  "evidence": [
+    {
+      "id": "home-key-mobile",
+      "file": "screenshots/visual-home-mobile.svg",
+      "sha256": "3c3ac172f0292d87d817e2db8c06471af681e1e14c1b36bdc4d9d4adcbc7ed6a",
+      "viewport": "mobile",
+      "state_ids": [
+        "home-loading"
+      ],
+      "render_source_ref": "visual-workbench/boards/DepthBoard.tsx"
+    },
+    {
+      "id": "home-key-desktop",
+      "file": "screenshots/visual-home-desktop.svg",
+      "sha256": "3cfc153e3965c083caed520f818f312efb52c59a7088a00a0205a03047cfe96c",
+      "viewport": "desktop",
+      "state_ids": [
+        "home-loading"
+      ],
+      "render_source_ref": "visual-workbench/boards/DepthBoard.tsx"
+    }
+  ],
+  "quality_review": {
+    "status": "pass",
+    "summary": "The responsive hierarchy and loading treatment meet the approved direction without adding uncontracted controls.",
+    "open_blockers": []
+  },
+  "approval": {
+    "kind": "explicit-user",
+    "decision_ref": "DEC-19",
+    "approved_at": "2026-07-20T00:20:00Z",
+    "evidence": "The user approved mobile and desktop key-screen evidence."
+  },
+  "source_hashes": {
+    "03-design-brief.md": "fb14891882c04b5fec60166fe4d897a58ea5fffb0dffcdf91f94a4235c152f3d",
+    "03.4-visual-directions.json": "94ef89c453d756757e80d5f6609460315b95217520cc62accd073fcc89ee7b00",
+    "03.5-art-direction-brief.md": "e11407266bd5a760ed6d811c4c3fe35cbeb1c6184ac9aca0b3d927c8bc77e79c",
+    "03.8-key-screen-review.md": "7f932ec51bea7f3c1b17b84ee22b17008c5e655b6cfb6e773376ff4d51a22da2"
+  }
+}

@@ -8,22 +8,25 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Product Blueprint",
-    "shortDescription": "Turn an idea into a cross-reviewed PRD, complete product flows, and a clear design handoff brief.",
-    "longDescription": "Product Blueprint guides research, product concept comparison, positioning and brand direction, PRD creation, six-lens planning review, explicit user confirmation, product definition, screen and service contracts, feasibility, low-fidelity flows, and a concise design brief. The default workflow stops before visual UI production. A separate opt-in design-production workflow compares visual directions, earns approval on one representative screen, and only then expands to a design system, complete screens, prototype, and handoff. Technical architecture and API/DB wiring remain later explicit work.",
+    "shortDescription": "Turn an idea into an evidence-linked PRD, complete product flows, and a clear visual-design brief.",
+    "longDescription": "Product Blueprint guides research, product concept comparison, positioning and brand direction, PRD creation, a six-perspective evidence-linked review, explicit user decision gates, product definition, screen and service contracts, feasibility, low-fidelity flows, and a concise design brief. The default workflow stops before visual UI production. A separate opt-in design-production workflow validates comparable visual directions, earns approval on one representative screen, and only then expands to a design system, complete screens, prototype, and handoff. Validation checks structure and recorded evidence; it does not prove market demand, design taste, or implementation readiness.",
     "developerName": "Local developer",
     "category": "Productivity",
     "capabilities": [
       "product-research",
       "guided-intake",
       "decision-gates",
-      "decision-dashboard",
+      "workflow-state",
+      "generated-decision-dashboard",
       "reference-deconstruction",
       "parallel-concepting",
       "prd-writing",
       "planning-quality-gate",
+      "evidence-linked-review",
       "design-brief",
       "optional-design-production",
       "visual-direction-comparison",
+      "key-screen-approval-gate",
       "screen-contracts",
       "service-contracts",
       "design-readiness",
@@ -41,7 +44,7 @@
       "engineering-handoff"
     ],
     "defaultPrompt": [
-      "Guide me from idea to a cross-reviewed product plan: compare concepts, establish a brand direction, write and review the PRD, confirm the first-version scope and product definition, map screens and flows, and finish with a design handoff brief. Stop before visual UI production unless I explicitly ask to continue with design-production."
+      "Guide me from idea to an evidence-linked product plan: compare concepts, establish a brand direction, write and review the PRD, record explicit user decisions, confirm the first-version scope and product definition, map screens and flows, and finish with a visual-design brief. Stop before visual UI production unless I explicitly ask to continue with design-production."
     ]
   }
 }

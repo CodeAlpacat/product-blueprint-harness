@@ -35,5 +35,5 @@ Handoff readiness fails while any scan item is "no" without an ACCEPT-FLAG, or w
 After closing the registry, run the prototype-stage validator. A prose audit cannot self-upgrade missing DOM/transition evidence:
 
 ```bash
-python3 <plugin-root>/scripts/validate_service_blueprint.py <planning-dir> --stage prototype --no-write
+python3 <plugin-root>/scripts/validate_service_blueprint.py <planning-dir> --stage prototype
 ```

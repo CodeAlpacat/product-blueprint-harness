@@ -26,7 +26,7 @@ Create or update `02.1-product-definition.json` from `assets/templates/product-d
 5. Enumerate every entry path: first use, returning, external result/import, edit, post-success redirect, refresh, back, cross-device, and offline when applicable.
 6. For exclusions, state what the current-release entry point shows. “Later” without current behavior is not an exclusion.
 7. Present the user-language definition and entry-point map to the user. Keep `status: draft` until they explicitly confirm it.
-8. Only after explicit confirmation, write `status: user-confirmed` and the decision-log evidence. The agent must never self-approve this file.
+8. Only after explicit confirmation, write `status: user-confirmed` and the decision-log evidence. Record the identical decision reference with `scripts/workflow_state.py confirm <planning-dir> --gate product-definition ...`. The agent must never self-approve this file.
 9. Run the contract stage after screen/service contracts exist. Any orphan requirement or entry point returns to this file or its downstream owner.
 
 ## Coverage semantics
@@ -39,7 +39,7 @@ Create or update `02.1-product-definition.json` from `assets/templates/product-d
 
 ## Change rule
 
-Changing this file invalidates screen/service contracts, visual acceptance, handoff, and technical planning. Do not update downstream hashes in place; regenerate and request design approval again.
+Changing this file invalidates screen/service contracts, visual acceptance, handoff, and technical planning. Run `scripts/workflow_state.py invalidate <planning-dir> --from-gate product-definition ...`; do not update downstream hashes in place. Regenerate downstream work and request affected approval again.
 
 ## Next step
 

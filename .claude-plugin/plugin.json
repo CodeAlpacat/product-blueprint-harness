@@ -1,7 +1,7 @@
 {
   "name": "product-blueprint",
   "version": "0.4.0",
-  "description": "Guided product-planning workflow for Claude Code: turns ideas into compared concepts, brand direction, a cross-reviewed PRD, confirmed product definition, complete screen and service flows, and a design brief. Visual UI and prototype production are a separate opt-in workflow.",
+  "description": "Guided product-planning workflow for Claude Code: turns ideas into compared concepts, brand direction, an evidence-linked PRD review, recorded user gates, complete screen and service flows, and a visual-design brief. Visual UI and prototype production are a separate opt-in workflow with direction and key-screen approval gates.",
   "author": {
     "name": "CodeAlpacat",
     "url": "https://github.com/CodeAlpacat"
@@ -13,9 +13,11 @@
     "product-planning",
     "prd",
     "planning-quality-gate",
+    "workflow-state",
     "design-brief",
     "optional-design-production",
     "visual-direction-comparison",
+    "key-screen-approval-gate",
     "design-system",
     "art-direction",
     "ux",

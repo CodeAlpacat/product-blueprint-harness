@@ -47,4 +47,4 @@ Do not choose fonts, colors, component libraries, final layout, illustration sty
 
 The brief passes when a designer can begin visual exploration without reopening every planning file, can distinguish fixed product behavior from open visual choices, and knows which representative screen should be explored first.
 
-After writing it, run the planning-stage validator and update the review dashboard. Stop unless the user explicitly requests visual design or a prototype.
+After writing it, run the planning-stage validator; it regenerates the review dashboard from current state and findings. Stop unless the user explicitly requests visual design or a prototype.

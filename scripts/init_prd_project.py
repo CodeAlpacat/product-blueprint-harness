@@ -84,8 +84,8 @@ Use this file to keep user decisions, assumptions, and gate status from getting 
 <body data-readiness-status="not-evaluated">
   <div class="wrap">
     <h1>Review Dashboard</h1>
-    <div class="sub">이 대시보드가 유일한 리뷰 진입점입니다. 각 md는 상세 SoT — 유저가 20개 문서를 하나하나 읽게 하지 마세요.</div>
-    <div class="todo">⚠️ 매 단계 종료 시 <code>product-blueprint:decision-dashboard</code>로 이 파일을 갱신하세요. 빈 스텁으로 두면 안 됩니다.</div>
+    <div class="sub">검증을 실행하면 현재 결정, 필요한 파일과 누락 사항이 이 화면에 자동으로 정리됩니다.</div>
+    <div class="todo">아직 검증 전입니다. 먼저 제품 방향을 정리한 뒤 현재 단계의 검증을 실행하세요.</div>
 
     <div class="hero">
       <div class="eyebrow">여기만 보세요</div>
@@ -93,13 +93,13 @@ Use this file to keep user decisions, assumptions, and gate status from getting 
       <p style="font-size:13px;color:var(--muted)">지금 유저가 실제로 봐야 할 산출물 2~4개만. 각 항목 = 무엇을 확인/결정할지 1줄. 나머지는 근거.</p>
     </div>
 
-    <section><h2>1. 현재 상태</h2><p style="font-size:13px;color:var(--muted)">단계 · pass/fail/ACCEPT-FLAG · 이유.</p></section>
-    <section><h2>2. 지금 당신의 결정 대기</h2><p style="font-size:13px;color:var(--muted)">각 결정 = Approve / Change / Hold · 영향 · 바뀔 파일.</p></section>
+    <section><h2>1. 현재 상태</h2><p style="font-size:13px;color:var(--muted)">현재 단계와 아직 해결하지 않은 내용을 보여줍니다.</p></section>
+    <section><h2>2. 지금 필요한 결정</h2><p style="font-size:13px;color:var(--muted)">확정, 수정 또는 보류할 내용과 영향을 보여줍니다.</p></section>
     <section><h2>3. 유저플로우 스냅샷</h2><p style="font-size:13px;color:var(--muted)">진입→게이트→커밋→결과→복구 압축 맵 (텍스트 아닌 시각 우선).</p></section>
     <section><h2>4. 경험 설계 스냅샷</h2><p style="font-size:13px;color:var(--muted)">주요 화면 · 흐름 · 상태 · 아직 정하지 않은 시각 디자인.</p></section>
-    <section><h2>5. 스코프</h2><p style="font-size:13px;color:var(--muted)">P0 / P1 / P2 · 명시적 scope-out.</p></section>
+    <section><h2>5. 첫 버전 범위</h2><p style="font-size:13px;color:var(--muted)">지금 포함할 것, 다음으로 미룰 것, 하지 않을 것을 보여줍니다.</p></section>
     <section><h2>6. 산출물 지도</h2><p style="font-size:13px;color:var(--muted)">각 md = 1줄 목적 + 상태 + 핵심(★) 표시. 링크로 상세 연결.</p></section>
-    <section><h2>7. 근거 / 갭</h2><p style="font-size:13px;color:var(--muted)">observed / user-confirmed / proposed / assumed / unverified.</p></section>
+    <section><h2>7. 근거와 빈틈</h2><p style="font-size:13px;color:var(--muted)">직접 확인한 내용, 사용자가 확인한 내용, 제안, 가정과 미확인 내용을 구분합니다.</p></section>
     <section><h2>8. 다음 단계</h2><p style="font-size:13px;color:var(--muted)">추천 스킬 1개 · 이유 · 산출물.</p></section>
   </div>
 </body>
@@ -141,6 +141,40 @@ Use this file to keep user decisions, assumptions, and gate status from getting 
 
 - Use product-blueprint:parallel-concepts.
 """,
+    "01-lite-direction.md": """# Lite Direction
+
+## Evidence Or Ideation Basis
+
+## Compared Product Directions
+
+## Confirmed Product Direction
+
+## Positioning And Working Brand
+
+## Known Assumptions And Risks
+
+## Decision References
+""",
+    "02-lite-plan.md": """# Lite Product Plan
+
+## Target User And Core Job
+
+## Core Loop
+
+## First-Version Scope And Non-Goals
+
+## Essential Mechanisms And Trust Behavior
+
+## User Stories And Acceptance Outcomes
+
+## Entry Points, Screens, And Critical States
+
+## Feasibility Limits
+
+## Confirmed Product Definition
+
+## Open Questions
+""",
     "01.5-reference-deconstruction.md": """# Reference Deconstruction
 
 ## Evidence Map
@@ -177,7 +211,7 @@ Use this file to keep user decisions, assumptions, and gate status from getting 
 
 ## Next Step
 
-- Lock one direction, then use product-blueprint:positioning-brand.
+- Ask the user to confirm one direction, then use product-blueprint:positioning-brand.
 """,
     "01.8-positioning-brand.md": """# Positioning & Brand
 
@@ -271,7 +305,7 @@ Not legal advice — real counsel reviews before launch.
 
 ## Next Step
 
-- 미분류 행 0이 될 때까지 engineering handoff 준비 완료 선언 금지 (references/coverage-self-audit.md).
+- 미분류 행이 남아 있으면 흐름과 화면 계약을 먼저 보완합니다.
 """,
     "02-prd.md": """# PRD
 
@@ -519,6 +553,26 @@ Cover first use, returning, route/deep link, auth gate, external/notification, r
 
 - After explicit user choice, use product-blueprint:art-direction-brief to codify the selected direction.
 """,
+    "03.8-key-screen-review.md": """# Key Screen Review
+
+## Representative Surface And Why
+
+## Narrow Viewport Evidence
+
+## Wide Viewport Evidence
+
+## Critical State Evidence
+
+## Product And Visual Critique
+
+## Revisions Applied
+
+## User Decision
+
+## Expansion Boundary
+
+- Do not expand to the full design system until the key-screen validator passes.
+""",
     "04.1-visual-quality-gate.md": """# Visual Quality Gate
 
 ## Verdict
@@ -535,7 +589,7 @@ Cover first use, returning, route/deep link, auth gate, external/notification, r
 
 ## Next Step
 
-- Use product-blueprint:backend-systems-brief and product-blueprint:design-system.
+- If the all-P0 visual gate passes, continue to clickable-demo or final design critique. Route failures to the named screen or design-system owner.
 """,
     "04.2-backend-systems-brief.md": """# Backend Systems Brief
 
@@ -557,7 +611,7 @@ Cover first use, returning, route/deep link, auth gate, external/notification, r
 
 ## Next Step
 
-- Use product-blueprint:design-system or product-blueprint:feasibility-review.
+- Use product-blueprint:design-brief. Visual design begins later only through the optional design-production workflow.
 """,
     "04.3-design-system.md": """# Design System
 
@@ -722,11 +776,13 @@ def main() -> int:
         help="Also add optional visual-design, prototype, acceptance, and handoff scaffolds",
     )
     args = parser.parse_args()
+    if args.lite and args.with_design:
+        parser.error("Lite stops at compact planning. Re-initialize or upgrade to Standard before --with-design.")
 
     target = Path(args.root).expanduser() / slugify(args.name)
     target.mkdir(parents=True, exist_ok=True)
-    (target / "screenshots").mkdir(exist_ok=True)
     if args.with_design:
+        (target / "screenshots").mkdir(exist_ok=True)
         (target / "prototypes").mkdir(exist_ok=True)
         (target / "tokens").mkdir(exist_ok=True)
 
@@ -737,6 +793,11 @@ def main() -> int:
     manifest["project"]["mode"] = profile
     manifest["evidence"]["demo_file"] = f"prototypes/{slugify(args.name)}-demo.html"
     files = dict(FILES)
+    workflow_state_path = Path(__file__).resolve().parent.parent / "assets" / "templates" / "workflow-state.json"
+    workflow_state = json.loads(workflow_state_path.read_text(encoding="utf-8"))
+    workflow_state["profile"] = profile
+    workflow_state["locale"] = "ko" if re.search(r"[가-힣]", args.name) else "en"
+    files["00-workflow-state.json"] = json.dumps(workflow_state, ensure_ascii=False, indent=2) + "\n"
     files["02.6-service-manifest.json"] = json.dumps(manifest, ensure_ascii=False, indent=2) + "\n"
     product_definition_path = Path(__file__).resolve().parent.parent / "assets" / "templates" / "product-definition.json"
     files["02.1-product-definition.json"] = product_definition_path.read_text(encoding="utf-8")
@@ -746,14 +807,16 @@ def main() -> int:
     files["02.05-planning-quality-review.json"] = json.dumps(planning_review, ensure_ascii=False, indent=2) + "\n"
     design_acceptance_path = Path(__file__).resolve().parent.parent / "assets" / "templates" / "design-acceptance.json"
     files["05-design-acceptance.json"] = design_acceptance_path.read_text(encoding="utf-8")
+    visual_direction_path = Path(__file__).resolve().parent.parent / "assets" / "templates" / "visual-direction-review.json"
+    files["03.4-visual-directions.json"] = visual_direction_path.read_text(encoding="utf-8")
+    key_screen_path = Path(__file__).resolve().parent.parent / "assets" / "templates" / "key-screen-review.json"
+    files["03.8-key-screen-review.json"] = key_screen_path.read_text(encoding="utf-8")
 
     PLANNING_FILES = {
         "00-brief.md",
         "00-decision-log.md",
+        "00-workflow-state.json",
         "00-review-dashboard.html",
-        "01-reference-research.md",
-        "01-ideation.md",
-        "01.5-reference-deconstruction.md",
         "01.6-parallel-concepts.md",
         "01.8-positioning-brand.md",
         "02-mechanisms.md",
@@ -772,28 +835,20 @@ def main() -> int:
 
     LITE_FILES = {
         "00-brief.md",
-        "00-decision-log.md",
+        "00-workflow-state.json",
         "00-review-dashboard.html",
-        "01-reference-research.md",
-        "01-ideation.md",
-        "01.6-parallel-concepts.md",
-        "01.8-positioning-brand.md",
-        "02-mechanisms.md",
-        "02-prd.md",
-        "02.05-planning-quality-review.md",
-        "02.05-planning-quality-review.json",
-        "02.1-product-definition.json",
-        "02.5-screen-contracts.md",
+        "01-lite-direction.md",
+        "02-lite-plan.md",
         "02.6-service-manifest.json",
-        "02.7-feasibility-checkpoint.md",
-        "02.8-undefined-surfaces.md",
-        "03-storyboard.html",
         "03-design-brief.md",
     }
 
     DESIGN_FILES = {
         "03.5-art-direction-brief.md",
         "03.4-visual-directions.md",
+        "03.4-visual-directions.json",
+        "03.8-key-screen-review.md",
+        "03.8-key-screen-review.json",
         "03.7-ux-writing.md",
         "04.1-visual-quality-gate.md",
         "04.3-design-system.md",

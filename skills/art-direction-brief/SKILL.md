@@ -5,7 +5,7 @@ description: Codifies the user-chosen visual direction into a measured art-direc
 
 # Product Blueprint Art Direction Brief
 
-Use this before the representative high-fidelity screen. Art direction is not decoration; it is the product's visual point of view. Read `03-design-brief.md`, `03.4-visual-directions.md`, and the decision-log entry that records the user's chosen direction. Do not invent a different direction here.
+Use this before the representative high-fidelity screen. Art direction is not decoration; it is the product's visual point of view. Read `03-design-brief.md`, the approved `03.4-visual-directions.json`, its Markdown companion, and the matching workflow-state/decision-log entry. Do not invent a different direction here. Stop if the visual-direction stage has not passed.
 
 Read first: `${CLAUDE_PLUGIN_ROOT}/references/anti-slop-doctrine.md` and `${CLAUDE_PLUGIN_ROOT}/references/measured-design-spec.md`. This brief is the input to the token substrate and the craft loop, so it must end in **numbers, not adjectives**.
 
@@ -65,6 +65,5 @@ Create `03.5-art-direction-brief.md` with:
 
 ## Next Step
 
-- Produce one representative high-fidelity screen and its critical states from this brief.
-- Run `product-blueprint:visual-quality-gate` and return the screen to the user for feedback.
+- Use `product-blueprint:key-screen-exploration` to produce, review, and explicitly approve one representative high-fidelity screen and its critical states.
 - Use `product-blueprint:design-system` only after the representative screen establishes an explicitly approved quality ceiling.

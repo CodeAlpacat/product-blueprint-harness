@@ -15,6 +15,7 @@ Create and maintain `05-design-acceptance.json`. Read `references/design-accepta
 ## Hard prerequisites
 
 - user-confirmed product definition and passing contract stage;
+- passing visual-direction and key-screen stages with current workflow-state decisions;
 - passing browser runtime report for the whole-service demo;
 - all-P0 workbench/demo, required states, responsive evidence, UX copy, critique, risk/feasibility, and undefined-surface audit;
 - a dependency-light React visual implementation (or existing-app React sources) where ComponentBoard, DepthBoard, FlowPreview, and P0 screens share components and use fixture-only data;
@@ -25,7 +26,7 @@ Create and maintain `05-design-acceptance.json`. Read `references/design-accepta
 1. Build the component contract inventory from the React design workbench. Record each component's source ref.
 2. Record the implementation-fidelity manifest and hash its component board, Depth board, Flow preview, component sources, and screen sources. Standalone HTML cannot satisfy this manifest.
 3. Capture one current, readable image artifact for every non-background P0 surface × release viewport from those React sources. Each row lists its render source ref, required state IDs, and component IDs.
-4. Hash every bound product/design source and every visual evidence file.
+4. Hash every bound product/design source and every visual evidence file, including `00-workflow-state.json`, `03.4-visual-directions.json`, and `03.8-key-screen-review.json`.
 5. Import the final developer-lens consultation from `04.5-feasibility-review.md`. Cover every P0 surface/action/operation/journey with the required lens and one verdict: `feasible`, `feasible-with-constraint`, or `infeasible`.
 6. Block on `infeasible`. For every conditional constraint, revise the product/design artifact that owns the user-visible consequence, then regenerate prototype and visual evidence.
 7. Run the design-stage validator while approval is pending. Fix deterministic coverage/staleness failures first.
@@ -43,8 +44,8 @@ For every persona and included P0 requirement, record the journeys walked and th
 
 ## Change discipline
 
-Any accepted source or feasibility change invalidates acceptance and handoff. Keep the old evidence as review history if useful, but never preserve its passing status or hashes.
+Any accepted source, workflow decision, or feasibility change invalidates acceptance and handoff. Invalidate the earliest affected workflow gate. Keep the old evidence as review history if useful, but never preserve its passing status or hashes.
 
 ## Next step
 
-After `design-pass`, create the product/design handoff and stop by default. A separate technical-design workflow begins only when the user explicitly asks for it.
+After `design-pass`, create the product/design handoff and run the separate handoff stage. Do not claim `design_handoff_ready` from a design-stage pass. A separate technical-design workflow begins only when the user explicitly asks for it after `handoff-pass`.

@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "status": "user-approved",
+  "comparison_setup": {
+    "surface_id": "home",
+    "viewport": "800x600",
+    "state_id": "home-loading",
+    "content_fixture": "public-catalogue-fixture-v1"
+  },
+  "directions": [
+    {
+      "id": "calm-catalogue",
+      "thesis": "A quiet catalogue makes public inspection and recovery feel dependable.",
+      "differentiators": [
+        "warm neutral canvas",
+        "soft grouped item cards",
+        "green action hierarchy"
+      ],
+      "evidence": [
+        {
+          "file": "screenshots/direction-calm.svg",
+          "sha256": "cdae017d14e5857506a54c444cbae6e764777497ad82a1384a7781e02ce97186",
+          "surface_id": "home",
+          "viewport": "800x600",
+          "state_id": "home-loading",
+          "content_fixture": "public-catalogue-fixture-v1"
+        }
+      ]
+    },
+    {
+      "id": "editorial-index",
+      "thesis": "A high-contrast editorial index makes browsing feel curated and expressive.",
+      "differentiators": [
+        "serif display typography",
+        "hard rules and asymmetry",
+        "brick-red action accent"
+      ],
+      "evidence": [
+        {
+          "file": "screenshots/direction-editorial.svg",
+          "sha256": "24f5f03f795433dc4d738c4aab5e65158754669f4c9cc7d41cec853d37073ad3",
+          "surface_id": "home",
+          "viewport": "800x600",
+          "state_id": "home-loading",
+          "content_fixture": "public-catalogue-fixture-v1"
+        }
+      ]
+    }
+  ],
+  "selected_direction_id": "calm-catalogue",
+  "approval": {
+    "kind": "explicit-user",
+    "decision_ref": "DEC-18",
+    "approved_at": "2026-07-20T00:15:00Z",
+    "evidence": "The user selected calm-catalogue after comparing the same home loading setup."
+  },
+  "source_hashes": {
+    "03-design-brief.md": "fb14891882c04b5fec60166fe4d897a58ea5fffb0dffcdf91f94a4235c152f3d",
+    "03.4-visual-directions.md": "288b1f77e7250b99071adf339cb79ba6b2eb949e7e86a0d962c25e74fd36eb83"
+  }
+}

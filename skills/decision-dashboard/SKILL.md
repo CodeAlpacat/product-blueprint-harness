@@ -1,65 +1,41 @@
 ---
 name: decision-dashboard
-description: Creates a visual HTML review dashboard from Product Blueprint artifacts so users can approve, request changes, or hold decisions without reading every markdown file. Use after any planning phase when markdown artifacts are too long or when the user wants fast visual review and next-step decisions.
+description: Regenerates the Product Blueprint review dashboard from workflow state and validator findings. Use when the user wants a current review surface without trusting hand-authored readiness badges or reading every artifact.
 ---
 
 # Product Blueprint Decision Dashboard
 
-Use this whenever the planning package has several markdown artifacts and the user needs a faster review surface.
+The dashboard is a generated validation view, not a source of truth and not a place to author approval. Its status comes only from the current validator run.
 
-Markdown remains the source of truth. The dashboard is the user's decision cockpit: what changed, what to inspect visually, what must be decided, what is blocked, and which skill runs next.
+## Refresh
 
-## Inputs
+1. Run `scripts/workflow_state.py status <planning-dir> --json` to identify the current gate.
+2. Choose the boundary actually being reviewed: `contract`, `planning`, `visual-direction`, `key-screen`, `prototype`, `design`, or `handoff`.
+3. Run the validator without `--no-write`:
 
-- `00-decision-log.md`
-- Current phase artifact
-- Storyboard and design brief; rendered screens or prototypes only when the optional design-production workflow is active
-- Screenshots when available
-- Open questions and gate status
-- `02.05-planning-quality-review.json` when the PRD draft exists
-- `05-readiness-report.json` when design readiness has run
+   ```bash
+   python3 scripts/validate_service_blueprint.py <planning-dir> --stage <stage>
+   ```
 
-## Output
+This atomically writes `00-validation-report.{json,md}` and regenerates `00-review-dashboard.html`. Handoff additionally writes `05-readiness-report.{json,md}`.
 
-Create or update:
+## What the generated view shows
 
-- `00-review-dashboard.html`
-
-## Required Sections
-
-1. **Current Status**: phase, pass/fail (+ACCEPT-FLAG), and why.
-2. **Review This First (핵심 2~4)**: the 2–4 artifacts the user must actually look at now, each marked ★, each with a one-line "what to confirm/decide." Do not list all artifacts here — only the few that matter this phase.
-3. **Decision Queue**: each decision as `Approve`, `Change`, or `Hold`; include impact and the file that changes.
-4. **Flow Snapshot**: compact user-flow map with entry, gate, commitment, result, and recovery.
-5. **Experience / Design Boundary**: current screens and flows, what visual design has not started or approved, and the design brief when ready.
-6. **Scope Snapshot**: P0/P1/P2 and explicit scope-out.
-7. **Artifact Map**: every artifact grouped (planning / spec / design), each with a one-line purpose + status, so the founder sees the whole package at a glance and knows which are ★-key vs supporting evidence.
-8. **Evidence / Gaps**: what is observed, user-confirmed, proposed, assumed, or unverified.
-9. **Next Step**: one recommended skill, why, and what it will produce.
-
-During the planning-quality phase, show the six review perspectives, unresolved issue counts, whether the review is current, and the recommended first-version scope. Keep internal severity and hash mechanics in the detail view; do not make the founder open the review JSON.
+- current stage, profile, and exact validator status
+- every recorded user-decision gate and its decision reference
+- artifacts required at the selected stage, with local links and present/missing state
+- current structural-consistency findings and their owning artifact
+- an explicit limitation that the validator does not prove market demand, planning quality, design taste, or implementation readiness
 
 ## Rules
 
-- **Update after every phase — mandatory, not on request.** The orchestrator finishes a phase by refreshing this dashboard. Never ship 10+ markdown files while the dashboard is still the init stub. A stale/stub dashboard while artifacts pile up is the single most common way the founder ends up overwhelmed ("too many docs, don't know what to look at").
-- Do not duplicate entire markdown contents.
-- Put the user's decisions and visual evidence first.
-- Link to markdown files for details.
-- Keep the dashboard readable in one browser tab.
-- Use Korean when the user is Korean.
-- Show unresolved issues honestly; do not make a polished dashboard hide missing work.
-- When production design is not ready, say so visibly.
-- Dashboard readiness is derived, never self-declared. Its root element carries a status matching the latest report.
-- At the default finish line, say `기획 완료 · 시각 디자인 미진행`. Show design approval only when the separate design-production workflow has current evidence and explicit user approval.
-- Keep manifest hashes and internal readiness field names in a collapsible technical detail area, not the primary user summary.
-- If the current manifest hash differs from the report hash, show `stale/fail` and rerun `design-readiness`; do not preserve an old green badge.
-
-## Pass / Fail
-
-Pass if the user can answer "what do I need to look at and decide next?" within 30 seconds.
-
-Fail if the dashboard is just a markdown dump in HTML, hides open questions, or does not link to the concrete artifact to inspect next.
+- Never hand-edit a green badge or `data-readiness-status`.
+- An empty or stale dashboard is not an input pass condition; rerun the validator to replace it.
+- Early in planning, a failing dashboard with missing artifacts is expected. The next workflow gate comes from `workflow_state.py status`, not from hiding those findings.
+- Keep user decisions in the decision log and workflow state. The dashboard only displays recorded state.
+- A `planning-structure-pass` still requires human review of product judgment. A `design-pass` is not a handoff pass.
+- When a source decision changes, invalidate the earliest affected gate and regenerate downstream work before refreshing the dashboard.
 
 ## Next Step
 
-- 사용자가 결정할 것: 없음 — 대시보드 갱신은 매 단계 자동 의무. 유저에게는 "지금 볼 것 2~4개"만 노출.
+Return the user to the `next_skill` reported by workflow state, or to the finding owner when validation fails.

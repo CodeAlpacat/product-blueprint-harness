@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import importlib.util
 import json
 import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -49,6 +51,24 @@ class ServiceBlueprintValidatorTest(unittest.TestCase):
     def write_product_definition(self, definition: dict) -> None:
         (self.root / "02.1-product-definition.json").write_text(json.dumps(definition, indent=2) + "\n", encoding="utf-8")
 
+    def workflow_state(self) -> dict:
+        return json.loads((self.root / "00-workflow-state.json").read_text(encoding="utf-8"))
+
+    def write_workflow_state(self, state: dict) -> None:
+        (self.root / "00-workflow-state.json").write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
+
+    def visual_direction(self) -> dict:
+        return json.loads((self.root / "03.4-visual-directions.json").read_text(encoding="utf-8"))
+
+    def write_visual_direction(self, review: dict) -> None:
+        (self.root / "03.4-visual-directions.json").write_text(json.dumps(review, indent=2) + "\n", encoding="utf-8")
+
+    def key_screen(self) -> dict:
+        return json.loads((self.root / "03.8-key-screen-review.json").read_text(encoding="utf-8"))
+
+    def write_key_screen(self, review: dict) -> None:
+        (self.root / "03.8-key-screen-review.json").write_text(json.dumps(review, indent=2) + "\n", encoding="utf-8")
+
     def design_acceptance(self) -> dict:
         return json.loads((self.root / "05-design-acceptance.json").read_text(encoding="utf-8"))
 
@@ -58,6 +78,28 @@ class ServiceBlueprintValidatorTest(unittest.TestCase):
     @staticmethod
     def codes(report: dict) -> set[str]:
         return {finding["code"] for finding in report["findings"]}
+
+    def convert_to_lite(self) -> None:
+        manifest = self.manifest()
+        manifest["project"]["mode"] = "lite"
+        self.write_manifest(manifest)
+        state = self.workflow_state()
+        state["profile"] = "lite"
+        state["current_phase"] = "planning"
+        self.write_workflow_state(state)
+        (self.root / "01-lite-direction.md").write_text(
+            "# Lite Direction\n\n" + (self.root / "01-ideation.md").read_text(encoding="utf-8"),
+            encoding="utf-8",
+        )
+        (self.root / "02-lite-plan.md").write_text(
+            "# Lite Plan\n\n" + (self.root / "02-prd.md").read_text(encoding="utf-8") * 2,
+            encoding="utf-8",
+        )
+        for relative in MODULE.STANDARD_ARTIFACTS:
+            if relative not in MODULE.LITE_ARTIFACTS:
+                path = self.root / relative
+                if path.is_file():
+                    path.unlink()
 
     def test_ac10_valid_standard_passes(self) -> None:
         report = self.validate()
@@ -113,6 +155,29 @@ class ServiceBlueprintValidatorTest(unittest.TestCase):
         prd.write_text(prd.read_text(encoding="utf-8") + "\nChanged after review.\n", encoding="utf-8")
         report = self.validate(stage="contract")
         self.assertIn("PLANNING_REVIEW_STALE", self.codes(report))
+
+    def test_blank_core_markdown_cannot_pass_with_refreshed_hash(self) -> None:
+        prd = self.root / "02-prd.md"
+        prd.write_text("# PRD\n", encoding="utf-8")
+        review = self.planning_review()
+        review["input_hashes"]["02-prd.md"] = hashlib.sha256(prd.read_bytes()).hexdigest()
+        self.write_planning_review(review)
+        report = self.validate(stage="planning")
+        self.assertIn("ARTIFACT_CONTENT_INCOMPLETE", self.codes(report))
+
+    def test_planning_requires_substantive_research_or_ideation_evidence(self) -> None:
+        review = self.planning_review()
+        review["evidence_sources"] = []
+        self.write_planning_review(review)
+        report = self.validate(stage="contract")
+        self.assertIn("PLANNING_EVIDENCE_MISSING", self.codes(report))
+
+    def test_recorded_brand_gate_is_required(self) -> None:
+        state = self.workflow_state()
+        state["gates"]["brand-direction"]["status"] = "pending"
+        self.write_workflow_state(state)
+        report = self.validate(stage="contract")
+        self.assertIn("WORKFLOW_GATE_UNCONFIRMED", self.codes(report))
 
     def test_ac02_false_readiness_claim_fails(self) -> None:
         manifest = self.manifest()
@@ -180,30 +245,27 @@ class ServiceBlueprintValidatorTest(unittest.TestCase):
         self.assertFalse(report["user_validated"])
 
     def test_ac12_lite_can_pass_but_is_not_engineering_ready(self) -> None:
-        manifest = self.manifest()
-        manifest["project"]["mode"] = "lite"
-        self.write_manifest(manifest)
-        planning_review = self.planning_review()
-        planning_review["profile"] = "lite"
-        self.write_planning_review(planning_review)
-        for relative in MODULE.STANDARD_ARTIFACTS:
-            if relative not in MODULE.LITE_ARTIFACTS:
-                path = self.root / relative
-                if path.exists():
-                    path.unlink()
-        report = self.validate()
-        self.assertEqual(report["status"], "lite-pass")
+        self.convert_to_lite()
+        report = self.validate(stage="planning")
+        self.assertEqual(report["status"], "lite-planning-pass")
+        self.assertTrue(report["planning_ready"])
+        self.assertFalse(report["design_handoff_ready"])
         self.assertFalse(report["engineering_ready"])
 
     def test_lite_manifest_cannot_be_an_empty_scaffold(self) -> None:
+        self.convert_to_lite()
         manifest = self.manifest()
-        manifest["project"]["mode"] = "lite"
         manifest["surfaces"] = []
         manifest["actions"] = []
         manifest["journeys"] = []
         self.write_manifest(manifest)
         report = self.validate(stage="contract")
         self.assertIn("CONTRACT_COLLECTION_EMPTY", self.codes(report))
+
+    def test_lite_stops_before_design_stages(self) -> None:
+        self.convert_to_lite()
+        report = self.validate(stage="visual-direction")
+        self.assertIn("LITE_DESIGN_UNSUPPORTED", self.codes(report))
 
     def test_unconfirmed_product_definition_blocks_contract(self) -> None:
         definition = self.product_definition()
@@ -325,6 +387,26 @@ class ServiceBlueprintValidatorTest(unittest.TestCase):
         self.assertEqual(written["manifest_sha256"], report["manifest_sha256"])
         self.assertIn("Status: **handoff-pass**", (self.root / "05-readiness-report.md").read_text(encoding="utf-8"))
 
+    def test_stage_report_regenerates_an_empty_dashboard(self) -> None:
+        dashboard = self.root / "00-review-dashboard.html"
+        dashboard.write_text("", encoding="utf-8")
+        report = self.validate(stage="planning")
+        MODULE.write_stage_report(self.root, report)
+        rendered = dashboard.read_text(encoding="utf-8")
+        self.assertIn('data-readiness-status="planning-structure-pass"', rendered)
+        self.assertIn("does not prove market demand", rendered)
+        self.assertTrue((self.root / "00-validation-report.json").is_file())
+
+    def test_generated_dashboard_uses_recorded_korean_locale(self) -> None:
+        state = self.workflow_state()
+        state["locale"] = "ko"
+        self.write_workflow_state(state)
+        report = self.validate(stage="planning")
+        MODULE.write_stage_report(self.root, report)
+        rendered = (self.root / "00-review-dashboard.html").read_text(encoding="utf-8")
+        self.assertIn("기획 판단의 품질", rendered)
+        self.assertIn("첫 버전 범위", rendered)
+
     def test_runtime_report_must_match_current_manifest_and_demo_hashes(self) -> None:
         runtime = self.root / "04.37-runtime-verification.json"
         report = json.loads(runtime.read_text(encoding="utf-8"))
@@ -358,8 +440,9 @@ class ServiceBlueprintValidatorTest(unittest.TestCase):
                 if path.is_file():
                     path.unlink()
         report = self.validate(stage="planning")
-        self.assertEqual(report["status"], "planning-pass")
+        self.assertEqual(report["status"], "planning-structure-pass")
         self.assertTrue(report["planning_ready"])
+        self.assertFalse(report["planning_quality_validated"])
         self.assertFalse(report["prototype_ready"])
         self.assertFalse(report["design_accepted"])
 
@@ -368,6 +451,58 @@ class ServiceBlueprintValidatorTest(unittest.TestCase):
         report = self.validate(stage="planning")
         self.assertIn("REQUIRED_ARTIFACT_MISSING", self.codes(report))
 
+    def test_visual_direction_stage_passes_before_key_screen(self) -> None:
+        for relative in MODULE.STANDARD_ARTIFACTS:
+            if relative not in MODULE.VISUAL_DIRECTION_ARTIFACTS:
+                path = self.root / relative
+                if path.is_file():
+                    path.unlink()
+        report = self.validate(stage="visual-direction")
+        self.assertEqual(report["status"], "visual-direction-pass")
+        self.assertTrue(report["visual_direction_approved"])
+        self.assertFalse(report["key_screen_approved"])
+
+    def test_visual_direction_markdown_cannot_be_blank_after_hash_refresh(self) -> None:
+        artifact = self.root / "03.4-visual-directions.md"
+        artifact.write_text("# Visual Directions\n", encoding="utf-8")
+        review = self.visual_direction()
+        review["source_hashes"]["03.4-visual-directions.md"] = hashlib.sha256(artifact.read_bytes()).hexdigest()
+        self.write_visual_direction(review)
+        report = self.validate(stage="visual-direction")
+        self.assertIn("ARTIFACT_CONTENT_INCOMPLETE", self.codes(report))
+
+    def test_visual_directions_must_use_the_same_comparison_setup(self) -> None:
+        review = self.visual_direction()
+        review["directions"][1]["evidence"][0]["state_id"] = "detail-error"
+        self.write_visual_direction(review)
+        report = self.validate(stage="visual-direction")
+        self.assertIn("VISUAL_COMPARISON_MISMATCH", self.codes(report))
+
+    def test_key_screen_stage_passes_before_system_expansion(self) -> None:
+        for relative in MODULE.STANDARD_ARTIFACTS:
+            if relative not in MODULE.KEY_SCREEN_ARTIFACTS:
+                path = self.root / relative
+                if path.is_file():
+                    path.unlink()
+        report = self.validate(stage="key-screen")
+        self.assertEqual(report["status"], "key-screen-pass")
+        self.assertTrue(report["key_screen_approved"])
+        self.assertFalse(report["prototype_ready"])
+
+    def test_key_screen_review_markdown_must_be_substantive(self) -> None:
+        (self.root / "03.8-key-screen-review.md").write_text("# Key Screen\n", encoding="utf-8")
+        report = self.validate(stage="key-screen")
+        self.assertIn("ARTIFACT_CONTENT_INCOMPLETE", self.codes(report))
+
+    def test_key_screen_state_must_belong_to_the_selected_surface(self) -> None:
+        review = self.key_screen()
+        review["critical_state_ids"] = ["detail-error"]
+        for row in review["evidence"]:
+            row["state_ids"] = ["detail-error"]
+        self.write_key_screen(review)
+        report = self.validate(stage="key-screen")
+        self.assertIn("KEY_SCREEN_STATE_INVALID", self.codes(report))
+
     def test_design_stage_rejects_design_brief_changed_after_approval(self) -> None:
         brief = self.root / "03-design-brief.md"
         brief.write_text(brief.read_text(encoding="utf-8") + "\nChanged after approval.\n", encoding="utf-8")
@@ -375,7 +510,6 @@ class ServiceBlueprintValidatorTest(unittest.TestCase):
         self.assertIn("DESIGN_BASELINE_STALE", self.codes(report))
 
     def test_prototype_stage_does_not_require_handoff_yet(self) -> None:
-        (self.root / "04.4-prototype-test.md").unlink()
         (self.root / "05-engineering-handoff.md").unlink()
         report = self.validate(stage="prototype")
         self.assertEqual(report["status"], "prototype-pass")
@@ -394,6 +528,13 @@ class ServiceBlueprintValidatorTest(unittest.TestCase):
         report = self.validate(stage="design")
         self.assertIn("DESIGN_NOT_APPROVED", self.codes(report))
         self.assertFalse(report["design_accepted"])
+
+    def test_design_pass_does_not_claim_handoff_readiness(self) -> None:
+        report = self.validate(stage="design")
+        self.assertEqual(report["status"], "design-pass")
+        self.assertTrue(report["design_accepted"])
+        self.assertFalse(report["design_handoff_ready"])
+        self.assertFalse(report["ready_for_technical_design"])
 
     def test_design_stage_requires_compared_visual_directions(self) -> None:
         (self.root / "03.4-visual-directions.md").unlink()
@@ -465,6 +606,8 @@ class ServiceBlueprintValidatorTest(unittest.TestCase):
         report = self.validate(stage="design")
         self.assertTrue(report["design_owner_approved"])
         self.assertTrue(report["design_accepted"])
+        self.assertFalse(report["design_handoff_ready"])
+        self.assertFalse(report["ready_for_technical_design"])
         self.assertFalse(report["user_validated"])
 
     def test_design_stage_requires_developer_lens_coverage(self) -> None:
@@ -530,6 +673,35 @@ class ServiceBlueprintValidatorTest(unittest.TestCase):
         self.assertFalse(report["technical_design_ready"])
         self.assertFalse(report["implementation_ready"])
         self.assertFalse(report["engineering_ready"])
+
+    def test_resume_router_recognizes_a_current_handoff_pass(self) -> None:
+        report = self.validate(stage="handoff")
+        MODULE.write_stage_report(self.root, report)
+        result = subprocess.run(
+            ["python3", str(ROOT / "scripts" / "workflow_state.py"), "status", str(self.root), "--json"],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        status = json.loads(result.stdout)
+        self.assertEqual(status["phase"], "handoff-complete")
+        self.assertEqual(status["next_skill"], "complete")
+
+    def test_resume_router_rejects_changed_artifact_after_a_pass(self) -> None:
+        report = self.validate(stage="handoff")
+        MODULE.write_stage_report(self.root, report)
+        prd = self.root / "02-prd.md"
+        prd.write_text(prd.read_text(encoding="utf-8") + "\nChanged after handoff.\n", encoding="utf-8")
+        result = subprocess.run(
+            ["python3", str(ROOT / "scripts" / "workflow_state.py"), "status", str(self.root), "--json"],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        status = json.loads(result.stdout)
+        self.assertEqual(status["validation_status"], "stale")
+        self.assertEqual(status["phase"], "validation-stale")
+        self.assertIn("02-prd.md", status["stale_artifacts"])
 
 
 if __name__ == "__main__":
